@@ -39,10 +39,17 @@ class LLMSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="")
 
-    google_api_key: str = Field(..., description="Google API key for Gemini")
-    llm_model: str = Field("gemini-2.0-flash", description="Gemini model to use")
+    google_api_key: str = Field("", description="Google API key for Gemini")
+    llm_model: str = Field("gemini-2.0-flash-exp", description="Gemini model to use")
     temperature: float = Field(0.7, ge=0, le=2, description="Generation temperature")
-    max_tokens: int = Field(4096, description="Maximum tokens in response")
+    max_tokens: int = Field(2048, description="Maximum tokens in response")
+    cache_ttl: int = Field(1800, description="LLM response cache TTL in seconds")
+    enable_cache: bool = Field(True, description="Enable LLM response caching")
+
+    @property
+    def api_key(self) -> str:
+        """Alias for google_api_key for compatibility."""
+        return self.google_api_key
 
 
 class DatabaseSettings(BaseSettings):

@@ -1,0 +1,158 @@
+# ===========================================
+# ML Model Configuration
+# ===========================================
+# Hyperparameters and settings for ML models
+
+# -------------------------------------------
+# Ticket Duration Estimator
+# -------------------------------------------
+ticket_estimator:
+  # Model type: lightgbm, random_forest, linear
+  model_type: lightgbm
+
+  # Target variable
+  target: cycle_time_hours
+
+  # Features to use
+  features:
+    numerical:
+      - story_points
+      - description_length
+      - num_components
+      - num_labels
+      - num_subtasks
+      - num_links
+      - has_attachments
+      - assignee_avg_cycle_time_30d
+      - assignee_completion_rate_30d
+      - assignee_current_wip
+    categorical:
+      - issue_type
+      - priority
+      - component_primary
+    temporal:
+      - created_day_of_week
+      - created_hour
+      - sprint_day_created
+
+  # LightGBM hyperparameters
+  lightgbm:
+    objective: regression
+    metric: mae
+    num_leaves: 31
+    learning_rate: 0.05
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    min_child_samples: 20
+    verbose: -1
+    n_estimators: 200
+    early_stopping_rounds: 50
+
+  # Training settings
+  training:
+    test_size: 0.2
+    cv_folds: 5
+    random_state: 42
+
+  # Data filtering
+  filtering:
+    min_cycle_time_hours: 1
+    max_cycle_time_hours: 500
+    min_samples: 100
+
+# -------------------------------------------
+# Sprint Risk Scorer
+# -------------------------------------------
+sprint_risk:
+  # Model type: lightgbm, rule_based, hybrid
+  model_type: hybrid
+
+  # Target variable (for ML model)
+  target: sprint_completed_on_time
+
+  # Rule-based weights (for composite score)
+  weights:
+    completion_gap: 0.30
+    velocity_ratio: 0.25
+    blocked_ratio: 0.20
+    scope_creep: 0.15
+    urgency: 0.10
+
+  # Risk thresholds
+  thresholds:
+    low: 30      # 0-30: Low risk (green)
+    medium: 60   # 31-60: Medium risk (orange)
+    high: 100    # 61-100: High risk (red)
+
+  # LightGBM hyperparameters (if using ML)
+  lightgbm:
+    objective: binary
+    metric: auc
+    num_leaves: 15
+    learning_rate: 0.05
+    feature_fraction: 0.7
+    n_estimators: 100
+
+# -------------------------------------------
+# Workload Scorer
+# -------------------------------------------
+workload_scorer:
+  # Components and weights for workload calculation
+  components:
+    wip_points:
+      weight: 0.35
+      description: "Story points currently in progress"
+    worklog_hours:
+      weight: 0.25
+      description: "Hours logged in last 7 days"
+    assigned_count:
+      weight: 0.25
+      description: "Total assigned unresolved tickets"
+    overdue_count:
+      weight: 0.15
+      description: "Number of overdue tickets"
+
+  # Alert thresholds (relative to team average)
+  thresholds:
+    overloaded: 1.3   # > 130% of average
+    underloaded: 0.7  # < 70% of average
+
+  # Burn-out risk indicators
+  burnout_indicators:
+    overtime_ratio_threshold: 1.2
+    weekend_work_frequency_threshold: 0.2
+    velocity_decline_weeks: 4
+    sustained_high_wip_days: 5
+    sustained_high_wip_threshold: 5
+
+# -------------------------------------------
+# Feature Engineering
+# -------------------------------------------
+feature_engineering:
+  # Missing value handling
+  missing_values:
+    numerical: median
+    categorical: mode
+
+  # Outlier handling
+  outliers:
+    method: winsorize
+    limits: [0.01, 0.01]
+
+  # Encoding
+  encoding:
+    categorical: native  # Use LightGBM native categorical support
+
+# -------------------------------------------
+# Model Persistence
+# -------------------------------------------
+persistence:
+  models_dir: models
+  metadata_file: metadata.json
+
+  # Files
+  files:
+    ticket_estimator: ticket_estimator.pkl
+    sprint_risk: sprint_risk.pkl
+    workload_scorer: workload_scorer.pkl

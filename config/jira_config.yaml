@@ -1,0 +1,129 @@
+# ===========================================
+# Jira Configuration
+# ===========================================
+# This file contains Jira-specific mappings that may vary per instance.
+# Override settings from .env if needed.
+
+# -------------------------------------------
+# Custom Fields Mapping
+# -------------------------------------------
+# Find your custom field IDs in Jira Admin > Issues > Custom Fields
+# Or use the REST API: GET /rest/api/3/field
+custom_fields:
+  story_points: customfield_10016
+  epic_link: customfield_10014
+  sprint: customfield_10020
+  # Add more custom fields as needed:
+  # team: customfield_10001
+  # start_date: customfield_10015
+
+# -------------------------------------------
+# Workflow Status Mapping
+# -------------------------------------------
+# Map your Jira statuses to standardized categories
+# This is crucial for cycle time calculations
+status_categories:
+  todo:
+    - "To Do"
+    - "Open"
+    - "Backlog"
+    - "New"
+  in_progress:
+    - "In Progress"
+    - "In Development"
+    - "In Review"
+    - "Code Review"
+    - "Testing"
+    - "QA"
+  blocked:
+    - "Blocked"
+    - "On Hold"
+    - "Waiting"
+  done:
+    - "Done"
+    - "Closed"
+    - "Resolved"
+    - "Released"
+
+# -------------------------------------------
+# Issue Type Mapping
+# -------------------------------------------
+# Map issue types to categories for analysis
+issue_type_categories:
+  feature:
+    - "Story"
+    - "Feature"
+    - "New Feature"
+  bug:
+    - "Bug"
+    - "Defect"
+  task:
+    - "Task"
+    - "Sub-task"
+    - "Technical Task"
+  epic:
+    - "Epic"
+  improvement:
+    - "Improvement"
+    - "Enhancement"
+
+# -------------------------------------------
+# Priority Weights
+# -------------------------------------------
+# Weights for priority scoring (higher = more urgent)
+priority_weights:
+  Highest: 5
+  High: 4
+  Medium: 3
+  Low: 2
+  Lowest: 1
+
+# -------------------------------------------
+# Sync Configuration
+# -------------------------------------------
+sync:
+  # Maximum issues to fetch per API call
+  batch_size: 100
+
+  # Fields to expand in API calls
+  expand:
+    - changelog
+    - renderedFields
+
+  # JQL filters (applied to all syncs)
+  base_jql: ""  # e.g., "project = PROJ AND created >= -365d"
+
+  # Exclude certain issue types from sync
+  exclude_issue_types: []
+
+  # Maximum history to sync (days)
+  max_history_days: 365
+
+# -------------------------------------------
+# Feature Extraction Settings
+# -------------------------------------------
+features:
+  # Time windows for rolling metrics
+  rolling_windows:
+    short: 7   # days
+    medium: 30 # days
+    long: 90   # days
+
+  # Thresholds for derived features
+  thresholds:
+    overdue_buffer_hours: 24  # Grace period before marking overdue
+    high_wip_count: 5         # WIP count considered high
+    long_cycle_time_days: 14  # Cycle time considered long
+
+# -------------------------------------------
+# Sprint Configuration
+# -------------------------------------------
+sprint:
+  # Standard sprint duration in days
+  default_duration_days: 14
+
+  # Working days per sprint (for capacity calculations)
+  working_days_per_sprint: 10
+
+  # Hours per day (for capacity calculations)
+  hours_per_day: 8

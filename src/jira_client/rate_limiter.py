@@ -60,6 +60,15 @@ def _should_retry(exception: BaseException) -> bool:
     return isinstance(exception, (JiraAPIError, ConnectionError, TimeoutError))
 
 
+def _retry_condition(exception: BaseException) -> bool:
+    """
+    Custom retry condition that only retries on retryable errors.
+
+    This prevents retrying on client errors (400) like "board doesn't support sprints".
+    """
+    return _should_retry(exception)
+
+
 def rate_limited(
     max_attempts: int = 3,
     initial_wait: float = 1.0,
@@ -70,6 +79,8 @@ def rate_limited(
     Decorator for rate-limited API calls with exponential backoff.
 
     Uses tenacity for robust retry logic with exponential backoff and jitter.
+    Only retries on rate limit errors (429) and server errors (5xx).
+    Client errors (4xx except 429) are not retried.
 
     Args:
         max_attempts: Maximum number of retry attempts
@@ -94,19 +105,13 @@ def rate_limited(
                 max=max_wait,
                 jitter=jitter,
             ),
-            retry=retry_if_exception_type((Exception,)),
+            retry=_retry_condition,
             before_sleep=_log_retry,
             reraise=True,
         )
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                if _should_retry(e):
-                    raise
-                # Don't retry non-retryable errors
-                raise
+            return func(*args, **kwargs)
 
         return wrapper
 

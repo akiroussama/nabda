@@ -224,7 +224,7 @@ class JiraFetcher:
             state: Filter by state ("active", "closed", "future", or None for all)
 
         Returns:
-            List of sprint dictionaries
+            List of sprint dictionaries (empty if board doesn't support sprints)
         """
         logger.info(f"Fetching sprints for board {board_id}")
 
@@ -270,6 +270,19 @@ class JiraFetcher:
             return all_sprints
 
         except JIRAError as e:
+            # Check if the board doesn't support sprints (Kanban board)
+            error_text = str(e.text).lower() if e.text else ""
+            if (
+                "does not support sprints" in error_text
+                or "ne prend pas les sprints en charge" in error_text
+                or "sprints are not supported" in error_text
+                or e.status_code == 400
+            ):
+                logger.warning(
+                    f"Board {board_id} does not support sprints (likely a Kanban board). "
+                    "Skipping sprint sync."
+                )
+                return []
             logger.error(f"Failed to fetch sprints: {e.text}")
             raise JiraFetchError(f"Failed to fetch sprints: {e.text}") from e
 

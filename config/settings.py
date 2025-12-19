@@ -14,7 +14,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class JiraSettings(BaseSettings):
     """Jira connection settings."""
 
-    model_config = SettingsConfigDict(env_prefix="JIRA_")
+    model_config = SettingsConfigDict(
+        env_prefix="JIRA_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     url: str = Field(..., description="Jira instance URL")
     email: str = Field(..., description="Jira user email")
@@ -37,7 +42,12 @@ class JiraSettings(BaseSettings):
 class LLMSettings(BaseSettings):
     """LLM (Gemini) settings."""
 
-    model_config = SettingsConfigDict(env_prefix="")
+    model_config = SettingsConfigDict(
+        env_prefix="",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     google_api_key: str = Field("", description="Google API key for Gemini")
     llm_model: str = Field("gemini-2.0-flash-exp", description="Gemini model to use")
@@ -55,7 +65,12 @@ class LLMSettings(BaseSettings):
 class DatabaseSettings(BaseSettings):
     """Database settings."""
 
-    model_config = SettingsConfigDict(env_prefix="")
+    model_config = SettingsConfigDict(
+        env_prefix="",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     database_path: str = Field("data/jira.duckdb", description="Path to DuckDB database")
 

@@ -178,14 +178,16 @@ class RealisticDataGenerator:
     def _get_assignable_users(self) -> list:
         """Get users that can be assigned issues."""
         try:
+            # Use correct parameter name for jira-python
             users = self.jira.search_assignable_users_for_projects(
                 username="",
-                project=self.project_key,
+                projectKeys=self.project_key,
                 maxResults=50
             )
             return [{"accountId": u.accountId, "name": u.displayName} for u in users]
         except Exception as e:
             print(f"Warning: Could not fetch assignable users: {e}")
+            # Return empty list - we'll use labels for developer assignment
             return []
 
     def create_sprints(self) -> list:
@@ -269,7 +271,9 @@ class RealisticDataGenerator:
 
     def generate_issue_data(self, category: str, issue_type: str) -> dict:
         """Generate a single issue's data."""
-        templates = ISSUE_TEMPLATES[category][issue_type]
+        # Capitalize issue_type for template lookup (story -> Story)
+        type_key = issue_type.capitalize()
+        templates = ISSUE_TEMPLATES[category][type_key]
         template = random.choice(templates)
 
         if category == "frontend":
@@ -320,8 +324,9 @@ class RealisticDataGenerator:
         # Distribution: 60% current sprint, 25% next, 15% future/backlog
         sprint_distribution = [0.60, 0.25, 0.15]
 
-        # Issue type distribution: 50% Story, 30% Bug, 20% Task
-        type_weights = [("Story", 0.50), ("Bug", 0.30), ("Task", 0.20)]
+        # Issue type distribution - Use labels to distinguish type since project only has "Tâche"
+        # All issues will be "Tâche" but labeled with story/bug/task
+        type_weights = [("story", 0.50), ("bug", 0.30), ("task", 0.20)]
 
         # Category distribution: 55% frontend, 45% backend
         category_weights = [("frontend", 0.55), ("backend", 0.45)]
@@ -377,14 +382,17 @@ class RealisticDataGenerator:
                 status = "To Do"
 
             try:
-                # Build fields
+                # Add issue type as a label since project only has "Tâche"
+                labels = issue_data["labels"] + [f"type-{issue_type}"]
+
+                # Build fields - use "Tâche" for all, distinguish via labels
                 fields = {
                     "project": {"key": self.project_key},
                     "summary": issue_data["summary"],
-                    "issuetype": {"name": issue_data["issue_type"]},
-                    "labels": issue_data["labels"],
+                    "issuetype": {"name": "Tâche"},  # French for Task - only available type
+                    "labels": labels,
                     "priority": {"name": issue_data["priority"]},
-                    self.story_points_field: issue_data["story_points"],
+                    # Story points via label (sp-X) since customfield not on create screen
                 }
 
                 # Add assignee if available

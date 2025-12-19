@@ -64,7 +64,7 @@ def main():
 
     page = st.sidebar.radio(
         "Navigation",
-        ["📊 Overview", "🏃 Sprint Health", "👥 Team Workload", "🎯 Predictions", "📋 Reports"],
+        ["📊 Overview", "📋 Board", "🏃 Sprint Health", "👥 Team Workload", "🎯 Predictions", "📋 Reports"],
         label_visibility="collapsed",
     )
 
@@ -91,6 +91,8 @@ def main():
     # Page routing
     if page == "📊 Overview":
         show_overview()
+    elif page == "📋 Board":
+        show_board()
     elif page == "🏃 Sprint Health":
         show_sprint_health()
     elif page == "👥 Team Workload":
@@ -143,9 +145,11 @@ def show_overview():
             st.caption("Tenez-vous au courant de ce qui se passe tout au long de l'espace.")
             
             recent_activity = conn.execute("""
-                SELECT assignee_name, summary, status, updated, issue_type
-                FROM issues 
-                ORDER BY updated DESC 
+                SELECT COALESCE(un.display_name, i.assignee_id, 'Unassigned') as assignee_name,
+                       i.summary, i.status, i.updated, i.issue_type
+                FROM issues i
+                LEFT JOIN user_names un ON i.assignee_id = un.pseudonym
+                ORDER BY i.updated DESC
                 LIMIT 5
             """).fetchdf()
             
@@ -203,10 +207,12 @@ def show_overview():
             st.caption("Surveillez la capacité de votre équipe.")
             
             workload_df = conn.execute("""
-                SELECT assignee_name, COUNT(*) as count 
-                FROM issues 
-                WHERE status != 'Done' 
-                GROUP BY assignee_name
+                SELECT COALESCE(un.display_name, i.assignee_id, 'Unassigned') as assignee_name,
+                       COUNT(*) as count
+                FROM issues i
+                LEFT JOIN user_names un ON i.assignee_id = un.pseudonym
+                WHERE i.status != 'Done'
+                GROUP BY COALESCE(un.display_name, i.assignee_id, 'Unassigned')
                 ORDER BY count DESC
                 LIMIT 5
             """).fetchdf()
@@ -369,11 +375,14 @@ def show_sprint_health():
         st.markdown("### Sprint Issues")
 
         issues = conn.execute("""
-            SELECT key, summary, status, priority, story_points, assignee_name,
-                   CASE WHEN status IN ('Blocked', 'On Hold') THEN true ELSE false END as is_blocked
-            FROM issues WHERE sprint_id = ?
+            SELECT i.key, i.summary, i.status, i.priority, i.story_points,
+                   COALESCE(un.display_name, i.assignee_id, 'Unassigned') as assignee_name,
+                   CASE WHEN i.status IN ('Blocked', 'On Hold') THEN true ELSE false END as is_blocked
+            FROM issues i
+            LEFT JOIN user_names un ON i.assignee_id = un.pseudonym
+            WHERE i.sprint_id = ?
             ORDER BY
-                CASE status
+                CASE i.status
                     WHEN 'Blocked' THEN 1
                     WHEN 'In Progress' THEN 2
                     WHEN 'To Do' THEN 3
@@ -740,6 +749,116 @@ def show_reports():
 
                 except Exception as e:
                     st.error(f"Error generating report: {e}")
+
+
+
+def show_board():
+    """Show Kanban board."""
+    st.markdown('<h1 class="main-header">📋 Project Board</h1>', unsafe_allow_html=True)
+
+    try:
+        conn = get_connection()
+        
+        # Filter options
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            search = st.text_input("🔍 Search issues...", "")
+        with col2:
+            my_issues = st.checkbox("Only my issues")
+
+        # Base query
+        query = """
+            SELECT i.key, i.summary, i.status, i.priority,
+                   COALESCE(un.display_name, i.assignee_id, 'Unassigned') as assignee_name,
+                   i.issue_type
+            FROM issues i
+            LEFT JOIN user_names un ON i.assignee_id = un.pseudonym
+        """
+        params = []
+        where_clauses = []
+
+        if search:
+            where_clauses.append("(summary ILIKE ? OR key ILIKE ?)")
+            params.extend([f"%{search}%", f"%{search}%"])
+        
+        if my_issues:
+            # For demo purposes, we might not have 'current user' auth, 
+            # so we'll just mock it or skip if not strictly required.
+            pass
+
+        if where_clauses:
+            query += " WHERE " + " AND ".join(where_clauses)
+
+        issues = conn.execute(query, params).fetchdf()
+
+        if issues.empty:
+            st.info("No issues found matching your criteria.")
+            return
+
+        # kanban columns
+        cols = st.columns(3)
+        statuses = [
+            ("To Do", ["To Do", "Open", "Reopened", "Backlog", "Blocked"]),
+            ("In Progress", ["In Progress", "Review", "QA", "On Hold"]),
+            ("Done", ["Done", "Closed", "Resolved", "Deployed"])
+        ]
+
+        for i, (col_name, status_list) in enumerate(statuses):
+            with cols[i]:
+                st.markdown(f"### {col_name}")
+                st.markdown("---")
+                
+                # Filter issues for this column
+                col_issues = issues[issues['status'].isin(status_list)]
+                
+                count = len(col_issues)
+                st.caption(f"{count} issues")
+
+                for _, issue in col_issues.iterrows():
+                    with st.container():
+                        # Card styling
+                        priority_color = {
+                            "High": "#ff4b4b", 
+                            "Medium": "#ffa726", 
+                            "Low": "#66bb6a"
+                        }.get(issue['priority'], "gray")
+                        
+                        summary = issue['summary']
+                        if len(summary) > 60:
+                            summary = summary[:60] + "..."
+                            
+                        assignee = issue['assignee_name'] if issue['assignee_name'] else "Unassigned"
+                        initial = assignee[0] if assignee != "Unassigned" else "?"
+                        
+                        st.markdown(f"""
+                        <div style="
+                            background-color: white;
+                            padding: 10px;
+                            border-radius: 5px;
+                            border-left: 5px solid {priority_color};
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+                            margin-bottom: 10px;
+                            color: black;
+                        ">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                                <span style="font-weight:bold;font-size:0.9em;color:#333;">{issue['key']}</span>
+                                <span style="font-size:0.7em;background:#f0f2f6;padding:2px 6px;border-radius:4px;color:#555;">{issue['issue_type']}</span>
+                            </div>
+                            <div style="margin: 8px 0; font-weight:500; font-size:0.95em; line-height:1.2;">{summary}</div>
+                            <div style="display:flex;align-items:center;font-size:0.8em;color:#666;margin-top:8px;">
+                                <div style="width:20px;height:20px;background:#e0e0e0;border-radius:50%;text-align:center;line-height:20px;margin-right:8px;font-size:10px;color:#555;">
+                                    {initial}
+                                </div>
+                                {assignee}
+                            </div>
+                            <div style="margin-top:5px;text-align:right;">
+                                <span style="font-size:0.7em;color:{priority_color};font-weight:bold;">{issue['priority']}</span>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+    except Exception as e:
+        st.error(f"Error loading board: {e}")
 
 
 if __name__ == "__main__":

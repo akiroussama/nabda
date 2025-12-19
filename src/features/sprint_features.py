@@ -128,7 +128,7 @@ class SprintFeatureExtractor:
         LEFT JOIN issues i ON s.id = i.sprint_id
         WHERE s.board_id = ?
           AND s.state = 'closed'
-        GROUP BY s.id
+        GROUP BY s.id, s.end_date
         ORDER BY s.end_date DESC
         LIMIT ?
         """

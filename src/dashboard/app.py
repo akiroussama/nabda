@@ -2,6 +2,8 @@
 
 import streamlit as st
 from pathlib import Path
+import altair as alt
+import pandas as pd
 
 # Page configuration
 st.set_page_config(
@@ -45,8 +47,8 @@ def get_connection():
 
 def get_predictor():
     """Get unified predictor with caching."""
-    from src.models.predictor import UnifiedPredictor
-    return UnifiedPredictor(model_dir="models")
+    from src.models.predictor import Predictor
+    return Predictor.from_model_dir("models")
 
 
 def get_intelligence():
@@ -105,115 +107,156 @@ def show_overview():
 
     try:
         conn = get_connection()
-
-        # Key metrics row
-        col1, col2, col3, col4 = st.columns(4)
-
-        # Active sprint metrics
-        active_sprint = conn.execute("""
-            SELECT sprint_id, sprint_name, start_date, end_date
-            FROM sprints WHERE state = 'active'
-            ORDER BY start_date DESC LIMIT 1
-        """).fetchone()
-
-        if active_sprint:
-            from src.features.sprint_features import SprintFeatureExtractor
-
-            extractor = SprintFeatureExtractor(conn)
-            features = extractor.extract_features(active_sprint[0])
-
-            predictor = get_predictor()
-            risk = predictor.predict_sprint_risk(features)
-
-            with col1:
-                st.metric(
-                    "Active Sprint",
-                    active_sprint[1][:20] if active_sprint[1] else "Unknown",
-                    f"{features.get('days_remaining', 0)} days left"
+        
+        # --- Row 1 ---
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### Vue d'ensemble de l'état")
+            st.caption("Obtenez un instantané de l'état de vos tickets. Afficher tous les tickets")
+            
+            status_df = conn.execute("SELECT status, COUNT(*) as count FROM issues GROUP BY status").fetchdf()
+            if not status_df.empty:
+                total_issues = status_df['count'].sum()
+                
+                # Doughnut chart
+                base = alt.Chart(status_df).encode(
+                    theta=alt.Theta("count", stack=True)
                 )
-
-            with col2:
-                completion = features.get("completion_rate", 0)
-                st.metric(
-                    "Completion",
-                    f"{completion:.0f}%",
-                    f"{features.get('completed_points', 0)}/{features.get('total_points', 0)} pts"
+                
+                pie = base.mark_arc(innerRadius=60).encode(
+                    color=alt.Color("status", legend=alt.Legend(title="Status")),
+                    order=alt.Order("count", sort="descending"),
+                    tooltip=["status", "count"]
                 )
-
-            with col3:
-                risk_score = risk.get("score", 0)
-                risk_level = risk.get("level", "unknown")
-                st.metric(
-                    "Risk Score",
-                    f"{risk_score:.0f}/100",
-                    risk_level.upper(),
-                    delta_color="inverse" if risk_score > 50 else "normal"
+                
+                text = base.mark_text(radius=0, fontSize=20, fontWeight="bold").encode(
+                    text=alt.value(f"{total_issues}")
                 )
+                
+                st.altair_chart(pie + text, use_container_width=True)
+            else:
+                st.info("No data available")
 
-            with col4:
-                blocked = conn.execute("""
-                    SELECT COUNT(*) FROM issues
-                    WHERE sprint_id = ? AND is_blocked = true
-                """, [active_sprint[0]]).fetchone()[0]
-                st.metric("Blocked Issues", blocked)
+        with col2:
+            st.markdown("### Activité récente")
+            st.caption("Tenez-vous au courant de ce qui se passe tout au long de l'espace.")
+            
+            recent_activity = conn.execute("""
+                SELECT assignee_name, summary, status, updated, issue_type
+                FROM issues 
+                ORDER BY updated DESC 
+                LIMIT 5
+            """).fetchdf()
+            
+            if not recent_activity.empty:
+                for _, row in recent_activity.iterrows():
+                    with st.container():
+                        c1, c2 = st.columns([1, 10])
+                        with c1:
+                            # Initials circle
+                            name = row['assignee_name']
+                            initials = "".join([n[0] for n in name.split()[:2]]) if name else "??"
+                            st.markdown(f"<div style='background-color:#ff4b4b;color:white;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;font-size:12px;margin-top:5px;'>{initials}</div>", unsafe_allow_html=True)
+                        with c2:
+                            st.markdown(f"<p style='margin-bottom:0px;font-size:14px;'><b>{name}</b> a mis à jour « {row['summary'][:40]}... »</p>", unsafe_allow_html=True)
+                            st.caption(f"{row['issue_type']} • {row['status']} • {row['updated']}")
 
-            # Sprint progress visualization
-            st.markdown("### Sprint Progress")
+        st.markdown("---")
 
-            progress = features.get("progress_percent", 0) / 100
-            completion_rate = features.get("completion_rate", 0) / 100
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.progress(progress, text=f"Time Progress: {progress*100:.0f}%")
-
-            with col2:
-                st.progress(min(completion_rate, 1.0), text=f"Work Completion: {completion_rate*100:.0f}%")
-
-            # Recent activity
-            st.markdown("### Recent Activity")
-
-            recent_issues = conn.execute("""
-                SELECT key, summary, status, updated_at
-                FROM issues
-                WHERE sprint_id = ?
-                ORDER BY updated_at DESC
-                LIMIT 10
-            """, [active_sprint[0]]).fetchall()
-
-            if recent_issues:
-                import pandas as pd
-                df = pd.DataFrame(
-                    recent_issues,
-                    columns=["Key", "Summary", "Status", "Updated"]
+        # --- Row 2 ---
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            st.markdown("### Répartition des priorités")
+            st.caption("Obtenez une vue globale montrant comment le travail est priorisé.")
+            
+            priority_df = conn.execute("SELECT priority, COUNT(*) as count FROM issues GROUP BY priority").fetchdf()
+            if not priority_df.empty:
+                chart = alt.Chart(priority_df).mark_bar().encode(
+                    x=alt.X('priority', sort=None, title="Priority"),
+                    y=alt.Y('count', title="Issue Count"),
+                    color='priority',
+                    tooltip=['priority', 'count']
                 )
-                df["Summary"] = df["Summary"].str[:50] + "..."
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.altair_chart(chart, use_container_width=True)
 
-        else:
-            st.warning("No active sprint found. Run 'jira-copilot sync full' first.")
+        with col4:
+            st.markdown("### Types de ticket")
+            st.caption("Obtenez une répartition des tickets par type.")
+            
+            type_df = conn.execute("SELECT issue_type, COUNT(*) as count FROM issues GROUP BY issue_type").fetchdf()
+            if not type_df.empty:
+                total = type_df['count'].sum()
+                for _, row in type_df.iterrows():
+                    pct = (row['count'] / total) * 100
+                    st.write(f"**{row['issue_type']}** ({pct:.0f}%)")
+                    st.progress(row['count'] / total)
 
-        # Team velocity chart
-        st.markdown("### Team Velocity Trend")
+        st.markdown("---")
 
-        velocity_data = conn.execute("""
-            SELECT sprint_name, committed_points, completed_points
-            FROM sprints
-            WHERE state = 'closed'
-            ORDER BY end_date DESC
-            LIMIT 6
-        """).fetchall()
+        # --- Row 3 ---
+        col5, col6 = st.columns(2)
+        
+        with col5:
+            st.markdown("### Charge de travail de l'équipe")
+            st.caption("Surveillez la capacité de votre équipe.")
+            
+            workload_df = conn.execute("""
+                SELECT assignee_name, COUNT(*) as count 
+                FROM issues 
+                WHERE status != 'Done' 
+                GROUP BY assignee_name
+                ORDER BY count DESC
+                LIMIT 5
+            """).fetchdf()
+            
+            if not workload_df.empty:
+                max_load = workload_df['count'].max()
+                for _, row in workload_df.iterrows():
+                    name = row['assignee_name']
+                    count = row['count']
+                    st.write(f"**{name}**")
+                    val = count / max_load if max_load > 0 else 0
+                    st.progress(val, text=f"{count} tickets")
 
-        if velocity_data:
-            import pandas as pd
-
-            df = pd.DataFrame(
-                reversed(velocity_data),
-                columns=["Sprint", "Committed", "Completed"]
-            )
-
-            st.bar_chart(df.set_index("Sprint")[["Committed", "Completed"]])
+        with col6:
+            st.markdown("### Epic : avancement")
+            st.caption("Utilisez des epics pour suivre les initiatives les plus importantes.")
+            
+            # Simple placeholder for now as epic logic can be complex
+            epics_df = conn.execute("""
+                SELECT epic_name, 
+                       COUNT(*) as total,
+                       SUM(CASE WHEN status = 'Done' THEN 1 ELSE 0 END) as completed
+                FROM issues 
+                WHERE epic_name IS NOT NULL 
+                GROUP BY epic_name
+                LIMIT 5
+            """).fetchdf()
+            
+            if not epics_df.empty:
+                 for _, row in epics_df.iterrows():
+                     epic = row['epic_name']
+                     total = row['total']
+                     completed = row['completed']
+                     pct = completed / total if total > 0 else 0
+                     
+                     st.write(f"**{epic}**")
+                     st.progress(pct, text=f"{completed}/{total} Done")
+            else:
+                 st.info("No epics found used in active issues.")
+                 # Show a placeholder image or text to match the "no data" look if needed, 
+                 # but for now this is good. The image shows a placeholder "Epic : avancement ... Une epic, qu'est-ce que c'est ?" 
+                 # if empty, maybe I should match that?
+                 if epics_df.empty:
+                     st.markdown("""
+                     <div style="text-align: center; color: gray; padding: 20px;">
+                        <h3>🧩</h3>
+                        <p><b>Epic : avancement</b></p>
+                        <p>Utilisez des epics pour suivre les initiatives les plus importantes.</p>
+                     </div>
+                     """, unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"Error loading overview: {e}")
@@ -228,7 +271,7 @@ def show_sprint_health():
 
         # Sprint selector
         sprints = conn.execute("""
-            SELECT sprint_id, sprint_name, state
+            SELECT id, name, state
             FROM sprints
             ORDER BY start_date DESC
             LIMIT 20
@@ -326,7 +369,8 @@ def show_sprint_health():
         st.markdown("### Sprint Issues")
 
         issues = conn.execute("""
-            SELECT key, summary, status, priority, story_points, assignee, is_blocked
+            SELECT key, summary, status, priority, story_points, assignee_name,
+                   CASE WHEN status IN ('Blocked', 'On Hold') THEN true ELSE false END as is_blocked
             FROM issues WHERE sprint_id = ?
             ORDER BY
                 CASE status
@@ -380,31 +424,29 @@ def show_team_workload():
         project_key = project_result[0]
 
         extractor = DeveloperFeatureExtractor(conn)
-        predictor = get_predictor()
 
-        developers = extractor.get_active_developers(project_key)
+        # Get all developers with their features
+        dev_df = extractor.extract_all_developers(project_key)
 
-        if not developers:
+        if dev_df.empty:
             st.warning("No active developers found")
             return
 
-        # Collect workload data
-        workload_data = []
-        for dev_id in developers:
-            features = extractor.extract_features(dev_id, project_key)
-            workload = predictor.assess_developer_workload(features)
+        import pandas as pd
 
+        # Build workload data from the extracted features
+        workload_data = []
+        for _, row in dev_df.iterrows():
             workload_data.append({
-                "Developer": features.get("pseudonym", f"dev_{dev_id[:8]}"),
-                "WIP Count": features.get("wip_count", 0),
-                "WIP Points": features.get("wip_points", 0),
-                "Blocked": features.get("blocked_count", 0),
-                "7-day Velocity": features.get("completed_last_7_days", 0),
-                "Status": workload.get("status", "optimal"),
-                "Score": workload.get("score", 0),
+                "Developer": row.get("assignee_name", "Unknown")[:20],
+                "WIP Count": int(row.get("wip_count", 0)),
+                "WIP Points": float(row.get("wip_points", 0)),
+                "Blocked": int(row.get("blocked_count", 0)),
+                "7-day Velocity": float(row.get("completed_7d", 0)),
+                "Status": "overloaded" if row.get("is_overloaded", False) else "optimal",
+                "Score": float(row.get("workload_ratio", 1.0)),
             })
 
-        import pandas as pd
         df = pd.DataFrame(workload_data)
 
         # Summary metrics
@@ -509,7 +551,7 @@ def show_predictions():
             issues = conn.execute("""
                 SELECT key, summary FROM issues
                 WHERE status NOT IN ('Done', 'Closed')
-                ORDER BY updated_at DESC
+                ORDER BY updated DESC
                 LIMIT 100
             """).fetchall()
 
@@ -560,7 +602,7 @@ def show_predictions():
             conn = get_connection()
 
             sprints = conn.execute("""
-                SELECT sprint_id, sprint_name, state
+                SELECT id, name, state
                 FROM sprints
                 ORDER BY start_date DESC
                 LIMIT 10
@@ -634,11 +676,11 @@ def show_reports():
 
                     if report_type == "Sprint Health Report":
                         from src.features.sprint_features import SprintFeatureExtractor
-                        from src.models.predictor import UnifiedPredictor
+                        from src.models.predictor import Predictor
                         from src.intelligence.orchestrator import JiraIntelligence
 
                         sprint = conn.execute("""
-                            SELECT sprint_id, sprint_name FROM sprints
+                            SELECT id, name FROM sprints
                             WHERE state = 'active' LIMIT 1
                         """).fetchone()
 
@@ -646,7 +688,7 @@ def show_reports():
                             extractor = SprintFeatureExtractor(conn)
                             features = extractor.extract_features(sprint[0])
 
-                            predictor = UnifiedPredictor(model_dir="models")
+                            predictor = Predictor.from_model_dir("models")
                             risk = predictor.predict_sprint_risk(features)
 
                             intel = JiraIntelligence()

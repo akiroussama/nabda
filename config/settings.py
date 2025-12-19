@@ -98,7 +98,7 @@ class AppSettings(BaseSettings):
     sync_interval_minutes: int = Field(30, description="Auto-sync interval in minutes")
 
     # Privacy
-    anonymize_developers: bool = Field(True, description="Pseudonymize developer names")
+    anonymize_developers: bool = Field(False, description="Pseudonymize developer names")
 
     # Feature flags
     enable_worklog_sync: bool = Field(True, description="Enable worklog synchronization")

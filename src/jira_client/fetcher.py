@@ -130,10 +130,89 @@ class JiraFetcher:
         logger.info(f"Fetching issues with JQL: {jql}")
 
         all_issues: list[dict[str, Any]] = []
-        start_at = 0
         expand = ",".join(self.DEFAULT_EXPAND) if include_changelog else ""
 
         try:
+            # Use REST API directly for Jira Cloud compatibility
+            # The search_issues method triggers deprecation warnings in Jira Cloud
+            all_issues = self._fetch_issues_via_rest(
+                jql=jql,
+                expand=expand,
+                max_results=max_results,
+            )
+
+            logger.info(f"Fetched {len(all_issues)} issues total")
+
+            # Save raw data if directory specified
+            if self._raw_data_dir:
+                self._save_raw_data(all_issues, "issues")
+
+            return all_issues
+
+        except JIRAError as e:
+            logger.error(f"Failed to fetch issues: {e.text}")
+            raise JiraFetchError(f"Failed to fetch issues: {e.text}") from e
+
+    def _fetch_issues_via_rest(
+        self,
+        jql: str,
+        expand: str,
+        max_results: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Fetch issues using the enhanced_search_issues method.
+
+        Uses the new Jira Cloud API /rest/api/3/search/jql endpoint.
+        See: https://developer.atlassian.com/changelog/#CHANGE-2046
+        """
+        all_issues: list[dict[str, Any]] = []
+
+        try:
+            # Use enhanced_search_issues which handles the new API
+            # It returns an iterator that handles pagination automatically
+            issues_iterator = self._jira.enhanced_search_issues(
+                jql,
+                maxResults=max_results if max_results else False,  # False = all results
+                expand=expand if expand else None,
+                fields=self._fields,
+            )
+
+            count = 0
+            for issue in issues_iterator:
+                with self._rate_limiter.limit():
+                    issue_dict = self._issue_to_dict(issue)
+                    all_issues.append(issue_dict)
+                    count += 1
+
+                    if count % 100 == 0:
+                        logger.debug(f"Fetched {count} issues so far...")
+
+                    if max_results and count >= max_results:
+                        break
+
+            return all_issues
+
+        except Exception as e:
+            # Fallback to standard search_issues for Server/DC
+            logger.warning(f"Enhanced search failed, falling back to standard search: {e}")
+            return self._fetch_issues_fallback(jql, expand, max_results, 0)
+
+    def _fetch_issues_fallback(
+        self,
+        jql: str,
+        expand: str,
+        max_results: int | None,
+        start_at: int,
+    ) -> list[dict[str, Any]]:
+        """Fallback method using the standard search_issues (for Server/DC)."""
+        import warnings
+
+        all_issues: list[dict[str, Any]] = []
+
+        # Suppress the deprecation warning since this is a fallback
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*deprecated.*")
+
             while True:
                 with self._rate_limiter.limit():
                     batch = self._jira.search_issues(
@@ -147,17 +226,10 @@ class JiraFetcher:
                 if not batch:
                     break
 
-                # Convert to dictionaries for serialization
                 for issue in batch:
                     issue_dict = self._issue_to_dict(issue)
                     all_issues.append(issue_dict)
 
-                logger.debug(
-                    f"Fetched {len(batch)} issues (total: {len(all_issues)}, "
-                    f"batch total: {batch.total})"
-                )
-
-                # Check if we've reached the end or max_results
                 if len(batch) < self._batch_size:
                     break
 
@@ -167,17 +239,45 @@ class JiraFetcher:
 
                 start_at += len(batch)
 
-            logger.info(f"Fetched {len(all_issues)} issues total")
+        return all_issues
 
-            # Save raw data if directory specified
-            if self._raw_data_dir:
-                self._save_raw_data(all_issues, "issues")
+    def _raw_issue_to_dict(self, issue_data: dict) -> dict[str, Any]:
+        """Convert raw JSON issue data to our dictionary format."""
+        fields = issue_data.get("fields", {})
 
-            return all_issues
+        # Extract changelog if present
+        changelog = []
+        changelog_data = issue_data.get("changelog", {})
+        histories = changelog_data.get("histories", [])
 
-        except JIRAError as e:
-            logger.error(f"Failed to fetch issues: {e.text}")
-            raise JiraFetchError(f"Failed to fetch issues: {e.text}") from e
+        for history in histories:
+            author = history.get("author", {})
+            history_entry = {
+                "created": history.get("created"),
+                "author": {
+                    "accountId": author.get("accountId"),
+                    "displayName": author.get("displayName"),
+                }
+                if author
+                else None,
+                "items": [
+                    {
+                        "field": item.get("field"),
+                        "fromString": item.get("fromString"),
+                        "toString": item.get("toString"),
+                    }
+                    for item in history.get("items", [])
+                ],
+            }
+            changelog.append(history_entry)
+
+        return {
+            "key": issue_data.get("key"),
+            "id": issue_data.get("id"),
+            "self": issue_data.get("self"),
+            "fields": fields,
+            "changelog": {"histories": changelog},
+        }
 
     def _issue_to_dict(self, issue) -> dict[str, Any]:
         """Convert a Jira issue object to a dictionary."""

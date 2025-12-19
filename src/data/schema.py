@@ -217,6 +217,191 @@ CREATE TABLE IF NOT EXISTS ml_features (
 )
 """
 
+# ============================================================================
+# GOOD MORNING DASHBOARD TABLES
+# ============================================================================
+
+CREATE_DAILY_BRIEFINGS_TABLE = """
+CREATE TABLE IF NOT EXISTS daily_briefings (
+    id INTEGER PRIMARY KEY,
+    user_id VARCHAR NOT NULL DEFAULT 'default',
+    project_key VARCHAR NOT NULL,
+
+    briefing_date DATE NOT NULL,
+    timeframe VARCHAR NOT NULL DEFAULT 'daily',  -- 'daily', 'weekly', 'monthly'
+
+    -- The generated content
+    narrative_summary TEXT,
+    key_highlights VARCHAR,     -- JSON: [{type, message, evidence, severity}]
+    recommendations VARCHAR,    -- JSON: [{id, action, reason, evidence}]
+
+    -- Metrics snapshot
+    metrics_snapshot VARCHAR,   -- JSON with metrics at time of briefing
+
+    -- Generation metadata
+    model_used VARCHAR,
+    tokens_used INTEGER,
+    generation_time_ms INTEGER,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(user_id, project_key, briefing_date, timeframe)
+)
+"""
+
+CREATE_RECOMMENDATION_ACTIONS_TABLE = """
+CREATE TABLE IF NOT EXISTS recommendation_actions (
+    id INTEGER PRIMARY KEY,
+    recommendation_id VARCHAR NOT NULL,
+    briefing_id INTEGER NOT NULL,
+
+    -- The recommendation
+    recommendation_text TEXT,
+    recommendation_type VARCHAR,  -- 'nudge', 'escalate', 'investigate', 'celebrate'
+    ticket_keys VARCHAR[],        -- Tickets involved
+
+    -- User response
+    action_taken VARCHAR DEFAULT 'pending',  -- 'completed', 'snoozed', 'dismissed', 'pending'
+    action_taken_at TIMESTAMP,
+    snooze_until DATE,
+    user_notes TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (briefing_id) REFERENCES daily_briefings(id)
+)
+"""
+
+CREATE_STAKEHOLDER_QUERIES_TABLE = """
+CREATE TABLE IF NOT EXISTS stakeholder_queries (
+    id INTEGER PRIMARY KEY,
+    project_key VARCHAR NOT NULL,
+
+    -- Who asked
+    asker_name VARCHAR,           -- "CEO", "CTO", "VP Product", etc.
+    asker_role VARCHAR,           -- 'executive', 'manager', 'stakeholder'
+
+    -- What they asked
+    query_topic VARCHAR,          -- 'timeline', 'budget', 'blockers', 'team', 'scope'
+    query_text TEXT,
+
+    -- When
+    asked_at TIMESTAMP NOT NULL,
+
+    -- For pattern detection
+    query_month INTEGER,
+    query_week INTEGER,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+CREATE_DAILY_DELTAS_TABLE = """
+CREATE TABLE IF NOT EXISTS daily_deltas (
+    id INTEGER PRIMARY KEY,
+    project_key VARCHAR NOT NULL,
+    delta_date DATE NOT NULL,
+
+    -- What changed (counts)
+    tickets_created INTEGER DEFAULT 0,
+    tickets_completed INTEGER DEFAULT 0,
+    tickets_reopened INTEGER DEFAULT 0,
+    points_completed FLOAT DEFAULT 0,
+    points_added FLOAT DEFAULT 0,
+    points_removed FLOAT DEFAULT 0,
+
+    -- Blockers
+    new_blockers INTEGER DEFAULT 0,
+    resolved_blockers INTEGER DEFAULT 0,
+    active_blockers INTEGER DEFAULT 0,
+
+    -- People signals
+    after_hours_events INTEGER DEFAULT 0,
+    weekend_events INTEGER DEFAULT 0,
+
+    -- Status transitions
+    status_transitions INTEGER DEFAULT 0,
+    regressions INTEGER DEFAULT 0,  -- Done -> back to In Progress
+
+    -- Lists (for drill-down, stored as JSON)
+    completed_ticket_keys VARCHAR,   -- JSON array
+    created_ticket_keys VARCHAR,     -- JSON array
+    blocker_ticket_keys VARCHAR,     -- JSON array
+
+    computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(project_key, delta_date)
+)
+"""
+
+CREATE_ATTENTION_QUEUE_TABLE = """
+CREATE TABLE IF NOT EXISTS attention_queue (
+    id INTEGER PRIMARY KEY,
+    project_key VARCHAR NOT NULL,
+    issue_key VARCHAR NOT NULL,
+
+    -- Why it needs attention
+    attention_reason VARCHAR NOT NULL,
+    -- 'silent_blocker', 'status_churn', 'overdue', 'scope_creep',
+    -- 'no_assignee', 'blocked_too_long', 'approaching_deadline',
+    -- 'after_hours_spike', 'regression'
+
+    severity VARCHAR NOT NULL,  -- 'critical', 'high', 'medium', 'low'
+
+    -- Evidence
+    evidence_summary TEXT,
+    days_in_state INTEGER,
+    status_changes_last_week INTEGER,
+
+    -- Scoring
+    attention_score FLOAT,  -- For ranking
+
+    -- Draft action
+    suggested_action TEXT,
+    draft_message TEXT,
+
+    -- Lifecycle
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP,
+    resolved_by VARCHAR,  -- 'user_action', 'auto_resolved', 'dismissed'
+
+    -- Prevent duplicates
+    UNIQUE(project_key, issue_key, attention_reason)
+)
+"""
+
+CREATE_PREDICTION_SNAPSHOTS_TABLE = """
+CREATE TABLE IF NOT EXISTS prediction_snapshots (
+    id INTEGER PRIMARY KEY,
+    project_key VARCHAR NOT NULL,
+
+    -- What we're predicting
+    target_type VARCHAR NOT NULL,    -- 'sprint', 'epic', 'milestone'
+    target_id VARCHAR NOT NULL,
+    target_name VARCHAR,
+
+    snapshot_date DATE NOT NULL,
+
+    -- Prediction results
+    target_date DATE,
+    probability_on_time FLOAT,
+    p50_completion_date DATE,  -- Median
+    p75_completion_date DATE,  -- Conservative
+    p90_completion_date DATE,  -- Safe
+
+    -- Risk factors (JSON)
+    risk_factors VARCHAR,  -- [{factor, impact_days, confidence}]
+
+    -- Simulation metadata
+    simulations_run INTEGER,
+    confidence_level VARCHAR,  -- 'high', 'medium', 'low'
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(project_key, target_type, target_id, snapshot_date)
+)
+"""
+
 # Index creation statements
 CREATE_INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_issues_assignee ON issues(assignee_id)",

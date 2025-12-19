@@ -1,6 +1,6 @@
 """Sync commands for Jira data synchronization."""
 
-from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -23,70 +23,43 @@ app = typer.Typer(help="Synchronize data from Jira")
 def full(
     project: Optional[str] = typer.Option(None, "--project", "-p", help="Project key to sync"),
     board: Optional[int] = typer.Option(None, "--board", "-b", help="Board ID to sync"),
-    days: int = typer.Option(90, "--days", "-d", help="Days of history to sync"),
-    batch_size: int = typer.Option(100, "--batch-size", help="Batch size for API requests"),
+    no_worklogs: bool = typer.Option(False, "--no-worklogs", help="Skip worklog sync"),
 ):
     """
     Perform full data synchronization from Jira.
 
     Syncs issues, sprints, changelogs, and worklogs.
     """
-    from src.sync.client import JiraClient
-    from src.sync.syncer import JiraSyncer
-    from src.data.schema import get_connection, initialize_schema
+    from src.jira_client.sync import JiraSyncOrchestrator
+    from src.jira_client.auth import create_jira_client_from_settings
+    from src.data.schema import initialize_database
     from config.settings import get_settings
-
-    print_header("Full Jira Sync", f"Project: {project or 'All'} | Board: {board or 'All'}")
 
     settings = get_settings()
 
-    try:
-        # Initialize
-        conn = get_connection()
-        initialize_schema(conn)
+    project_key = project or settings.jira.project_key
+    board_id = board or settings.jira.board_id
 
-        client = JiraClient(
-            url=settings.jira.url,
-            email=settings.jira.email,
-            api_token=settings.jira.api_token,
+    print_header("Full Jira Sync", f"Project: {project_key} | Board: {board_id}")
+
+    try:
+        # Initialize database
+        initialize_database(settings.database.full_path)
+
+        # Create authenticator and orchestrator
+        auth = create_jira_client_from_settings()
+
+        orchestrator = JiraSyncOrchestrator(
+            authenticator=auth,
+            project_key=project_key,
+            board_id=board_id,
+            sync_worklogs=not no_worklogs,
         )
 
-        syncer = JiraSyncer(client=client, conn=conn)
-
-        results = {}
-
         with create_sync_progress() as progress:
-            # Sync issues
-            task = progress.add_task("Syncing issues...", total=None)
-            issue_count = syncer.sync_issues(
-                project_key=project or settings.jira.project_key,
-                days_back=days,
-                batch_size=batch_size,
-            )
-            results["issues"] = issue_count
+            task = progress.add_task("Syncing from Jira...", total=None)
+            results = orchestrator.full_sync()
             progress.update(task, completed=True)
-
-            # Sync sprints
-            if board or settings.jira.board_id:
-                progress.update(task, description="Syncing sprints...")
-                sprint_count = syncer.sync_sprints(
-                    board_id=board or settings.jira.board_id,
-                )
-                results["sprints"] = sprint_count
-
-            # Sync changelogs
-            progress.update(task, description="Syncing changelogs...")
-            changelog_count = syncer.sync_changelogs(
-                project_key=project or settings.jira.project_key,
-            )
-            results["changelogs"] = changelog_count
-
-            # Sync worklogs
-            progress.update(task, description="Syncing worklogs...")
-            worklog_count = syncer.sync_worklogs(
-                project_key=project or settings.jira.project_key,
-            )
-            results["worklogs"] = worklog_count
 
         console.print()
         print_sync_results(results)
@@ -100,39 +73,36 @@ def full(
 @app.command()
 def issues(
     project: Optional[str] = typer.Option(None, "--project", "-p", help="Project key"),
-    days: int = typer.Option(30, "--days", "-d", help="Days of history"),
-    status: Optional[str] = typer.Option(None, "--status", "-s", help="Filter by status"),
+    jql: Optional[str] = typer.Option(None, "--jql", help="Additional JQL filter"),
 ):
     """
     Sync issues only.
 
-    Quick sync of issues without changelogs or worklogs.
+    Quick sync of issues without full orchestration.
     """
-    from src.sync.client import JiraClient
-    from src.sync.syncer import JiraSyncer
-    from src.data.schema import get_connection
+    from src.jira_client.fetcher import create_fetcher_from_settings
+    from src.data.loader import create_loader_from_settings
+    from src.data.schema import initialize_database
     from config.settings import get_settings
 
     print_header("Issue Sync")
 
     settings = get_settings()
+    project_key = project or settings.jira.project_key
 
     try:
-        conn = get_connection()
-        client = JiraClient(
-            url=settings.jira.url,
-            email=settings.jira.email,
-            api_token=settings.jira.api_token,
-        )
+        # Initialize database
+        initialize_database(settings.database.full_path)
 
-        syncer = JiraSyncer(client=client, conn=conn)
+        # Create fetcher and loader
+        fetcher = create_fetcher_from_settings()
+        loader = create_loader_from_settings()
 
         with create_sync_progress() as progress:
             task = progress.add_task("Syncing issues...", total=None)
-            count = syncer.sync_issues(
-                project_key=project or settings.jira.project_key,
-                days_back=days,
-            )
+            issues = fetcher.fetch_issues(project_key, jql_filter=jql, include_changelog=True)
+            count = loader.load_issues(issues)
+            loader.update_sync_metadata("issues", "success", count)
             progress.update(task, completed=True)
 
         print_success(f"Synced {count} issues")
@@ -145,16 +115,16 @@ def issues(
 @app.command()
 def sprints(
     board: Optional[int] = typer.Option(None, "--board", "-b", help="Board ID"),
-    state: str = typer.Option("active,closed", "--state", "-s", help="Sprint states"),
+    state: str = typer.Option("active,closed,future", "--state", "-s", help="Sprint states"),
 ):
     """
     Sync sprints only.
 
     Syncs sprint data from a specific board.
     """
-    from src.sync.client import JiraClient
-    from src.sync.syncer import JiraSyncer
-    from src.data.schema import get_connection
+    from src.jira_client.fetcher import create_fetcher_from_settings
+    from src.data.loader import create_loader_from_settings
+    from src.data.schema import initialize_database
     from config.settings import get_settings
 
     print_header("Sprint Sync")
@@ -167,21 +137,28 @@ def sprints(
         raise typer.Exit(1)
 
     try:
-        conn = get_connection()
-        client = JiraClient(
-            url=settings.jira.url,
-            email=settings.jira.email,
-            api_token=settings.jira.api_token,
-        )
+        # Initialize database
+        initialize_database(settings.database.full_path)
 
-        syncer = JiraSyncer(client=client, conn=conn)
+        # Create fetcher and loader
+        fetcher = create_fetcher_from_settings()
+        loader = create_loader_from_settings()
+
+        total_count = 0
+        states = [s.strip() for s in state.split(",")]
 
         with create_sync_progress() as progress:
-            task = progress.add_task("Syncing sprints...", total=None)
-            count = syncer.sync_sprints(board_id=board_id, states=state.split(","))
-            progress.update(task, completed=True)
+            task = progress.add_task("Syncing sprints...", total=len(states))
 
-        print_success(f"Synced {count} sprints")
+            for sprint_state in states:
+                sprints = fetcher.fetch_sprints(board_id, state=sprint_state)
+                count = loader.load_sprints(sprints)
+                total_count += count
+                progress.advance(task)
+
+            loader.update_sync_metadata("sprints", "success", total_count)
+
+        print_success(f"Synced {total_count} sprints")
 
     except Exception as e:
         print_error(f"Sprint sync failed: {e}")
@@ -193,40 +170,57 @@ def status():
     """
     Show sync status and last sync times.
     """
-    from src.data.schema import get_connection
+    import duckdb
+    from rich.table import Table
+    from rich import box
 
     print_header("Sync Status")
 
+    db_path = Path("data/jira.duckdb")
+
+    if not db_path.exists():
+        print_warning("Database not found. Run 'jira-copilot init' first.")
+        return
+
     try:
-        conn = get_connection()
+        conn = duckdb.connect(str(db_path))
 
         # Get sync metadata
         metadata = conn.execute("""
-            SELECT entity_type, last_sync, record_count
+            SELECT entity_type, last_sync_timestamp, last_sync_status, records_synced
             FROM sync_metadata
             ORDER BY entity_type
         """).fetchall()
 
         if not metadata:
-            print_warning("No sync history found. Run 'sync full' first.")
+            print_warning("No sync history found. Run 'jira-copilot sync full' first.")
             return
-
-        from rich.table import Table
-        from rich import box
 
         table = Table(title="Sync History", box=box.ROUNDED)
         table.add_column("Entity", style="cyan")
         table.add_column("Last Sync", style="green")
+        table.add_column("Status", style="yellow")
         table.add_column("Records", justify="right")
 
-        for entity, last_sync, count in metadata:
+        for entity, last_sync, sync_status, count in metadata:
             table.add_row(
                 entity.title(),
                 str(last_sync) if last_sync else "Never",
+                sync_status or "-",
                 str(count) if count else "-",
             )
 
         console.print(table)
+
+        # Show entity counts
+        console.print()
+        issue_count = conn.execute("SELECT COUNT(*) FROM issues").fetchone()[0]
+        sprint_count = conn.execute("SELECT COUNT(*) FROM sprints").fetchone()[0]
+        user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+        print_info(f"Total issues: {issue_count}")
+        print_info(f"Total sprints: {sprint_count}")
+        print_info(f"Total users: {user_count}")
 
     except Exception as e:
         print_error(f"Failed to get sync status: {e}")

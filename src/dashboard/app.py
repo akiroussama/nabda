@@ -36,8 +36,11 @@ st.markdown("""
 
 def get_connection():
     """Get database connection with caching."""
-    from src.data.schema import get_connection as db_get_connection
-    return db_get_connection()
+    import duckdb
+    db_path = Path("data/jira.duckdb")
+    if not db_path.exists():
+        raise FileNotFoundError("Database not found. Run 'jira-copilot init' first.")
+    return duckdb.connect(str(db_path))
 
 
 def get_predictor():
@@ -364,10 +367,17 @@ def show_team_workload():
     try:
         conn = get_connection()
         from src.features.developer_features import DeveloperFeatureExtractor
-        from config.settings import get_settings
 
-        settings = get_settings()
-        project_key = settings.jira.project_key
+        # Get project key from existing issues
+        project_result = conn.execute("""
+            SELECT DISTINCT project_key FROM issues LIMIT 1
+        """).fetchone()
+
+        if not project_result:
+            st.warning("No project data found. Run 'jira-copilot sync full' first.")
+            return
+
+        project_key = project_result[0]
 
         extractor = DeveloperFeatureExtractor(conn)
         predictor = get_predictor()

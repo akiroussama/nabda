@@ -1,0 +1,34 @@
+Analyze this developer's workload and provide recommendations.
+
+Developer: {{ developer.pseudonym }}
+Current Status: {{ developer.status | upper }}
+Workload Score: {{ developer.score }}/200 ({{ developer.relative_to_team | round(0) }}% of team average)
+
+Current Work:
+- WIP tickets: {{ developer.wip_count }} ({{ developer.wip_points }} points)
+- Blocked: {{ developer.blocked_count }}
+- Overdue: {{ developer.overdue_count }}
+
+Recent Performance (30 days):
+- Completed: {{ developer.completed_count_30d }} tickets ({{ developer.completed_points_30d }} points)
+- Hours logged: {{ developer.hours_logged_30d | round(1) }}
+
+Team Context:
+- Team average WIP: {{ developer.team_avg_wip_points | round(1) }} points
+- Team average completed: {{ developer.team_avg_completed_points | round(1) }} points
+
+Provide a workload assessment:
+1. Is this sustainable?
+2. Any immediate concerns?
+3. Recommendations?
+
+Format as JSON:
+{
+  "assessment": "sustainable|concerning|critical",
+  "summary": "...",
+  "immediate_concerns": ["..."],
+  "recommendations": ["..."],
+  "suggested_actions": [
+    {"action": "...", "priority": "high|medium|low"}
+  ]
+}

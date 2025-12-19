@@ -24,7 +24,6 @@ from src.cli.formatters import (
 app = typer.Typer(
     name="jira-copilot",
     help="🤖 Jira AI Co-pilot - Intelligent project management assistant",
-    no_args_is_help=True,
     rich_markup_mode="rich",
 )
 
@@ -48,31 +47,35 @@ def status(
 
     Displays sync status, model status, and connection health.
     """
-    from src.data.schema import get_connection
+    import duckdb
     from src.models.trainer import ModelTrainer
 
     print_header("Jira AI Co-pilot Status")
 
-    # Check database
+    # Check database (use default path)
+    db_path = Path("data/jira.duckdb")
     try:
-        conn = get_connection()
-
-        # Get issue count
-        issue_count = conn.execute("SELECT COUNT(*) FROM issues").fetchone()[0]
-        sprint_count = conn.execute("SELECT COUNT(*) FROM sprints").fetchone()[0]
-
-        # Get last sync
-        last_sync = conn.execute(
-            "SELECT MAX(last_sync) FROM sync_metadata"
-        ).fetchone()[0]
-
-        print_success(f"Database connected")
-        print_info(f"  Issues: {issue_count}")
-        print_info(f"  Sprints: {sprint_count}")
-        if last_sync:
-            print_info(f"  Last sync: {last_sync}")
+        if not db_path.exists():
+            print_warning("Database not found - run 'jira-copilot init' first")
         else:
-            print_warning("  Never synced")
+            conn = duckdb.connect(str(db_path))
+
+            # Get issue count
+            issue_count = conn.execute("SELECT COUNT(*) FROM issues").fetchone()[0]
+            sprint_count = conn.execute("SELECT COUNT(*) FROM sprints").fetchone()[0]
+
+            # Get last sync
+            last_sync = conn.execute(
+                "SELECT MAX(last_sync_timestamp) FROM sync_metadata"
+            ).fetchone()[0]
+
+            print_success("Database connected")
+            print_info(f"  Issues: {issue_count}")
+            print_info(f"  Sprints: {sprint_count}")
+            if last_sync:
+                print_info(f"  Last sync: {last_sync}")
+            else:
+                print_warning("  Never synced")
 
     except Exception as e:
         print_error(f"Database error: {e}")
@@ -81,10 +84,10 @@ def status(
     console.print()
     try:
         trainer = ModelTrainer()
-        status = trainer.load_models()
+        model_status = trainer.load_models()
 
-        loaded_count = sum(1 for v in status.values() if v)
-        total_count = len(status)
+        loaded_count = sum(1 for v in model_status.values() if v)
+        total_count = len(model_status)
 
         if loaded_count == total_count:
             print_success(f"Models loaded ({loaded_count}/{total_count})")
@@ -94,7 +97,7 @@ def status(
             print_warning("No models loaded - run 'jira-copilot train' first")
 
         if verbose:
-            for model, is_loaded in status.items():
+            for model, is_loaded in model_status.items():
                 status_text = "✓" if is_loaded else "✗"
                 style = "green" if is_loaded else "red"
                 console.print(f"  [{style}]{status_text}[/{style}] {model}")
@@ -102,19 +105,14 @@ def status(
     except Exception as e:
         print_warning(f"Models not available: {e}")
 
-    # Check LLM
+    # Check LLM (check environment variable directly)
     console.print()
-    try:
-        from config.settings import get_settings
-        settings = get_settings()
-
-        if settings.llm.api_key:
-            print_success("LLM configured (Gemini)")
-        else:
-            print_warning("LLM not configured - set GOOGLE_API_KEY")
-
-    except Exception as e:
-        print_warning(f"LLM configuration error: {e}")
+    import os
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if api_key:
+        print_success("LLM configured (Gemini)")
+    else:
+        print_warning("LLM not configured - set GOOGLE_API_KEY")
 
 
 @app.command()
@@ -234,16 +232,18 @@ def init(
 
     Creates database schema and default configuration.
     """
-    from src.data.schema import initialize_schema, get_connection
+    from src.data.schema import initialize_database
     from src.intelligence.prompts import create_default_templates
+    from config.settings import get_settings
     from pathlib import Path
 
     print_header("Initializing Jira AI Co-pilot")
 
-    # Initialize database
+    # Initialize database (use default path, don't require full settings)
     try:
-        conn = get_connection()
-        initialize_schema(conn)
+        db_path = Path("data/jira.duckdb")
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        conn = initialize_database(db_path)
         print_success("Database schema initialized")
     except Exception as e:
         print_error(f"Database initialization failed: {e}")
@@ -286,9 +286,10 @@ def init(
     console.print("  4. Run 'jira-copilot dashboard' to view insights")
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
-    version: bool = typer.Option(False, "--version", "-V", help="Show version"),
+    ctx: typer.Context,
+    version: bool = typer.Option(False, "--version", "-V", help="Show version", is_eager=True),
 ):
     """
     🤖 Jira AI Co-pilot - Intelligent project management assistant.
@@ -298,6 +299,9 @@ def main(
     if version:
         console.print("Jira AI Co-pilot v0.1.0")
         raise typer.Exit()
+    if ctx.invoked_subcommand is None:
+        console.print(ctx.get_help())
+        raise typer.Exit(0)
 
 
 def cli():

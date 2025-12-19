@@ -1,0 +1,33 @@
+Based on the current sprint state, suggest priority adjustments.
+
+Sprint: {{ sprint.name }}
+Days Remaining: {{ sprint.days_remaining }}
+
+Current Tickets:
+{% for ticket in tickets %}
+- {{ ticket.key }}: {{ ticket.summary | truncate(50) }}
+  Type: {{ ticket.issue_type }} | Status: {{ ticket.status }} | Points: {{ ticket.story_points | default('?') }}
+  {% if ticket.is_blocked %}⚠️ BLOCKED{% endif %}
+{% endfor %}
+
+Sprint Goals: {{ sprint.goal | default('Not specified') }}
+
+Constraints:
+- Available capacity: ~{{ sprint.days_remaining * 6 }} hours
+- Team velocity: {{ sprint.avg_historical_velocity | round(1) }} points/sprint
+
+Analyze the tickets and suggest:
+1. Which tickets MUST be completed this sprint?
+2. Which could be moved to next sprint?
+3. Any re-ordering for optimal flow?
+
+Format as JSON:
+{
+  "must_complete": ["KEY-1", "KEY-2"],
+  "consider_deferring": ["KEY-3"],
+  "reorder_suggestion": [
+    {"ticket": "KEY-1", "reason": "..."}
+  ],
+  "focus_recommendation": "...",
+  "risk_if_unchanged": "..."
+}

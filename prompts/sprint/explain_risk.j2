@@ -1,0 +1,39 @@
+Analyze the risk factors for this sprint and explain them clearly.
+
+Sprint: {{ sprint.name }}
+Progress: {{ sprint.days_elapsed }}/{{ sprint.total_days }} days ({{ sprint.progress_percent | round(1) }}%)
+
+Completion Metrics:
+- Completed: {{ sprint.completed_points }}/{{ sprint.total_points }} points ({{ sprint.completion_rate | round(1) }}%)
+- Expected by now: {{ sprint.expected_completion_rate | round(1) }}%
+- Gap: {{ sprint.completion_gap | round(1) }}%
+
+Risk Indicators:
+- Velocity ratio: {{ sprint.velocity_ratio | round(2) }}x historical average
+- Blocked tickets: {{ sprint.blocked_issues }} ({{ (sprint.blocked_ratio * 100) | round(1) }}%)
+- Remaining: {{ sprint.remaining_points }} points in {{ sprint.days_remaining }} days
+
+Risk Score: {{ risk_score.score }}/100 ({{ risk_score.level | upper }})
+
+Top Risk Factors:
+{% for factor_name, factor_data in risk_score.factors.items() %}
+{% if factor_data.contribution > 0.05 %}
+- {{ factor_name }}: {{ (factor_data.contribution * 100) | round(1) }}% contribution
+{% endif %}
+{% endfor %}
+
+Explain this risk assessment in plain language for a project manager:
+1. What are the main concerns?
+2. Why is the risk score at this level?
+3. What specific actions could reduce risk?
+
+Format as JSON:
+{
+  "risk_summary": "1-2 sentence overview",
+  "main_concerns": ["concern1", "concern2", ...],
+  "root_causes": ["cause1", "cause2", ...],
+  "recommended_actions": [
+    {"action": "...", "priority": "high|medium|low", "impact": "..."}
+  ],
+  "outlook": "improving|stable|declining"
+}

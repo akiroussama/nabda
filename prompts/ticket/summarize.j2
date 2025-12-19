@@ -1,0 +1,39 @@
+Summarize this Jira ticket for a quick status update.
+
+Ticket: {{ ticket.key }}
+Type: {{ ticket.issue_type }}
+Status: {{ ticket.status }}
+Priority: {{ ticket.priority }}
+Assignee: {{ ticket.assignee | default('Unassigned') }}
+
+Summary: {{ ticket.summary }}
+
+Description:
+{{ ticket.description | truncate_smart(800) }}
+
+{% if ticket.comments %}
+Recent Comments ({{ ticket.comments | length }}):
+{% for comment in ticket.comments[:3] %}
+- {{ comment.author }}: {{ comment.body | truncate_smart(200) }}
+{% endfor %}
+{% endif %}
+
+{% if ticket.changelog %}
+Recent Changes:
+{% for change in ticket.changelog[:5] %}
+- {{ change.field }}: {{ change.from_value }} → {{ change.to_value }}
+{% endfor %}
+{% endif %}
+
+Provide a 2-3 sentence summary covering:
+1. What this ticket is about
+2. Current progress/blockers
+3. What needs to happen next
+
+Format as JSON:
+{
+  "summary": "...",
+  "status_assessment": "on_track|at_risk|blocked",
+  "next_action": "...",
+  "key_blocker": "..." or null
+}

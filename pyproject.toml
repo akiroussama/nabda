@@ -61,7 +61,7 @@ dev = [
 ]
 
 [project.scripts]
-jira-copilot = "src.interface.cli:app"
+jira-copilot = "src.cli.app:cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

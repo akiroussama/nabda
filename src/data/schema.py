@@ -394,6 +394,67 @@ CREATE TABLE IF NOT EXISTS prediction_snapshots (
 )
 """
 
+# ============================================================================
+# FOLLOW-THROUGH OS TABLES
+# ============================================================================
+
+CREATE_WAITING_ON_TABLE = """
+CREATE TABLE IF NOT EXISTS waiting_on (
+    id INTEGER PRIMARY KEY,
+
+    -- Who's involved
+    created_by VARCHAR NOT NULL,           -- User who's waiting (account_id or name)
+    created_by_name VARCHAR,               -- Display name for UI
+    waiting_for VARCHAR NOT NULL,          -- User who needs to deliver
+    waiting_for_name VARCHAR,              -- Display name for UI
+
+    -- What's needed
+    description VARCHAR(280) NOT NULL,     -- What they're waiting for
+    context TEXT,                          -- Why it matters / business context
+    evidence_required VARCHAR(280),        -- What counts as "done" (e.g., "PR link")
+
+    -- When it's due
+    expected_by DATE NOT NULL,
+    urgency VARCHAR DEFAULT 'medium',      -- low, medium, high, blocker
+
+    -- Linking to Jira
+    linked_issue_key VARCHAR,              -- FK to issues.key
+    linked_issue_summary VARCHAR,          -- Denormalized for display
+    source VARCHAR DEFAULT 'manual',       -- manual, auto_blocked, auto_handoff, auto_comment
+
+    -- Status lifecycle
+    status VARCHAR DEFAULT 'active',       -- active, acknowledged, completed, canceled, stale
+    acknowledged_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    completion_evidence TEXT,              -- Link or note proving completion
+    canceled_reason TEXT,
+
+    -- Engagement tracking
+    nudge_count INTEGER DEFAULT 0,
+    last_nudged_at TIMESTAMP,
+    escalated_at TIMESTAMP,
+    escalated_to VARCHAR,
+
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+CREATE_WAITING_ON_HISTORY_TABLE = """
+CREATE TABLE IF NOT EXISTS waiting_on_history (
+    id INTEGER PRIMARY KEY,
+    waiting_on_id INTEGER NOT NULL,
+
+    -- What happened
+    action VARCHAR NOT NULL,               -- created, nudged, acknowledged, completed, canceled, escalated
+    actor VARCHAR,                         -- Who performed the action
+    note TEXT,                             -- Optional note/reason
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
 # Index creation statements
 CREATE_INDEXES = [
     # Core tables
@@ -430,6 +491,14 @@ CREATE_INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_attention_score ON attention_queue(attention_score)",
     "CREATE INDEX IF NOT EXISTS idx_predictions_project ON prediction_snapshots(project_key)",
     "CREATE INDEX IF NOT EXISTS idx_predictions_date ON prediction_snapshots(snapshot_date)",
+    # Follow-Through OS tables
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_creator ON waiting_on(created_by)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_waitee ON waiting_on(waiting_for)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_status ON waiting_on(status)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_due ON waiting_on(expected_by)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_linked ON waiting_on(linked_issue_key)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_on_urgency ON waiting_on(urgency)",
+    "CREATE INDEX IF NOT EXISTS idx_waiting_history_item ON waiting_on_history(waiting_on_id)",
 ]
 
 
@@ -469,6 +538,9 @@ def initialize_database(db_path: str | Path) -> duckdb.DuckDBPyConnection:
         ("daily_deltas", CREATE_DAILY_DELTAS_TABLE),
         ("attention_queue", CREATE_ATTENTION_QUEUE_TABLE),
         ("prediction_snapshots", CREATE_PREDICTION_SNAPSHOTS_TABLE),
+        # Follow-Through OS tables
+        ("waiting_on", CREATE_WAITING_ON_TABLE),
+        ("waiting_on_history", CREATE_WAITING_ON_HISTORY_TABLE),
     ]
 
     for table_name, create_sql in tables:
@@ -521,6 +593,9 @@ def drop_all_tables(conn: duckdb.DuckDBPyConnection) -> None:
     logger.warning("Dropping all tables!")
 
     tables = [
+        # Follow-Through OS tables (drop first)
+        "waiting_on_history",
+        "waiting_on",
         # Good Morning Dashboard tables (drop first due to FK)
         "prediction_snapshots",
         "attention_queue",
@@ -573,6 +648,9 @@ def get_table_stats(conn: duckdb.DuckDBPyConnection) -> dict[str, int]:
         "daily_deltas",
         "attention_queue",
         "prediction_snapshots",
+        # Follow-Through OS tables
+        "waiting_on",
+        "waiting_on_history",
     ]
 
     stats = {}

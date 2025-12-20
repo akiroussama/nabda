@@ -482,7 +482,7 @@ def calculate_sprint_health(conn) -> Dict[str, Any]:
 def calculate_predictability_index(conn) -> Dict[str, Any]:
     """Calculate team's delivery predictability based on historical data."""
     sprints = conn.execute("""
-        SELECT s.id, s.name,
+        SELECT s.id, s.name, s.start_date,
                COUNT(i.key) as committed,
                SUM(CASE WHEN i.status IN ('Done', 'Terminé(e)', 'Closed') THEN 1 ELSE 0 END) as delivered,
                COALESCE(SUM(i.story_points), 0) as committed_points,
@@ -490,7 +490,7 @@ def calculate_predictability_index(conn) -> Dict[str, Any]:
         FROM sprints s
         LEFT JOIN issues i ON i.sprint_id = s.id
         WHERE s.start_date IS NOT NULL
-        GROUP BY s.id, s.name
+        GROUP BY s.id, s.name, s.start_date
         ORDER BY s.start_date DESC
         LIMIT 8
     """).fetchdf()
@@ -1022,26 +1022,26 @@ def main():
         agenda_html = "".join([f'<li style="padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; font-size: 13px;"><span>→</span> {item}</li>' for item in ceremony_data['agenda'][:4]])
 
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4); position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 15 min saved</div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-                    {ceremony_data['emoji']} {ceremony_data['type'].upper()} GUIDE
-                </span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
-                <div style="flex: 1;">
-                    <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Today's Ceremony</div>
-                    <div style="font-size: 24px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{ceremony_data['duration']} min • {len(ceremony_data['agenda'])} items</div>
-                    <ul style="list-style: none; padding: 0; margin: 12px 0 0 0;">{agenda_html}</ul>
-                </div>
-                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 200px; text-align: center;">
-                    <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Key Question to Ask</div>
-                    <div style="font-size: 15px; font-weight: 700; line-height: 1.3;">"{ceremony_data['key_question']}"</div>
-                </div>
-            </div>
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 15 min saved</div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+            {ceremony_data['emoji']} {ceremony_data['type'].upper()} GUIDE
+        </span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
+        <div style="flex: 1;">
+            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Today's Ceremony</div>
+            <div style="font-size: 24px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{ceremony_data['duration']} min • {len(ceremony_data['agenda'])} items</div>
+            <ul style="list-style: none; padding: 0; margin: 12px 0 0 0;">{agenda_html}</ul>
         </div>
-        """, unsafe_allow_html=True)
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 200px; text-align: center;">
+            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Key Question to Ask</div>
+            <div style="font-size: 15px; font-weight: 700; line-height: 1.3;">"{ceremony_data['key_question']}"</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # Calculate all metrics
     health_data = calculate_sprint_health(conn)
@@ -1085,39 +1085,39 @@ def main():
         m1, m2, m3, m4 = st.columns(4)
         with m1:
             st.markdown(f"""
-            <div class="pulse-card" style="--pulse-color: #667eea;">
-                <div class="pulse-value">{metrics.get('done', 0)}/{metrics.get('total', 0)}</div>
-                <div class="pulse-label">Issues Done</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="pulse-card" style="--pulse-color: #667eea;">
+    <div class="pulse-value">{metrics.get('done', 0)}/{metrics.get('total', 0)}</div>
+    <div class="pulse-label">Issues Done</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m2:
             st.markdown(f"""
-            <div class="pulse-card" style="--pulse-color: #764ba2;">
-                <div class="pulse-value">{metrics.get('done_points', 0):.0f}</div>
-                <div class="pulse-label">Points Delivered</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="pulse-card" style="--pulse-color: #764ba2;">
+    <div class="pulse-value">{metrics.get('done_points', 0):.0f}</div>
+    <div class="pulse-label">Points Delivered</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m3:
             wip = metrics.get('in_progress', 0)
             wip_color = '#27ae60' if wip <= 5 else '#f39c12' if wip <= 10 else '#e74c3c'
             st.markdown(f"""
-            <div class="pulse-card" style="--pulse-color: {wip_color};">
-                <div class="pulse-value">{wip}</div>
-                <div class="pulse-label">Work in Progress</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="pulse-card" style="--pulse-color: {wip_color};">
+    <div class="pulse-value">{wip}</div>
+    <div class="pulse-label">Work in Progress</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m4:
             blocked = metrics.get('blocked', 0)
             blocked_color = '#27ae60' if blocked == 0 else '#e74c3c'
             st.markdown(f"""
-            <div class="pulse-card" style="--pulse-color: {blocked_color};">
-                <div class="pulse-value">{blocked}</div>
-                <div class="pulse-label">Blockers</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="pulse-card" style="--pulse-color: {blocked_color};">
+    <div class="pulse-value">{blocked}</div>
+    <div class="pulse-label">Blockers</div>
+</div>
+""", unsafe_allow_html=True)
 
         # Progress bars
         st.markdown("#### Progress Tracking")
@@ -1125,25 +1125,25 @@ def main():
         time_pct = metrics.get('time_progress', 0)
 
         st.markdown(f"""
-        <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span style="color: #334155;">Work Progress</span>
-                <span style="color: #667eea; font-weight: 600;">{work_pct:.0f}%</span>
-            </div>
-            <div style="background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden;">
-                <div style="background: linear-gradient(90deg, #667eea, #764ba2); width: {work_pct}%; height: 100%;"></div>
-            </div>
-        </div>
-        <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span style="color: #334155;">Time Elapsed</span>
-                <span style="color: #f39c12; font-weight: 600;">{time_pct:.0f}%</span>
-            </div>
-            <div style="background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden;">
-                <div style="background: linear-gradient(90deg, #f39c12, #e67e22); width: {time_pct}%; height: 100%;"></div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="margin-bottom: 16px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span style="color: #334155;">Work Progress</span>
+        <span style="color: #667eea; font-weight: 600;">{work_pct:.0f}%</span>
+    </div>
+    <div style="background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, #667eea, #764ba2); width: {work_pct}%; height: 100%;"></div>
+    </div>
+</div>
+<div style="margin-bottom: 16px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span style="color: #334155;">Time Elapsed</span>
+        <span style="color: #f39c12; font-weight: 600;">{time_pct:.0f}%</span>
+    </div>
+    <div style="background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, #f39c12, #e67e22); width: {time_pct}%; height: 100%;"></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with col3:
         # Predictability Index
@@ -1155,22 +1155,22 @@ def main():
         trend_color = '#27ae60' if pred_trend == 'improving' else '#e74c3c' if pred_trend == 'declining' else '#f39c12'
 
         st.markdown(f"""
-        <div class="pulse-card">
-            <div class="pulse-value">{pred_score:.0f}%</div>
-            <div class="pulse-label">Predictability Index</div>
-            <div class="pulse-trend" style="background: {trend_color}22; color: {trend_color};">
-                {trend_icon} {pred_trend.title()}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="pulse-card">
+    <div class="pulse-value">{pred_score:.0f}%</div>
+    <div class="pulse-label">Predictability Index</div>
+    <div class="pulse-trend" style="background: {trend_color}22; color: {trend_color};">
+        {trend_icon} {pred_trend.title()}
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         avg_delivery = predictability.get('avg_delivery_rate', 0)
         st.markdown(f"""
-        <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.03); border-radius: 8px;">
-            <div style="color: #64748b; font-size: 12px;">Avg Delivery Rate</div>
-            <div style="color: #334155; font-size: 20px; font-weight: 600;">{avg_delivery:.0f}%</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.03); border-radius: 8px;">
+    <div style="color: #64748b; font-size: 12px;">Avg Delivery Rate</div>
+    <div style="color: #334155; font-size: 20px; font-weight: 600;">{avg_delivery:.0f}%</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1190,14 +1190,14 @@ def main():
                 card_class = 'impediment-critical' if severity == 'critical' else 'impediment-warning'
 
                 st.markdown(f"""
-                <div class="{card_class}">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="color: #1a202c; font-weight: 600;">{risk_name}</span>
-                        <span class="risk-badge {severity_class}">{severity.upper()}</span>
-                    </div>
-                    <div style="color: #64748b; font-size: 13px;">{risk_desc}</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="{card_class}">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="color: #1a202c; font-weight: 600;">{risk_name}</span>
+        <span class="risk-badge {severity_class}">{severity.upper()}</span>
+    </div>
+    <div style="color: #64748b; font-size: 13px;">{risk_desc}</div>
+</div>
+""", unsafe_allow_html=True)
         else:
             st.markdown("""
             <div style="text-align: center; padding: 40px; color: #27ae60;">
@@ -1219,15 +1219,15 @@ def main():
                              'risk-high' if imp['severity'] == 'high' else 'risk-medium'
 
                 st.markdown(f"""
-                <div class="{severity_class}">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="color: #4f46e5; font-size: 12px; font-weight: 600;">{imp['key']}</span>
-                        <span class="risk-badge {badge_class}">{imp['age_days']}d old</span>
-                    </div>
-                    <div style="color: #1a202c; font-size: 14px; margin-bottom: 6px;">{imp['summary'][:60]}...</div>
-                    <div style="color: #64748b; font-size: 12px;">👤 {imp['assignee']} • {imp['status']}</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="{severity_class}">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="color: #4f46e5; font-size: 12px; font-weight: 600;">{imp['key']}</span>
+        <span class="risk-badge {badge_class}">{imp['age_days']}d old</span>
+    </div>
+    <div style="color: #1a202c; font-size: 14px; margin-bottom: 6px;">{imp['summary'][:60]}...</div>
+    <div style="color: #64748b; font-size: 12px;">👤 {imp['assignee']} • {imp['status']}</div>
+</div>
+""", unsafe_allow_html=True)
         else:
             st.markdown("""
             <div style="text-align: center; padding: 40px; color: #27ae60;">
@@ -1250,21 +1250,21 @@ def main():
         balance_color = '#27ae60' if balance >= 70 else '#f39c12' if balance >= 50 else '#e74c3c'
 
         st.markdown(f"""
-        <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-            <div class="mini-stat" style="flex: 1;">
-                <div class="mini-stat-value" style="color: {balance_color};">{balance:.0f}%</div>
-                <div class="mini-stat-label">Balance Score</div>
-            </div>
-            <div class="mini-stat" style="flex: 1;">
-                <div class="mini-stat-value">{dynamics.get('total_team_size', 0)}</div>
-                <div class="mini-stat-label">Team Size</div>
-            </div>
-            <div class="mini-stat" style="flex: 1;">
-                <div class="mini-stat-value">{dynamics.get('avg_workload', 0):.1f}</div>
-                <div class="mini-stat-label">Avg Items</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="display: flex; gap: 16px; margin-bottom: 16px;">
+    <div class="mini-stat" style="flex: 1;">
+        <div class="mini-stat-value" style="color: {balance_color};">{balance:.0f}%</div>
+        <div class="mini-stat-label">Balance Score</div>
+    </div>
+    <div class="mini-stat" style="flex: 1;">
+        <div class="mini-stat-value">{dynamics.get('total_team_size', 0)}</div>
+        <div class="mini-stat-label">Team Size</div>
+    </div>
+    <div class="mini-stat" style="flex: 1;">
+        <div class="mini-stat-value">{dynamics.get('avg_workload', 0):.1f}</div>
+        <div class="mini-stat-label">Avg Items</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         # Radar chart
         fig = create_team_radar(dynamics)
@@ -1279,11 +1279,11 @@ def main():
                 color = '#27ae60' if insight['type'] == 'success' else \
                        '#f39c12' if insight['type'] == 'warning' else '#3498db'
                 st.markdown(f"""
-                <div style="padding: 8px 12px; background: {color}22; border-left: 3px solid {color};
-                            border-radius: 4px; margin-bottom: 8px; font-size: 13px; color: #334155;">
-                    {insight['icon']} {insight['message']}
-                </div>
-                """, unsafe_allow_html=True)
+<div style="padding: 8px 12px; background: {color}22; border-left: 3px solid {color};
+            border-radius: 4px; margin-bottom: 8px; font-size: 13px; color: #334155;">
+    {insight['icon']} {insight['message']}
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1294,18 +1294,18 @@ def main():
         if coaching_tips:
             for tip in coaching_tips[:4]:
                 st.markdown(f"""
-                <div class="coaching-tip">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="color: #3b82f6; font-size: 12px; font-weight: 600;">{tip['category'].upper()}</span>
-                        <span style="font-size: 20px;">{tip['icon']}</span>
-                    </div>
-                    <div style="color: #1a202c; font-weight: 600; margin-bottom: 6px;">{tip['title']}</div>
-                    <div style="color: #64748b; font-size: 13px; margin-bottom: 8px;">{tip['tip']}</div>
-                    <div style="color: #4f46e5; font-size: 12px; font-weight: 500;">
-                        💡 Action: {tip['action']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="coaching-tip">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="color: #3b82f6; font-size: 12px; font-weight: 600;">{tip['category'].upper()}</span>
+        <span style="font-size: 20px;">{tip['icon']}</span>
+    </div>
+    <div style="color: #1a202c; font-weight: 600; margin-bottom: 6px;">{tip['title']}</div>
+    <div style="color: #64748b; font-size: 13px; margin-bottom: 8px;">{tip['tip']}</div>
+    <div style="color: #4f46e5; font-size: 12px; font-weight: 500;">
+        💡 Action: {tip['action']}
+    </div>
+</div>
+""", unsafe_allow_html=True)
         else:
             st.markdown("""
             <div style="text-align: center; padding: 40px; color: #3498db;">
@@ -1403,22 +1403,22 @@ def main():
             health_color = '#27ae60' if health >= 80 else '#f39c12' if health >= 60 else '#e74c3c'
 
             st.markdown(f"""
-            <div class="ceremony-card">
-                <div style="text-align: center; font-size: 32px; margin-bottom: 8px;">{ceremony['icon']}</div>
-                <div style="text-align: center; color: #1a202c; font-weight: 600; font-size: 14px; margin-bottom: 4px;">
-                    {ceremony['name']}
-                </div>
-                <div style="text-align: center; color: #64748b; font-size: 11px; margin-bottom: 12px;">
-                    {ceremony['frequency']}
-                </div>
-                <div style="background: #e2e8f0; border-radius: 8px; height: 8px; overflow: hidden;">
-                    <div style="background: {health_color}; width: {health}%; height: 100%;"></div>
-                </div>
-                <div style="text-align: center; color: {health_color}; font-size: 12px; margin-top: 8px;">
-                    {health}% Health
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="ceremony-card">
+    <div style="text-align: center; font-size: 32px; margin-bottom: 8px;">{ceremony['icon']}</div>
+    <div style="text-align: center; color: #1a202c; font-weight: 600; font-size: 14px; margin-bottom: 4px;">
+        {ceremony['name']}
+    </div>
+    <div style="text-align: center; color: #64748b; font-size: 11px; margin-bottom: 12px;">
+        {ceremony['frequency']}
+    </div>
+    <div style="background: #e2e8f0; border-radius: 8px; height: 8px; overflow: hidden;">
+        <div style="background: {health_color}; width: {health}%; height: 100%;"></div>
+    </div>
+    <div style="text-align: center; color: {health_color}; font-size: 12px; margin-top: 8px;">
+        {health}% Health
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             with st.expander("💡 Tip"):
                 st.write(ceremony['tip'])

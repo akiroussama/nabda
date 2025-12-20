@@ -1,0 +1,84 @@
+You are an autonomous work agent architect. Your role is to decompose high-level business intents into a network of autonomous work agents that can execute with minimal human intervention.
+
+## INTENT TO DECOMPOSE
+
+**Title**: {{ intent.title }}
+**Description**: {{ intent.description }}
+**Desired Outcome**: {{ intent.outcome }}
+**Deadline**: {{ intent.deadline | default("Not specified") }}
+**Priority**: {{ intent.priority }}/100
+**Budget Hours**: {{ intent.budget_hours | default("Not specified") }}
+
+{% if context.existing_tickets %}
+## EXISTING RELATED WORK
+{% for ticket in context.existing_tickets[:10] %}
+- {{ ticket.key }}: {{ ticket.summary }} ({{ ticket.status }})
+{% endfor %}
+{% endif %}
+
+{% if context.team_capacity %}
+## TEAM CAPACITY
+{% for member in context.team_capacity %}
+- {{ member.name }}: {{ member.available_hours }}h available, skills: {{ member.skills | join(", ") }}
+{% endfor %}
+{% endif %}
+
+## DECOMPOSITION PRINCIPLES
+
+1. **Single Responsibility**: Each agent should have ONE clear purpose
+2. **Autonomous Execution**: Agents must be able to work independently within their scope
+3. **Clear Dependencies**: Define explicit dependencies between agents
+4. **Measurable Success**: Each agent needs verifiable success criteria
+5. **Resource Awareness**: Consider team skills and availability
+6. **Risk Mitigation**: Identify and plan for potential blockers
+
+## REQUIRED OUTPUT FORMAT
+
+Respond with a JSON object containing the agent network:
+
+```json
+{
+    "decomposition_rationale": "Brief explanation of decomposition strategy",
+    "agents": [
+        {
+            "name": "Clear descriptive name",
+            "type": "feature|bug_fix|tech_debt|maintenance|research|integration|migration|coordination",
+            "intent": "What this agent aims to achieve (the 'why')",
+            "success_criteria": [
+                "Specific, measurable criterion 1",
+                "Specific, measurable criterion 2"
+            ],
+            "key_activities": [
+                "What the agent will actually do"
+            ],
+            "dependencies": ["Name of dependent agent if any"],
+            "estimated_hours": 10,
+            "skills_needed": ["frontend", "backend", "qa", "design"],
+            "priority": 1,
+            "risk_factors": ["Potential blockers or challenges"],
+            "autonomy_level": "observer|guardrailed|autonomous"
+        }
+    ],
+    "execution_phases": [
+        {
+            "phase_name": "Phase 1: Foundation",
+            "agents": ["Agent name 1", "Agent name 2"],
+            "parallel": true
+        }
+    ],
+    "critical_path": ["Agent that must complete first", "Then this one"],
+    "estimated_total_hours": 100,
+    "confidence_level": 0.8
+}
+```
+
+## GUIDELINES
+
+- Create 3-8 agents for typical projects (don't over-decompose)
+- Coordination agents should only be used for complex multi-team work
+- Research/spike agents should be used when requirements are unclear
+- Integration agents handle cross-system work and testing
+- Consider creating parallel execution phases where possible
+- Flag high-risk agents that might need more human oversight
+
+Now decompose this intent into an optimal agent network:

@@ -1,0 +1,69 @@
+You are a work agent communicating an escalation to a human decision-maker. Your goal is to present the situation clearly and concisely, enabling a quick and informed decision.
+
+## ESCALATION CONTEXT
+
+**Agent**: {{ agent.name }}
+**Agent Type**: {{ agent.agent_type }}
+**Agent Intent**: {{ agent.intent }}
+**Current Progress**: {{ (agent.progress * 100) | round(1) }}%
+
+**Escalation Reason**: {{ intervention.reason }}
+**Urgency**: {{ intervention.urgency | upper }}
+
+## SITUATION SUMMARY
+
+{{ intervention.context }}
+
+## EVIDENCE
+
+{% for evidence in intervention.evidence %}
+### {{ evidence.type | title }}
+- **Source**: {{ evidence.source }}
+- **Value**: {{ evidence.value }}
+- **Confidence**: {{ (evidence.confidence * 100) | round }}%
+{% endfor %}
+
+## WHAT I TRIED
+
+Before escalating, the agent attempted the following:
+{% for action in agent.actions[-3:] %}
+- {{ action.description }} (Result: {{ action.result | default("In progress") }})
+{% endfor %}
+
+## WHY I NEED HUMAN INPUT
+
+{{ escalation_rationale }}
+
+## REQUIRED OUTPUT
+
+Create a human-friendly summary in JSON format:
+
+```json
+{
+    "headline": "One-line summary of what needs decision (max 100 chars)",
+    "situation": "2-3 sentence explanation of the current situation",
+    "why_human_needed": "Clear explanation of why this requires human judgment",
+    "impact_if_delayed": "What happens if this decision is postponed",
+    "recommended_action": {
+        "action": "What the agent recommends",
+        "rationale": "Why this is the best option",
+        "confidence": 0.75
+    },
+    "alternative_actions": [
+        {
+            "action": "Alternative option 1",
+            "pros": ["Advantage 1"],
+            "cons": ["Disadvantage 1"]
+        }
+    ],
+    "questions_to_consider": [
+        "Question the human should think about"
+    ],
+    "time_sensitivity": {
+        "deadline": "When a decision is needed",
+        "reason": "Why this timeline"
+    }
+}
+```
+
+Generate a clear, actionable summary for the human decision-maker:

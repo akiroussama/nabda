@@ -616,30 +616,30 @@ def main():
     factors_html = ""
     for factor in risk_data['factors']:
         factors_html += f"""
-        <div class="risk-factor">
-            <span class="factor-icon">{factor['icon']}</span>
-            <span class="factor-text">{factor['text']}</span>
-            <span class="factor-value">{factor['value']}</span>
-        </div>
-        """
+<div class="risk-factor">
+    <span class="factor-icon">{factor['icon']}</span>
+    <span class="factor-text">{factor['text']}</span>
+    <span class="factor-value">{factor['value']}</span>
+</div>
+"""
 
     st.markdown(f"""
-    <div class="quick-win-widget">
-        <div class="quick-win-header">
-            <span class="quick-win-icon">🚀</span>
-            <span class="quick-win-title">Release Risk — Is It Safe to Release?</span>
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🚀</span>
+        <span class="quick-win-title">Release Risk — Is It Safe to Release?</span>
+    </div>
+    <div class="risk-summary">
+        <div class="risk-score-main">
+            <div class="risk-score-value {risk_data['class']}">{risk_data['score']}</div>
+            <div class="risk-label">{risk_data['status']}</div>
         </div>
-        <div class="risk-summary">
-            <div class="risk-score-main">
-                <div class="risk-score-value {risk_data['class']}">{risk_data['score']}</div>
-                <div class="risk-label">{risk_data['status']}</div>
-            </div>
-            <div class="risk-factors">
-                {factors_html}
-            </div>
+        <div class="risk-factors">
+            {factors_html}
         </div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     # Tabs
     tab1, tab2, tab3 = st.tabs(["📋 Ticket Duration", "🏃 Sprint Risk", "📊 Batch Predictions"])
@@ -684,37 +684,37 @@ def main():
 
                     with r1:
                         st.markdown(f"""
-                        <div class="prediction-card">
-                            <div class="prediction-value">{prediction['predicted_hours']:.0f}h</div>
-                            <div class="prediction-label">Predicted Duration</div>
-                            <div class="prediction-sublabel">{prediction['predicted_days']:.1f} working days</div>
-                        </div>
-                        """, unsafe_allow_html=True)
+<div class="prediction-card">
+    <div class="prediction-value">{prediction['predicted_hours']:.0f}h</div>
+    <div class="prediction-label">Predicted Duration</div>
+    <div class="prediction-sublabel">{prediction['predicted_days']:.1f} working days</div>
+</div>
+""", unsafe_allow_html=True)
 
                     with r2:
                         ci = prediction['confidence_interval']
                         st.markdown(f"""
-                        <div class="prediction-card">
-                            <div class="prediction-value">{ci['lower_hours']:.0f}-{ci['upper_hours']:.0f}h</div>
-                            <div class="prediction-label">95% Confidence Range</div>
-                            <div class="prediction-sublabel">Most likely outcome range</div>
-                        </div>
-                        """, unsafe_allow_html=True)
+<div class="prediction-card">
+    <div class="prediction-value">{ci['lower_hours']:.0f}-{ci['upper_hours']:.0f}h</div>
+    <div class="prediction-label">95% Confidence Range</div>
+    <div class="prediction-sublabel">Most likely outcome range</div>
+</div>
+""", unsafe_allow_html=True)
 
                     with r3:
                         conf_score = prediction['confidence_score'] * 100
                         conf_class = "confidence-high" if conf_score > 80 else ("confidence-medium" if conf_score > 60 else "confidence-low")
                         st.markdown(f"""
-                        <div class="prediction-card">
-                            <div class="prediction-value">{conf_score:.0f}%</div>
-                            <div class="prediction-label">Model Confidence</div>
-                            <div class="confidence-bar-container">
-                                <div class="confidence-bar {conf_class}" style="width: {conf_score}%;">
-                                    {conf_score:.0f}%
-                                </div>
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+<div class="prediction-card">
+    <div class="prediction-value">{conf_score:.0f}%</div>
+    <div class="prediction-label">Model Confidence</div>
+    <div class="confidence-bar-container">
+        <div class="confidence-bar {conf_class}" style="width: {conf_score}%;">
+            {conf_score:.0f}%
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
                     # Confidence interval chart
                     st.markdown("#### Prediction Confidence Interval")
@@ -733,21 +733,21 @@ def main():
 
             # Simulated model stats
             st.markdown("""
-            <div class="model-info">
-                <div class="model-stat">
-                    <div class="model-stat-value">87%</div>
-                    <div class="model-stat-label">Accuracy</div>
-                </div>
-                <div class="model-stat">
-                    <div class="model-stat-value">0.82</div>
-                    <div class="model-stat-label">R² Score</div>
-                </div>
-                <div class="model-stat">
-                    <div class="model-stat-value">4.2h</div>
-                    <div class="model-stat-label">MAE</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="model-info">
+    <div class="model-stat">
+        <div class="model-stat-value">87%</div>
+        <div class="model-stat-label">Accuracy</div>
+    </div>
+    <div class="model-stat">
+        <div class="model-stat-value">0.82</div>
+        <div class="model-stat-label">R² Score</div>
+    </div>
+    <div class="model-stat">
+        <div class="model-stat-value">4.2h</div>
+        <div class="model-stat-label">MAE</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             st.markdown("---")
             st.markdown("**Key Factors:**")

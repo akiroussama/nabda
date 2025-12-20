@@ -619,18 +619,18 @@ def create_scenario_comparison(scenarios: List[dict]) -> go.Figure:
 def main():
     # Header
     st.markdown("""
-    <div style="text-align: center; padding: 20px 0 30px 0;">
-        <h1 style="font-size: 42px; font-weight: 800; margin: 0;
-                   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #3498db 100%);
-                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                   background-clip: text;">
-            🎲 Delivery Forecast
-        </h1>
-        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
-            Monte Carlo Simulation for Probabilistic Delivery Dates
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; padding: 20px 0 30px 0;">
+    <h1 style="font-size: 42px; font-weight: 800; margin: 0;
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #3498db 100%);
+               -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+               background-clip: text;">
+        🎲 Delivery Forecast
+    </h1>
+    <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
+        Monte Carlo Simulation for Probabilistic Delivery Dates
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
     conn = get_connection()
     if not conn:
@@ -641,23 +641,23 @@ def main():
     try:
         conf = get_release_confidence(conn)
         st.markdown(f"""
-        <div class="quick-win-widget">
-            <div class="quick-win-header">
-                <span class="quick-win-icon">🚀</span>
-                <span class="quick-win-title">RELEASE CONFIDENCE • Quick Check</span>
-            </div>
-            <div class="confidence-summary">
-                <div class="confidence-score">{conf['score']}%</div>
-                <div class="confidence-details">
-                    <div class="confidence-message">{conf['message']}</div>
-                    <div class="confidence-stats">
-                        <span class="confidence-stat"><strong>{conf['done']}/{conf['total']}</strong> items done</span>
-                        <span class="confidence-stat"><strong>{conf['blockers']}</strong> blockers</span>
-                    </div>
-                </div>
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🚀</span>
+        <span class="quick-win-title">RELEASE CONFIDENCE • Quick Check</span>
+    </div>
+    <div class="confidence-summary">
+        <div class="confidence-score">{conf['score']}%</div>
+        <div class="confidence-details">
+            <div class="confidence-message">{conf['message']}</div>
+            <div class="confidence-stats">
+                <span class="confidence-stat"><strong>{conf['done']}/{conf['total']}</strong> items done</span>
+                <span class="confidence-stat"><strong>{conf['blockers']}</strong> blockers</span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+</div>
+""", unsafe_allow_html=True)
     except Exception:
         pass
 
@@ -716,11 +716,11 @@ def main():
     with col4:
         target_date = datetime.now() + timedelta(weeks=target_weeks)
         st.markdown(f"""
-        <div style="text-align: center; padding-top: 8px;">
-            <div style="color: #64748b; font-size: 12px;">Target Date</div>
-            <div style="color: #1a202c; font-size: 18px; font-weight: 600;">{target_date.strftime('%b %d, %Y')}</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center; padding-top: 8px;">
+    <div style="color: #64748b; font-size: 12px;">Target Date</div>
+    <div style="color: #1a202c; font-size: 18px; font-weight: 600;">{target_date.strftime('%b %d, %Y')}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -793,12 +793,12 @@ def main():
 
     with m1:
         st.markdown(f"""
-        <div class="prob-card prob-{prob_class}">
-            <div class="prob-label">On-Time Probability</div>
-            <div class="prob-value value-{prob_class}">{prob*100:.0f}%</div>
-            <div class="prob-subtitle">Target: {target_date.strftime('%b %d')}</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="prob-card prob-{prob_class}">
+    <div class="prob-label">On-Time Probability</div>
+    <div class="prob-value value-{prob_class}">{prob*100:.0f}%</div>
+    <div class="prob-subtitle">Target: {target_date.strftime('%b %d')}</div>
+</div>
+""", unsafe_allow_html=True)
 
     with m2:
         st.markdown(f"""

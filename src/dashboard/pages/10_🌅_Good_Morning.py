@@ -674,12 +674,12 @@ def render_greeting():
     greeting, time_class, icon = get_time_greeting()
 
     st.markdown(f"""
-    <div class="greeting-card {time_class}">
-        <div class="greeting-text">{greeting}!</div>
-        <div class="greeting-date">{datetime.now().strftime('%A, %B %d, %Y')} at {datetime.now().strftime('%I:%M %p')}</div>
-        <div class="greeting-icon">{icon}</div>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="greeting-card {time_class}">
+    <div class="greeting-text">{greeting}!</div>
+    <div class="greeting-date">{datetime.now().strftime('%A, %B %d, %Y')} at {datetime.now().strftime('%I:%M %p')}</div>
+    <div class="greeting-icon">{icon}</div>
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_quick_stats(data: Dict[str, Any]):
@@ -699,45 +699,45 @@ def render_quick_stats(data: Dict[str, Any]):
     with c1:
         delta_class = 'positive' if completed_count > 0 else 'neutral'
         st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-value {delta_class}">{completed_count}</div>
-            <div class="stat-label">Completed Today</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="stat-card">
+    <div class="stat-value {delta_class}">{completed_count}</div>
+    <div class="stat-label">Completed Today</div>
+</div>
+""", unsafe_allow_html=True)
 
     with c2:
         st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-value">{total_points:.0f}</div>
-            <div class="stat-label">Points Delivered</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="stat-card">
+    <div class="stat-value">{total_points:.0f}</div>
+    <div class="stat-label">Points Delivered</div>
+</div>
+""", unsafe_allow_html=True)
 
     with c3:
         blocker_class = 'negative' if blocker_count > 2 else ('stat-value' if blocker_count > 0 else 'positive')
         st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-value {blocker_class}">{blocker_count}</div>
-            <div class="stat-label">Active Blockers</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="stat-card">
+    <div class="stat-value {blocker_class}">{blocker_count}</div>
+    <div class="stat-label">Active Blockers</div>
+</div>
+""", unsafe_allow_html=True)
 
     with c4:
         st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-value">{created_count}</div>
-            <div class="stat-label">Created Today</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="stat-card">
+    <div class="stat-value">{created_count}</div>
+    <div class="stat-label">Created Today</div>
+</div>
+""", unsafe_allow_html=True)
 
     with c5:
         in_progress = stats.get('in_progress', 0) if isinstance(stats, (dict, pd.Series)) else 0
         st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-value">{in_progress}</div>
-            <div class="stat-label">In Progress</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="stat-card">
+    <div class="stat-value">{in_progress}</div>
+    <div class="stat-label">In Progress</div>
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_briefing(data: Dict[str, Any], project_key: str):
@@ -760,21 +760,21 @@ def render_briefing(data: Dict[str, Any], project_key: str):
         points = completed['story_points'].sum() if 'story_points' in completed.columns else 0
 
         st.markdown(f"""
-        <div class="good-news-card">
-            <div class="card-text">
-                <strong>{completed_count} ticket(s) completed</strong> today ({points:.0f} points delivered)
-                <span class="evidence-badge">{ticket_keys}</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="good-news-card">
+    <div class="card-text">
+        <strong>{completed_count} ticket(s) completed</strong> today ({points:.0f} points delivered)
+        <span class="evidence-badge">{ticket_keys}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div class="good-news-card">
-            <div class="card-text">
-                Team is working on making progress. Check back later for updates!
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="good-news-card">
+    <div class="card-text">
+        Team is working on making progress. Check back later for updates!
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -786,22 +786,22 @@ def render_briefing(data: Dict[str, Any], project_key: str):
         if not blockers.empty:
             blocker_keys = ", ".join(blockers['key'].head(3).tolist())
             st.markdown(f"""
-            <div class="concern-card">
-                <div class="card-text">
-                    <strong>{len(blockers)} active blocker(s)</strong> need attention
-                    <span class="evidence-badge">{blocker_keys}</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="concern-card">
+    <div class="card-text">
+        <strong>{len(blockers)} active blocker(s)</strong> need attention
+        <span class="evidence-badge">{blocker_keys}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         if len(created) > len(completed) * 2:
             st.markdown(f"""
-            <div class="concern-card">
-                <div class="card-text">
-                    <strong>Backlog growing</strong>: {len(created)} created vs {len(completed)} completed
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="concern-card">
+    <div class="card-text">
+        <strong>Backlog growing</strong>: {len(created)} created vs {len(completed)} completed
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -814,13 +814,13 @@ def render_briefing(data: Dict[str, Any], project_key: str):
 
         for _, item in critical_items.head(2).iterrows():
             st.markdown(f"""
-            <div class="risk-card">
-                <div class="card-text">
-                    <strong>{item['key']}</strong>: {str(item['summary'])[:80]}...
-                    <span class="evidence-badge">Priority: Highest</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="risk-card">
+    <div class="card-text">
+        <strong>{item['key']}</strong>: {str(item['summary'])[:80]}...
+        <span class="evidence-badge">Priority: Highest</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -837,11 +837,11 @@ def render_briefing(data: Dict[str, Any], project_key: str):
         recommendation = "Keep up the great work! Monitor progress and stay proactive."
 
     st.markdown(f"""
-    <div class="recommendation-card">
-        <div class="recommendation-title">🎯 Top Recommendation</div>
-        <div class="recommendation-text">{recommendation}</div>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="recommendation-card">
+    <div class="recommendation-title">🎯 Top Recommendation</div>
+    <div class="recommendation-text">{recommendation}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -881,22 +881,22 @@ def render_decision_queue(data: Dict[str, Any]):
 
     if not items:
         st.markdown("""
-        <div style="text-align: center; padding: 40px; color: #16a34a;">
-            <span style="font-size: 32px;">✓</span>
-            <p style="color: #64748b; margin-top: 10px;">No items requiring immediate attention!</p>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center; padding: 40px; color: #16a34a;">
+    <span style="font-size: 32px;">✓</span>
+    <p style="color: #64748b; margin-top: 10px;">No items requiring immediate attention!</p>
+</div>
+""", unsafe_allow_html=True)
     else:
         for idx, item in enumerate(items[:5], 1):
             severity = item['severity']
             st.markdown(f"""
-            <div class="decision-item {severity}">
-                <span class="decision-priority priority-{severity}">{idx}</span>
-                <span class="decision-key">{item['key']}</span>
-                <div class="decision-summary">{str(item['summary'])[:60]}{'...' if len(str(item['summary'])) > 60 else ''}</div>
-                <div class="decision-reason">{item['reason']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="decision-item {severity}">
+    <span class="decision-priority priority-{severity}">{idx}</span>
+    <span class="decision-key">{item['key']}</span>
+    <div class="decision-summary">{str(item['summary'])[:60]}{'...' if len(str(item['summary'])) > 60 else ''}</div>
+    <div class="decision-reason">{item['reason']}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -910,10 +910,10 @@ def render_ai_insights(data: Dict[str, Any]):
 
     for insight in insights:
         st.markdown(f"""
-        <div class="ai-insight">
-            <div class="ai-text">{insight}</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="ai-insight">
+    <div class="ai-text">{insight}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -940,12 +940,12 @@ def render_team_activity(data: Dict[str, Any]):
             in_progress = member.get('in_progress', 0)
 
             st.markdown(f"""
-            <div class="team-member-row">
-                <div class="team-avatar" style="background: {color};">{initials}</div>
-                <div class="team-name">{name}</div>
-                <div class="team-stat">{completed} done • {in_progress} active</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="team-member-row">
+    <div class="team-avatar" style="background: {color};">{initials}</div>
+    <div class="team-name">{name}</div>
+    <div class="team-stat">{completed} done • {in_progress} active</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1028,29 +1028,29 @@ def main():
         blocked_html = f'<div style="margin-top: 8px; color: #ff6b81;">⚠️ Blocked by: {priority_data["blocked_by"]}</div>' if priority_data.get('blocked_by') else ''
 
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, {severity_color} 0%, {severity_color}dd 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px {severity_color}66; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 20 min saved</div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
-                    #1 PRIORITY TODAY
-                </span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
-                <div style="flex: 1;">
-                    <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Focus On This First</div>
-                    <div style="font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{priority_data['title']}</div>
-                    <div style="font-size: 14px; opacity: 0.85;">{priority_data['reason']}</div>
-                    {blocked_html}
-                </div>
-                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 180px; text-align: center;">
-                    <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Impact</div>
-                    <div style="font-size: 16px; font-weight: 700; line-height: 1.3;">{priority_data['impact']}</div>
-                </div>
-            </div>
+<div style="background: linear-gradient(135deg, {severity_color} 0%, {severity_color}dd 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px {severity_color}66; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 20 min saved</div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
+            #1 PRIORITY TODAY
+        </span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
+        <div style="flex: 1;">
+            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Focus On This First</div>
+            <div style="font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{priority_data['title']}</div>
+            <div style="font-size: 14px; opacity: 0.85;">{priority_data['reason']}</div>
+            {blocked_html}
         </div>
-        <style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
-        """, unsafe_allow_html=True)
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 180px; text-align: center;">
+            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Impact</div>
+            <div style="font-size: 16px; font-weight: 700; line-height: 1.3;">{priority_data['impact']}</div>
+        </div>
+    </div>
+</div>
+<style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
+""", unsafe_allow_html=True)
 
     # Generate data
     with st.spinner("Loading your briefing..."):
@@ -1065,14 +1065,14 @@ def main():
     script_html = "".join([f'<div style="margin-bottom: 8px; font-size: 14px; color: #334155;">{line}</div>' for line in standup_script])
     
     st.markdown(f"""
-    <div style="background: white; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-        <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            <span>🎙️ Standup Cheat Sheet</span>
-            <span style="font-size: 10px; font-weight: 400; text-transform: none; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">Read this aloud</span>
-        </div>
-        <div>{script_html}</div>
+<div style="background: white; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+    <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span>🎙️ Standup Cheat Sheet</span>
+        <span style="font-size: 10px; font-weight: 400; text-transform: none; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">Read this aloud</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div>{script_html}</div>
+</div>
+""", unsafe_allow_html=True)
 
 
     # Main content layout
@@ -1091,11 +1091,11 @@ def main():
 
     # Footer
     st.markdown(f"""
-    <div class="dashboard-footer">
-        Generated at {datetime.now().strftime('%I:%M %p')} | Project: {project_key} |
-        Made with Premium Analytics
-    </div>
-    """, unsafe_allow_html=True)
+<div class="dashboard-footer">
+    Generated at {datetime.now().strftime('%I:%M %p')} | Project: {project_key} |
+    Made with Premium Analytics
+</div>
+""", unsafe_allow_html=True)
 
     conn.close()
 

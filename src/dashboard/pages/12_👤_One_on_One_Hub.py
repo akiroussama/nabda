@@ -839,16 +839,16 @@ def create_type_distribution_chart(type_df: pd.DataFrame) -> go.Figure:
 def main():
     # Header
     st.markdown("""
-    <div class="hub-header">
-        <h1 class="hub-title">👤 1-on-1 Intelligence Hub</h1>
-        <p class="hub-subtitle">Auto-generated agendas • Performance insights • Action tracking</p>
-        <div style="margin-top: 16px;">
-            <span class="hub-stat">⏱️ Saves 4-8 hrs/week</span>
-            <span class="hub-stat">📊 Data-driven conversations</span>
-            <span class="hub-stat">📋 Review-ready data</span>
-        </div>
+<div class="hub-header">
+    <h1 class="hub-title">👤 1-on-1 Intelligence Hub</h1>
+    <p class="hub-subtitle">Auto-generated agendas • Performance insights • Action tracking</p>
+    <div style="margin-top: 16px;">
+        <span class="hub-stat">⏱️ Saves 4-8 hrs/week</span>
+        <span class="hub-stat">📊 Data-driven conversations</span>
+        <span class="hub-stat">📋 Review-ready data</span>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     conn = get_connection()
     if not conn:
@@ -903,61 +903,61 @@ def main():
             initials = ''.join([n[0].upper() for n in selected_member['name'].split()[:2]])
 
             st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
-                <div class="member-avatar" style="background: {avatar_color}; width: 72px; height: 72px; font-size: 24px;">
-                    {initials}
-                </div>
-                <div>
-                    <div style="font-size: 28px; font-weight: 700; color: #fff;">{selected_member['name']}</div>
-                    <div style="color: #8892b0;">
-                        {selected_member['total_issues']} total issues •
-                        {selected_member['completed_points']:.0f} points delivered
-                    </div>
-                    <span class="performance-badge {metrics['rating'][1]}">{metrics['rating'][0]}</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+    <div class="member-avatar" style="background: {avatar_color}; width: 72px; height: 72px; font-size: 24px;">
+        {initials}
+    </div>
+    <div>
+        <div style="font-size: 28px; font-weight: 700; color: #fff;">{selected_member['name']}</div>
+        <div style="color: #8892b0;">
+            {selected_member['total_issues']} total issues •
+            {selected_member['completed_points']:.0f} points delivered
+        </div>
+        <span class="performance-badge {metrics['rating'][1]}">{metrics['rating'][0]}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             # Quick metrics
             m1, m2, m3, m4 = st.columns(4)
             with m1:
                 trend_class = 'trend-up' if metrics['velocity_trend'] > 0 else 'trend-down' if metrics['velocity_trend'] < 0 else 'trend-neutral'
                 st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{metrics['avg_velocity']:.1f}</div>
-                    <div class="metric-label">Avg Weekly Pts</div>
-                    <div class="metric-trend {trend_class}">
-                        {'↑' if metrics['velocity_trend'] > 0 else '↓' if metrics['velocity_trend'] < 0 else '→'}
-                        {abs(metrics['velocity_trend']):.0f}%
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{metrics['avg_velocity']:.1f}</div>
+    <div class="metric-label">Avg Weekly Pts</div>
+    <div class="metric-trend {trend_class}">
+        {'↑' if metrics['velocity_trend'] > 0 else '↓' if metrics['velocity_trend'] < 0 else '→'}
+        {abs(metrics['velocity_trend']):.0f}%
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             with m2:
                 st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{metrics['completion_rate']:.0f}%</div>
-                    <div class="metric-label">Completion Rate</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{metrics['completion_rate']:.0f}%</div>
+    <div class="metric-label">Completion Rate</div>
+</div>
+""", unsafe_allow_html=True)
 
             with m3:
                 st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{selected_member['in_progress']}</div>
-                    <div class="metric-label">In Progress</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{selected_member['in_progress']}</div>
+    <div class="metric-label">In Progress</div>
+</div>
+""", unsafe_allow_html=True)
 
             with m4:
                 blocked_count = len(details.get('blocked', pd.DataFrame()))
                 blocked_color = '#e74c3c' if blocked_count > 0 else '#27ae60'
                 st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value" style="color: {blocked_color};">{blocked_count}</div>
-                    <div class="metric-label">Blocked</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value" style="color: {blocked_color};">{blocked_count}</div>
+    <div class="metric-label">Blocked</div>
+</div>
+""", unsafe_allow_html=True)
 
             # Tabs for different views
             tab1, tab2, tab3, tab4 = st.tabs(["📋 1-on-1 Agenda", "📈 Performance", "📊 Activity", "📄 Review Data"])
@@ -970,15 +970,15 @@ def main():
                     for point in talking_points:
                         css_class = point['category']
                         st.markdown(f"""
-                        <div class="talking-point {css_class}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-weight: 600; color: #fff;">{point['icon']} {point['title']}</span>
-                                <span style="font-size: 11px; color: #8892b0; text-transform: uppercase;">{point['category']}</span>
-                            </div>
-                            <div style="color: #ccd6f6; font-size: 14px; margin-bottom: 6px;">{point['content']}</div>
-                            <div style="color: #667eea; font-size: 12px;">💡 {point['action']}</div>
-                        </div>
-                        """, unsafe_allow_html=True)
+<div class="talking-point {css_class}">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-weight: 600; color: #fff;">{point['icon']} {point['title']}</span>
+        <span style="font-size: 11px; color: #8892b0; text-transform: uppercase;">{point['category']}</span>
+    </div>
+    <div style="color: #ccd6f6; font-size: 14px; margin-bottom: 6px;">{point['content']}</div>
+    <div style="color: #667eea; font-size: 12px;">💡 {point['action']}</div>
+</div>
+""", unsafe_allow_html=True)
 
                 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1044,11 +1044,11 @@ def main():
                         with cols[i]:
                             color = colors.get(row['complexity'], '#667eea')
                             st.markdown(f"""
-                            <div class="metric-card">
-                                <div class="metric-value" style="color: {color};">{int(row['count'])}</div>
-                                <div class="metric-label">{row['complexity']}</div>
-                            </div>
-                            """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value" style="color: {color};">{int(row['count'])}</div>
+    <div class="metric-label">{row['complexity']}</div>
+</div>
+""", unsafe_allow_html=True)
 
                 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1066,17 +1066,17 @@ def main():
                                              'Medium': '#f39c12', 'Low': '#3498db'}
                             p_color = priority_colors.get(item['priority'], '#8892b0')
                             st.markdown(f"""
-                            <div class="action-item">
-                                <div style="flex: 1;">
-                                    <div style="color: #667eea; font-size: 12px; font-weight: 600;">{item['key']}</div>
-                                    <div style="color: #ccd6f6; font-size: 14px;">{item['summary'][:50]}...</div>
-                                    <div style="display: flex; gap: 8px; margin-top: 4px;">
-                                        <span style="color: {p_color}; font-size: 11px;">{item['priority']}</span>
-                                        <span style="color: #8892b0; font-size: 11px;">• {int(item['story_points'])} pts</span>
-                                    </div>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
+<div class="action-item">
+    <div style="flex: 1;">
+        <div style="color: #667eea; font-size: 12px; font-weight: 600;">{item['key']}</div>
+        <div style="color: #ccd6f6; font-size: 14px;">{item['summary'][:50]}...</div>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <span style="color: {p_color}; font-size: 11px;">{item['priority']}</span>
+            <span style="color: #8892b0; font-size: 11px;">• {int(item['story_points'])} pts</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
                     else:
                         st.info("No items currently in progress.")
 
@@ -1090,15 +1090,15 @@ def main():
                     if not completed.empty:
                         for _, item in completed.head(5).iterrows():
                             st.markdown(f"""
-                            <div class="action-item">
-                                <div class="action-checkbox done">✓</div>
-                                <div style="flex: 1;">
-                                    <div style="color: #667eea; font-size: 12px; font-weight: 600;">{item['key']}</div>
-                                    <div style="color: #ccd6f6; font-size: 14px;">{item['summary'][:50]}...</div>
-                                    <div style="color: #27ae60; font-size: 11px;">{int(item['story_points'])} pts delivered</div>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
+<div class="action-item">
+    <div class="action-checkbox done">✓</div>
+    <div style="flex: 1;">
+        <div style="color: #667eea; font-size: 12px; font-weight: 600;">{item['key']}</div>
+        <div style="color: #ccd6f6; font-size: 14px;">{item['summary'][:50]}...</div>
+        <div style="color: #27ae60; font-size: 11px;">{int(item['story_points'])} pts delivered</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
                     else:
                         st.info("No recent completions.")
 
@@ -1109,14 +1109,14 @@ def main():
                 st.markdown('<div class="section-title">📄 Performance Review Data Generator</div>', unsafe_allow_html=True)
 
                 st.markdown("""
-                <div style="padding: 16px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; margin-bottom: 16px;">
-                    <div style="color: #667eea; font-weight: 600; margin-bottom: 8px;">⏱️ Save hours on performance reviews</div>
-                    <div style="color: #8892b0; font-size: 14px;">
-                        Generate a data-rich performance review document with one click.
-                        All metrics are pulled directly from work data.
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+<div style="padding: 16px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; margin-bottom: 16px;">
+    <div style="color: #667eea; font-weight: 600; margin-bottom: 8px;">⏱️ Save hours on performance reviews</div>
+    <div style="color: #8892b0; font-size: 14px;">
+        Generate a data-rich performance review document with one click.
+        All metrics are pulled directly from work data.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
                 if st.button("📊 Generate Performance Review Data", type="primary"):
                     review = generate_performance_review(selected_member, metrics, details)
@@ -1141,11 +1141,11 @@ def main():
     # Footer
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #8892b0; font-size: 12px;">
-        👤 1-on-1 Intelligence Hub | Saving managers 4-8 hours weekly |
-        Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; color: #8892b0; font-size: 12px;">
+    👤 1-on-1 Intelligence Hub | Saving managers 4-8 hours weekly |
+    Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+</div>
+""", unsafe_allow_html=True)
 
     conn.close()
 

@@ -624,7 +624,7 @@ def create_velocity_comparison(conn, current_sprint_id: int) -> go.Figure:
         FROM sprints s
         LEFT JOIN issues i ON i.sprint_id = s.id
         WHERE s.start_date IS NOT NULL
-        GROUP BY s.id, s.name
+        GROUP BY s.id, s.name, s.start_date
         ORDER BY s.start_date DESC
         LIMIT 6
     """).fetchdf()
@@ -857,14 +857,14 @@ def main():
     end_str = sprint_info['end_date'].strftime('%b %d, %Y') if pd.notna(sprint_info['end_date']) else 'TBD'
 
     st.markdown(f"""
-    <div class="sprint-header">
-        <div class="sprint-title">
-            {sprint_info['name']}
-            <span class="sprint-state {state_class}">{sprint_info['state'].upper()}</span>
-        </div>
-        <div class="sprint-dates">📅 {start_str} - {end_str}</div>
+<div class="sprint-header">
+    <div class="sprint-title">
+        {sprint_info['name']}
+        <span class="sprint-state {state_class}">{sprint_info['state'].upper()}</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div class="sprint-dates">📅 {start_str} - {end_str}</div>
+</div>
+""", unsafe_allow_html=True)
 
     # Get sprint issues
     issues = conn.execute("""
@@ -881,45 +881,45 @@ def main():
     # ========== QUICK WIN: DEADLINE FORECAST ==========
     forecast = calculate_deadline_forecast(sprint_info.to_dict(), issues)
     st.markdown(f"""
-    <div class="quick-win-widget">
-        <div class="quick-win-header">
-            <span class="quick-win-icon">📅</span>
-            <span class="quick-win-title">Deadline Forecast — Will This Sprint Meet Its Goal?</span>
-        </div>
-        <div class="deadline-forecast">
-            <div class="forecast-main">
-                <span class="forecast-confidence">{forecast['confidence']}%</span>
-                <div>
-                    <div class="forecast-label">Confidence</div>
-                    <span class="forecast-status {forecast['class']}">{forecast['status']}</span>
-                </div>
-            </div>
-            <div class="forecast-details">
-                <div class="forecast-stat">
-                    <div class="forecast-stat-value">{forecast['days_left']}</div>
-                    <div class="forecast-stat-label">Days Left</div>
-                </div>
-                <div class="forecast-stat">
-                    <div class="forecast-stat-value">{forecast['remaining_pts']:.0f}</div>
-                    <div class="forecast-stat-label">Pts Remaining</div>
-                </div>
-                <div class="forecast-stat">
-                    <div class="forecast-stat-value">{forecast['daily_needed']}</div>
-                    <div class="forecast-stat-label">Pts/Day Needed</div>
-                </div>
-            </div>
-        </div>
-        {f'''
-        <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 3px solid #f87171;">
-            <div style="color: #fca5a5; font-weight: 600; font-size: 13px;">⚠️ RECOVERY PLAN DETECTED</div>
-            <div style="color: #cbd5e1; font-size: 13px; margin-top: 4px;">
-                To reach 85% confidence, consider removing <b>{forecast['recovery_plan']['points_to_cut']} points</b>.
-                <br>Suggested candidates: <span style="color: #fff; font-family: monospace;">{', '.join(forecast['recovery_plan']['items'])}</span>
-            </div>
-        </div>
-        ''' if forecast.get('recovery_plan') else ''}
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">📅</span>
+        <span class="quick-win-title">Deadline Forecast — Will This Sprint Meet Its Goal?</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div class="deadline-forecast">
+        <div class="forecast-main">
+            <span class="forecast-confidence">{forecast['confidence']}%</span>
+            <div>
+                <div class="forecast-label">Confidence</div>
+                <span class="forecast-status {forecast['class']}">{forecast['status']}</span>
+            </div>
+        </div>
+        <div class="forecast-details">
+            <div class="forecast-stat">
+                <div class="forecast-stat-value">{forecast['days_left']}</div>
+                <div class="forecast-stat-label">Days Left</div>
+            </div>
+            <div class="forecast-stat">
+                <div class="forecast-stat-value">{forecast['remaining_pts']:.0f}</div>
+                <div class="forecast-stat-label">Pts Remaining</div>
+            </div>
+            <div class="forecast-stat">
+                <div class="forecast-stat-value">{forecast['daily_needed']}</div>
+                <div class="forecast-stat-label">Pts/Day Needed</div>
+            </div>
+        </div>
+    </div>
+    {f'''
+    <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 3px solid #f87171;">
+        <div style="color: #fca5a5; font-weight: 600; font-size: 13px;">⚠️ RECOVERY PLAN DETECTED</div>
+        <div style="color: #cbd5e1; font-size: 13px; margin-top: 4px;">
+            To reach 85% confidence, consider removing <b>{forecast.get('recovery_plan', {}).get('points_to_cut', 0)} points</b>.
+            <br>Suggested candidates: <span style="color: #fff; font-family: monospace;">{', '.join(forecast.get('recovery_plan', {}).get('items', []))}</span>
+        </div>
+    </div>
+    ''' if forecast.get('recovery_plan') else ''}
+</div>
+""", unsafe_allow_html=True)
 
     # Calculate metrics
     total_issues = len(issues)
@@ -977,57 +977,57 @@ def main():
         with m1:
             delta_class = "delta-positive" if days_remaining > 3 else ("delta-negative" if days_remaining <= 1 else "delta-neutral")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{days_remaining}</div>
-                <div class="metric-label">Days Left</div>
-                <div class="metric-delta {delta_class}">of {total_days} total</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{days_remaining}</div>
+    <div class="metric-label">Days Left</div>
+    <div class="metric-delta {delta_class}">of {total_days} total</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m2:
             velocity = done_points / max(days_elapsed, 1) * 7  # Weekly velocity
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{velocity:.0f}</div>
-                <div class="metric-label">Weekly Velocity</div>
-                <div class="metric-delta delta-neutral">pts/week</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{velocity:.0f}</div>
+    <div class="metric-label">Weekly Velocity</div>
+    <div class="metric-delta delta-neutral">pts/week</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m3:
             remaining_pts = total_points - done_points
             daily_needed = remaining_pts / max(days_remaining, 1)
             delta_class = "delta-positive" if daily_needed < 3 else ("delta-negative" if daily_needed > 8 else "delta-neutral")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{remaining_pts:.0f}</div>
-                <div class="metric-label">Points Left</div>
-                <div class="metric-delta {delta_class}">{daily_needed:.1f} pts/day needed</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{remaining_pts:.0f}</div>
+    <div class="metric-label">Points Left</div>
+    <div class="metric-delta {delta_class}">{daily_needed:.1f} pts/day needed</div>
+</div>
+""", unsafe_allow_html=True)
 
         with m4:
             delta_class = "delta-negative" if blocked > 0 else "delta-positive"
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value">{blocked}</div>
-                <div class="metric-label">Blocked</div>
-                <div class="metric-delta {delta_class}">{in_progress} in progress</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="metric-card">
+    <div class="metric-value">{blocked}</div>
+    <div class="metric-label">Blocked</div>
+    <div class="metric-delta {delta_class}">{in_progress} in progress</div>
+</div>
+""", unsafe_allow_html=True)
 
     # ========== ROW 2: Burndown Chart ==========
     st.markdown('<div class="progress-section">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📉 Burndown / Burnup Chart</div>', unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="burndown-legend">
-        <div class="legend-item"><div class="legend-line" style="background: #667eea;"></div>Ideal Burndown</div>
-        <div class="legend-item"><div class="legend-line" style="background: #e74c3c;"></div>Actual Remaining</div>
-        <div class="legend-item"><div class="legend-line" style="background: #27ae60;"></div>Completed</div>
-        <div class="legend-item"><div class="legend-line" style="background: #8892b0; border-style: dotted;"></div>Total Scope</div>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="burndown-legend">
+    <div class="legend-item"><div class="legend-line" style="background: #667eea;"></div>Ideal Burndown</div>
+    <div class="legend-item"><div class="legend-line" style="background: #e74c3c;"></div>Actual Remaining</div>
+    <div class="legend-item"><div class="legend-line" style="background: #27ae60;"></div>Completed</div>
+    <div class="legend-item"><div class="legend-line" style="background: #8892b0; border-style: dotted;"></div>Total Scope</div>
+</div>
+""", unsafe_allow_html=True)
 
     sprint_data = {
         'start_date': sprint_info['start_date'].date() if hasattr(sprint_info['start_date'], 'date') else sprint_info['start_date'],
@@ -1136,13 +1136,13 @@ def main():
         pts = f"{int(issue['story_points'])} pts" if issue['story_points'] > 0 else ""
 
         st.markdown(f"""
-        <div class="issue-row">
-            <span class="issue-key">{issue['key']}</span>
-            <span class="issue-summary">{summary}</span>
-            <span style="color: #8892b0; font-size: 11px; margin-right: 12px;">{pts}</span>
-            <span class="status-pill {status_class}">{status_text}</span>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="issue-row">
+    <span class="issue-key">{issue['key']}</span>
+    <span class="issue-summary">{summary}</span>
+    <span style="color: #8892b0; font-size: 11px; margin-right: 12px;">{pts}</span>
+    <span class="status-pill {status_class}">{status_text}</span>
+</div>
+""", unsafe_allow_html=True)
 
     if filtered.empty:
         st.markdown('<p style="color: #8892b0; text-align: center; padding: 20px;">No issues match the filter criteria</p>', unsafe_allow_html=True)
@@ -1152,11 +1152,11 @@ def main():
     # ========== Summary Footer ==========
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #8892b0; font-size: 12px;">
-        Sprint Health Dashboard | {total_issues} issues | {total_points:.0f} story points |
-        Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; color: #8892b0; font-size: 12px;">
+    Sprint Health Dashboard | {total_issues} issues | {total_points:.0f} story points |
+    Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+</div>
+""", unsafe_allow_html=True)
 
     conn.close()
 

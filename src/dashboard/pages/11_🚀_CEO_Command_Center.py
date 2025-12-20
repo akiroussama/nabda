@@ -983,41 +983,41 @@ def main():
     pitch_color = '#22c55e' if pitch['sentiment'] == 'positive' else '#f59e0b' if pitch['sentiment'] == 'neutral' else '#ef4444'
 
     st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 30 min saved</div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <span style="background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: {pitch_color}; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
-                CEO ELEVATOR PITCH
-            </span>
+<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 30 min saved</div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: {pitch_color}; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
+            CEO ELEVATOR PITCH
+        </span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
+        <div style="flex: 1;">
+            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Tell the Board This</div>
+            <div style="font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">"{pitch['headline']}"</div>
+            <div style="font-size: 14px; color: {pitch_color}; margin-top: 8px;">{pitch['trend']}</div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
-            <div style="flex: 1;">
-                <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Tell the Board This</div>
-                <div style="font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">"{pitch['headline']}"</div>
-                <div style="font-size: 14px; color: {pitch_color}; margin-top: 8px;">{pitch['trend']}</div>
-            </div>
-            <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 150px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Key Metric</div>
-                <div style="font-size: 32px; font-weight: 800;">{pitch['metric']}</div>
-                <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">{pitch['recommendation']}</div>
-            </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 150px; text-align: center;">
+            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Key Metric</div>
+            <div style="font-size: 32px; font-weight: 800;">{pitch['metric']}</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">{pitch['recommendation']}</div>
         </div>
     </div>
-    <style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
-    """, unsafe_allow_html=True)
+</div>
+<style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
+""", unsafe_allow_html=True)
 
     # Header
     st.markdown(f"""
-    <div class="command-header">
-        <h1 class="command-title">🚀 CEO Command Center</h1>
-        <p class="command-subtitle">Real-time organizational intelligence • Strategic decision support</p>
-        <div class="live-indicator">
-            <div class="pulse-dot"></div>
-            <span class="live-text">Live</span>
-        </div>
+<div class="command-header">
+    <h1 class="command-title">🚀 CEO Command Center</h1>
+    <p class="command-subtitle">Real-time organizational intelligence • Strategic decision support</p>
+    <div class="live-indicator">
+        <div class="pulse-dot"></div>
+        <span class="live-text">Live</span>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     # Main Layout - Health Score + Key Quadrants
     col_health, col_metrics = st.columns([1, 2])
@@ -1029,17 +1029,17 @@ def main():
         trend_arrow = '↑' if health.trend == 'up' else '↓'
 
         st.markdown(f"""
-        <div class="health-score-container health-{score_class}">
-            <div class="health-label">Organization Health</div>
-            <div class="health-score score-{score_class}">{health.score}</div>
-            <div class="health-status" style="color: {'#27ae60' if score_class == 'excellent' else ('#3498db' if score_class == 'good' else ('#f39c12' if score_class == 'warning' else '#e74c3c'))}">
-                {health.status}
-            </div>
-            <div class="health-trend {trend_class}">
-                {trend_arrow} {health.trend_value:.1f}% vs last week
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="health-score-container health-{score_class}">
+    <div class="health-label">Organization Health</div>
+    <div class="health-score score-{score_class}">{health.score}</div>
+    <div class="health-status" style="color: {'#27ae60' if score_class == 'excellent' else ('#3498db' if score_class == 'good' else ('#f39c12' if score_class == 'warning' else '#e74c3c'))}">
+        {health.status}
+    </div>
+    <div class="health-trend {trend_class}">
+        {trend_arrow} {health.trend_value:.1f}% vs last week
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         st.plotly_chart(create_health_gauge(health.score, health.status), use_container_width=True)
 
@@ -1054,66 +1054,66 @@ def main():
     with q1:
         vel_status = 'green' if health.velocity_score >= 60 else ('yellow' if health.velocity_score >= 40 else 'red')
         st.markdown(f"""
-        <div class="quadrant-card">
-            <div class="quadrant-header">
-                <span class="quadrant-icon">⚡</span>
-                <div class="quadrant-status status-{vel_status}"></div>
-            </div>
-            <div class="quadrant-title">Velocity</div>
-            <div class="quadrant-value">{health.velocity_score}%</div>
-            <div class="quadrant-delta delta-positive">↑ 5% this sprint</div>
-            <div class="quadrant-insight">Completion rate on track. {int(roi['completed_points'])} story points delivered.</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quadrant-card">
+    <div class="quadrant-header">
+        <span class="quadrant-icon">⚡</span>
+        <div class="quadrant-status status-{vel_status}"></div>
+    </div>
+    <div class="quadrant-title">Velocity</div>
+    <div class="quadrant-value">{health.velocity_score}%</div>
+    <div class="quadrant-delta delta-positive">↑ 5% this sprint</div>
+    <div class="quadrant-insight">Completion rate on track. {int(roi['completed_points'])} story points delivered.</div>
+</div>
+""", unsafe_allow_html=True)
 
     with q2:
         qual_status = 'green' if health.quality_score >= 80 else ('yellow' if health.quality_score >= 60 else 'red')
         st.markdown(f"""
-        <div class="quadrant-card">
-            <div class="quadrant-header">
-                <span class="quadrant-icon">🎯</span>
-                <div class="quadrant-status status-{qual_status}"></div>
-            </div>
-            <div class="quadrant-title">Quality</div>
-            <div class="quadrant-value">{health.quality_score}%</div>
-            <div class="quadrant-delta delta-positive">↑ 3% improvement</div>
-            <div class="quadrant-insight">Defect rate within targets. Code review coverage strong.</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quadrant-card">
+    <div class="quadrant-header">
+        <span class="quadrant-icon">🎯</span>
+        <div class="quadrant-status status-{qual_status}"></div>
+    </div>
+    <div class="quadrant-title">Quality</div>
+    <div class="quadrant-value">{health.quality_score}%</div>
+    <div class="quadrant-delta delta-positive">↑ 3% improvement</div>
+    <div class="quadrant-insight">Defect rate within targets. Code review coverage strong.</div>
+</div>
+""", unsafe_allow_html=True)
 
     with q3:
         team_status = 'green' if health.team_health_score >= 70 else ('yellow' if health.team_health_score >= 50 else 'red')
         st.markdown(f"""
-        <div class="quadrant-card">
-            <div class="quadrant-header">
-                <span class="quadrant-icon">👥</span>
-                <div class="quadrant-status status-{team_status}"></div>
-            </div>
-            <div class="quadrant-title">Team Health</div>
-            <div class="quadrant-value">{health.team_health_score}%</div>
-            <div class="quadrant-delta {'delta-positive' if health.team_health_score >= 70 else 'delta-negative'}">
-                {'Balanced' if health.team_health_score >= 70 else 'Imbalance detected'}
-            </div>
-            <div class="quadrant-insight">Workload distribution across 6 team members monitored.</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quadrant-card">
+    <div class="quadrant-header">
+        <span class="quadrant-icon">👥</span>
+        <div class="quadrant-status status-{team_status}"></div>
+    </div>
+    <div class="quadrant-title">Team Health</div>
+    <div class="quadrant-value">{health.team_health_score}%</div>
+    <div class="quadrant-delta {'delta-positive' if health.team_health_score >= 70 else 'delta-negative'}">
+        {'Balanced' if health.team_health_score >= 70 else 'Imbalance detected'}
+    </div>
+    <div class="quadrant-insight">Workload distribution across 6 team members monitored.</div>
+</div>
+""", unsafe_allow_html=True)
 
     with q4:
         del_status = 'green' if health.delivery_confidence >= 70 else ('yellow' if health.delivery_confidence >= 50 else 'red')
         st.markdown(f"""
-        <div class="quadrant-card">
-            <div class="quadrant-header">
-                <span class="quadrant-icon">🚀</span>
-                <div class="quadrant-status status-{del_status}"></div>
-            </div>
-            <div class="quadrant-title">Delivery Confidence</div>
-            <div class="quadrant-value">{health.delivery_confidence}%</div>
-            <div class="quadrant-delta {'delta-positive' if health.delivery_confidence >= 70 else 'delta-negative'}">
-                {'On Track' if health.delivery_confidence >= 70 else 'At Risk'}
-            </div>
-            <div class="quadrant-insight">Sprint progress monitored. Monte Carlo simulation active.</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quadrant-card">
+    <div class="quadrant-header">
+        <span class="quadrant-icon">🚀</span>
+        <div class="quadrant-status status-{del_status}"></div>
+    </div>
+    <div class="quadrant-title">Delivery Confidence</div>
+    <div class="quadrant-value">{health.delivery_confidence}%</div>
+    <div class="quadrant-delta {'delta-positive' if health.delivery_confidence >= 70 else 'delta-negative'}">
+        {'On Track' if health.delivery_confidence >= 70 else 'At Risk'}
+    </div>
+    <div class="quadrant-insight">Sprint progress monitored. Monte Carlo simulation active.</div>
+</div>
+""", unsafe_allow_html=True)
 
     # Alerts and ROI Section
     st.markdown("<br>", unsafe_allow_html=True)
@@ -1121,13 +1121,13 @@ def main():
 
     with col_alerts:
         st.markdown(f"""
-        <div class="alert-section">
-            <div class="alert-header">
-                <span style="font-size: 20px;">🔔</span>
-                <span class="alert-title">Executive Alerts</span>
-                <span class="alert-count">{len([a for a in alerts if a.severity == 'critical'])} critical</span>
-            </div>
-        """, unsafe_allow_html=True)
+<div class="alert-section">
+    <div class="alert-header">
+        <span style="font-size: 20px;">🔔</span>
+        <span class="alert-title">Executive Alerts</span>
+        <span class="alert-count">{len([a for a in alerts if a.severity == 'critical'])} critical</span>
+    </div>
+""", unsafe_allow_html=True)
 
         for alert in alerts:
             priority_class = f"priority-{alert.severity}"
@@ -1135,41 +1135,41 @@ def main():
             icon = "🔴" if alert.severity == "critical" else ("🟡" if alert.severity == "warning" else "🔵")
 
             st.markdown(f"""
-            <div class="alert-item {alert_class}">
-                <div class="alert-priority {priority_class}">{icon}</div>
-                <div class="alert-content">
-                    <div class="alert-message">{alert.message}</div>
-                    <div class="alert-meta">{alert.context} • Impact: {alert.impact}</div>
-                </div>
-                <button class="alert-action">{alert.action}</button>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="alert-item {alert_class}">
+    <div class="alert-priority {priority_class}">{icon}</div>
+    <div class="alert-content">
+        <div class="alert-message">{alert.message}</div>
+        <div class="alert-meta">{alert.context} • Impact: {alert.impact}</div>
+    </div>
+    <button class="alert-action">{alert.action}</button>
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col_roi:
         st.markdown(f"""
-        <div class="roi-section">
-            <div class="roi-header">
-                <span style="font-size: 20px;">💰</span>
-                <span class="roi-title">Business Impact</span>
-            </div>
-            <div class="roi-metric">
-                <div class="roi-value">${roi['value_delivered']:,.0f}</div>
-                <div class="roi-label">Value Delivered</div>
-            </div>
-            <div style="height: 16px;"></div>
-            <div class="roi-metric">
-                <div class="roi-value">${roi['monthly_projection']:,.0f}</div>
-                <div class="roi-label">Monthly Projection</div>
-            </div>
-            <div style="height: 16px;"></div>
-            <div class="roi-metric">
-                <div class="roi-value">{roi['time_saved_hours']:,.0f}h</div>
-                <div class="roi-label">Engineering Hours</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="roi-section">
+    <div class="roi-header">
+        <span style="font-size: 20px;">💰</span>
+        <span class="roi-title">Business Impact</span>
+    </div>
+    <div class="roi-metric">
+        <div class="roi-value">${roi['value_delivered']:,.0f}</div>
+        <div class="roi-label">Value Delivered</div>
+    </div>
+    <div style="height: 16px;"></div>
+    <div class="roi-metric">
+        <div class="roi-value">${roi['monthly_projection']:,.0f}</div>
+        <div class="roi-label">Monthly Projection</div>
+    </div>
+    <div style="height: 16px;"></div>
+    <div class="roi-metric">
+        <div class="roi-value">{roi['time_saved_hours']:,.0f}h</div>
+        <div class="roi-label">Engineering Hours</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # Strategic Recommendations
     st.markdown("<br>", unsafe_allow_html=True)
@@ -1189,15 +1189,15 @@ def main():
             priority_label = "IMMEDIATE" if rec.priority == "immediate" else ("THIS WEEK" if rec.priority == "thisweek" else "STRATEGIC")
 
             st.markdown(f"""
-            <div class="recommendation-card">
-                <span class="recommendation-priority {priority_class}">{priority_label}</span>
-                <div class="recommendation-text">{rec.recommendation}</div>
-                <div class="recommendation-impact">
-                    Expected Impact: <span class="impact-value">{rec.expected_impact}</span>
-                    <span style="float: right; color: #667eea;">Confidence: {rec.confidence*100:.0f}%</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="recommendation-card">
+    <span class="recommendation-priority {priority_class}">{priority_label}</span>
+    <div class="recommendation-text">{rec.recommendation}</div>
+    <div class="recommendation-impact">
+        Expected Impact: <span class="impact-value">{rec.expected_impact}</span>
+        <span style="float: right; color: #667eea;">Confidence: {rec.confidence*100:.0f}%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # Competitive Velocity Benchmark
     st.markdown("<br>", unsafe_allow_html=True)
@@ -1206,45 +1206,45 @@ def main():
 
     with b1:
         st.markdown("""
-        <div class="velocity-card">
-            <div class="velocity-title">📊 Your Velocity vs Industry Average</div>
-            <div class="velocity-bar">
-                <div class="velocity-fill" style="width: 78%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
-            </div>
-            <div class="velocity-label">
-                <span>Your Team: 78%</span>
-                <span>Industry: 65%</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="velocity-card">
+    <div class="velocity-title">📊 Your Velocity vs Industry Average</div>
+    <div class="velocity-bar">
+        <div class="velocity-fill" style="width: 78%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+    </div>
+    <div class="velocity-label">
+        <span>Your Team: 78%</span>
+        <span>Industry: 65%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with b2:
         st.markdown("""
-        <div class="velocity-card">
-            <div class="velocity-title">📈 Sprint Completion Trend</div>
-            <div class="velocity-bar">
-                <div class="velocity-fill" style="width: 85%; background: linear-gradient(90deg, #27ae60, #2ecc71);"></div>
-            </div>
-            <div class="velocity-label">
-                <span>Current: 85%</span>
-                <span>Target: 90%</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="velocity-card">
+    <div class="velocity-title">📈 Sprint Completion Trend</div>
+    <div class="velocity-bar">
+        <div class="velocity-fill" style="width: 85%; background: linear-gradient(90deg, #27ae60, #2ecc71);"></div>
+    </div>
+    <div class="velocity-label">
+        <span>Current: 85%</span>
+        <span>Target: 90%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with b3:
         st.markdown("""
-        <div class="velocity-card">
-            <div class="velocity-title">🎯 Feature Delivery Rate</div>
-            <div class="velocity-bar">
-                <div class="velocity-fill" style="width: 92%; background: linear-gradient(90deg, #3498db, #5dade2);"></div>
-            </div>
-            <div class="velocity-label">
-                <span>On-Time: 92%</span>
-                <span>Goal: 95%</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="velocity-card">
+    <div class="velocity-title">🎯 Feature Delivery Rate</div>
+    <div class="velocity-bar">
+        <div class="velocity-fill" style="width: 92%; background: linear-gradient(90deg, #3498db, #5dade2);"></div>
+    </div>
+    <div class="velocity-label">
+        <span>On-Time: 92%</span>
+        <span>Goal: 95%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # Footer
     st.markdown(f"""

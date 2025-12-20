@@ -356,6 +356,94 @@ st.markdown("""
         text-align: center;
         padding: 12px;
     }
+
+    /* 1:1 Autopilot Widget - Manager's Secret Weapon */
+    .oneonone-widget {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 20px 0;
+        color: white;
+        box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+    }
+    .oneonone-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .oneonone-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #93c5fd;
+    }
+    .oneonone-person {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .oneonone-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    .oneonone-name {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .oneonone-score {
+        font-size: 12px;
+        color: #fca5a5;
+    }
+    .talking-points {
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 16px;
+    }
+    .talking-point {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .talking-point:last-child {
+        border-bottom: none;
+    }
+    .point-quote {
+        color: #fff;
+        font-size: 14px;
+        font-style: italic;
+        margin-bottom: 4px;
+    }
+    .point-reason {
+        color: #93c5fd;
+        font-size: 12px;
+    }
+    .avoid-section {
+        margin-top: 16px;
+        padding: 12px;
+        background: rgba(239, 68, 68, 0.2);
+        border-radius: 8px;
+        border-left: 3px solid #ef4444;
+    }
+    .avoid-title {
+        color: #fca5a5;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    .avoid-text {
+        color: #fecaca;
+        font-size: 13px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -378,6 +466,61 @@ def get_connection():
     if not db_path.exists():
         return None
     return duckdb.connect(str(db_path), read_only=True)
+
+
+def generate_oneonone_prep(profile: 'RiskProfile') -> dict:
+    """Generate AI-powered 1:1 talking points based on work patterns."""
+    talking_points = []
+    avoid_topics = []
+
+    # Generate contextual talking points based on risk factors
+    if 'High Workload Volume' in profile.top_risk_factors:
+        talking_points.append({
+            'quote': "How are you feeling about your current workload?",
+            'reason': f"They have {profile.current_metrics.get('ticket_volume', 0):.0f} tickets/week (above average)"
+        })
+
+    if 'Weekend Work Pattern' in profile.top_risk_factors:
+        talking_points.append({
+            'quote': "I noticed some weekend activity - is everything okay?",
+            'reason': f"{profile.current_metrics.get('weekend_ratio', 0)*100:.0f}% weekend work detected"
+        })
+
+    if 'After-Hours Activity' in profile.top_risk_factors:
+        talking_points.append({
+            'quote': "How's your work-life balance been lately?",
+            'reason': f"{profile.current_metrics.get('after_hours_ratio', 0)*100:.0f}% after-hours commits"
+        })
+
+    if 'Too Many WIP Items' in profile.top_risk_factors:
+        talking_points.append({
+            'quote': "What's blocking you from finishing your current items?",
+            'reason': f"{profile.current_metrics.get('wip_count', 0)} items in progress simultaneously"
+        })
+
+    if 'Sprint Overcommitment' in profile.top_risk_factors:
+        talking_points.append({
+            'quote': "Are the sprint commitments realistic for you?",
+            'reason': "Pattern of overcommitment detected"
+        })
+
+    # If improving, add recognition opportunity
+    if profile.trend == 'improving':
+        talking_points.insert(0, {
+            'quote': "I've noticed things are going better - what changed?",
+            'reason': "Trend is improving - reinforce positive behavior"
+        })
+
+    # Add avoid topics
+    if profile.risk_level == 'High Risk':
+        avoid_topics.append("Adding new deadlines or commitments")
+    if 'High Workload Volume' in profile.top_risk_factors:
+        avoid_topics.append("Asking about taking on additional work")
+
+    return {
+        'talking_points': talking_points[:3],  # Top 3
+        'avoid_topics': avoid_topics[:2]  # Top 2
+    }
 
 
 def get_intervention_alerts(profiles: List['RiskProfile']) -> list:
@@ -701,18 +844,18 @@ def get_intervention_recommendation(profile: RiskProfile) -> dict:
 def main():
     # Header
     st.markdown("""
-    <div style="text-align: center; padding: 20px 0 30px 0;">
-        <h1 style="font-size: 42px; font-weight: 800; margin: 0;
-                   background: linear-gradient(135deg, #ef4444 0%, #f59e0b 50%, #22c55e 100%);
-                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                   background-clip: text;">
-            🕯️ Burnout Barometer™
-        </h1>
-        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
-            Early Warning System for Behavioral Anomalies
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; padding: 20px 0 30px 0;">
+    <h1 style="font-size: 42px; font-weight: 800; margin: 0;
+                background: linear-gradient(135deg, #ef4444 0%, #f59e0b 50%, #22c55e 100%);
+                -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                background-clip: text;">
+        🕯️ Burnout Barometer™
+    </h1>
+    <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
+        Early Warning System for Behavioral Anomalies
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
     conn = get_connection()
     if not conn:
@@ -729,33 +872,33 @@ def main():
             items_html = ""
             for alert in alerts:
                 items_html += f"""
-                <div class="intervention-item">
-                    <div class="intervention-avatar">{alert['initials']}</div>
-                    <div>
-                        <div class="intervention-text">{alert['name']}</div>
-                        <div class="intervention-reason">{alert['reason']}</div>
-                    </div>
-                </div>
-                """
+<div class="intervention-item">
+    <div class="intervention-avatar">{alert['initials']}</div>
+    <div>
+        <div class="intervention-text">{alert['name']}</div>
+        <div class="intervention-reason">{alert['reason']}</div>
+    </div>
+</div>
+"""
             st.markdown(f"""
-            <div class="quick-win-widget">
-                <div class="quick-win-header">
-                    <span class="quick-win-icon">🚨</span>
-                    <span class="quick-win-title">INTERVENTION NEEDED • Check In Today</span>
-                </div>
-                <div class="intervention-summary">{items_html}</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🚨</span>
+        <span class="quick-win-title">INTERVENTION NEEDED • Check In Today</span>
+    </div>
+    <div class="intervention-summary">{items_html}</div>
+</div>
+""", unsafe_allow_html=True)
         else:
             st.markdown(f"""
-            <div class="quick-win-widget">
-                <div class="quick-win-header">
-                    <span class="quick-win-icon">✅</span>
-                    <span class="quick-win-title">TEAM HEALTH • All Clear</span>
-                </div>
-                <div class="intervention-ok">No urgent interventions needed today. Team is stable.</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">✅</span>
+        <span class="quick-win-title">TEAM HEALTH • All Clear</span>
+    </div>
+    <div class="intervention-ok">No urgent interventions needed today. Team is stable.</div>
+</div>
+""", unsafe_allow_html=True)
     except Exception:
         pass
 
@@ -776,43 +919,43 @@ def main():
 
     with m1:
         st.markdown(f"""
-        <div class="risk-metric-card risk-{highest_class}">
-            <div class="metric-label">Highest Risk Score</div>
-            <div class="metric-value value-{highest_class}">{highest_score:.0f}</div>
-            <div class="metric-subtitle">{profiles[0].user_name if profiles else 'N/A'}</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="risk-metric-card risk-{highest_class}">
+    <div class="metric-label">Highest Risk Score</div>
+    <div class="metric-value value-{highest_class}">{highest_score:.0f}</div>
+    <div class="metric-subtitle">{profiles[0].user_name if profiles else 'N/A'}</div>
+</div>
+""", unsafe_allow_html=True)
 
     with m2:
         at_risk_class = 'critical' if len(high_risk) > 2 else ('elevated' if len(high_risk) > 0 else 'healthy')
         st.markdown(f"""
-        <div class="risk-metric-card risk-{at_risk_class}">
-            <div class="metric-label">At-Risk Engineers</div>
-            <div class="metric-value value-{at_risk_class}">{len(high_risk)}</div>
-            <div class="metric-subtitle">Requiring Immediate Attention</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="risk-metric-card risk-{at_risk_class}">
+    <div class="metric-label">At-Risk Engineers</div>
+    <div class="metric-value value-{at_risk_class}">{len(high_risk)}</div>
+    <div class="metric-subtitle">Requiring Immediate Attention</div>
+</div>
+""", unsafe_allow_html=True)
 
     with m3:
         elevated_class = 'elevated' if len(elevated) > 3 else 'healthy'
         st.markdown(f"""
-        <div class="risk-metric-card risk-{elevated_class}">
-            <div class="metric-label">Elevated Watch</div>
-            <div class="metric-value value-{elevated_class}">{len(elevated)}</div>
-            <div class="metric-subtitle">On Monitoring Watchlist</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="risk-metric-card risk-{elevated_class}">
+    <div class="metric-label">Elevated Watch</div>
+    <div class="metric-value value-{elevated_class}">{len(elevated)}</div>
+    <div class="metric-subtitle">On Monitoring Watchlist</div>
+</div>
+""", unsafe_allow_html=True)
 
     with m4:
         team_avg = sum(p.risk_score for p in profiles) / len(profiles) if profiles else 0
         avg_class = 'critical' if team_avg >= 60 else ('elevated' if team_avg >= 40 else 'healthy')
         st.markdown(f"""
-        <div class="risk-metric-card risk-{avg_class}">
-            <div class="metric-label">Team Average</div>
-            <div class="metric-value value-{avg_class}">{team_avg:.0f}</div>
-            <div class="metric-subtitle">Organization Health Score</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="risk-metric-card risk-{avg_class}">
+    <div class="metric-label">Team Average</div>
+    <div class="metric-value value-{avg_class}">{team_avg:.0f}</div>
+    <div class="metric-subtitle">Organization Health Score</div>
+</div>
+""", unsafe_allow_html=True)
 
     # ========== TEAM HEATMAP ==========
     st.markdown('<div class="section-container">', unsafe_allow_html=True)
@@ -875,22 +1018,22 @@ def main():
             trend_icon = '📈' if profile.trend == 'worsening' else ('📉' if profile.trend == 'improving' else '➡️')
 
             st.markdown(f"""
-            <div class="profile-card high-risk">
-                <div class="profile-header">
-                    <div style="display: flex; align-items: center;">
-                        <div class="profile-avatar" style="background: {avatar_color};">{initials}</div>
-                        <div class="profile-info">
-                            <div class="profile-name">{profile.user_name}</div>
-                            <div class="profile-role">Risk Score: {profile.risk_score:.0f}/100</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="trend-indicator {trend_class}">{trend_icon} {profile.trend.title()}</span>
-                        <span class="risk-badge badge-critical">High Risk</span>
-                    </div>
-                </div>
+<div class="profile-card high-risk">
+    <div class="profile-header">
+        <div style="display: flex; align-items: center;">
+            <div class="profile-avatar" style="background: {avatar_color};">{initials}</div>
+            <div class="profile-info">
+                <div class="profile-name">{profile.user_name}</div>
+                <div class="profile-role">Risk Score: {profile.risk_score:.0f}/100</div>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="trend-indicator {trend_class}">{trend_icon} {profile.trend.title()}</span>
+            <span class="risk-badge badge-critical">High Risk</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             col_gauge, col_factors, col_trend = st.columns([1, 1, 2])
 
@@ -904,11 +1047,11 @@ def main():
 
                 intervention = get_intervention_recommendation(profile)
                 st.markdown(f"""
-                <div class="intervention-card">
-                    <div class="intervention-title">{intervention['title']}</div>
-                    <div class="intervention-text">{intervention['text']}</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="intervention-card">
+    <div class="intervention-title">{intervention['title']}</div>
+    <div class="intervention-text">{intervention['text']}</div>
+</div>
+""", unsafe_allow_html=True)
 
             with col_trend:
                 st.plotly_chart(create_behavioral_trend(profile), use_container_width=True)
@@ -921,45 +1064,90 @@ def main():
             with mc1:
                 delta_class = 'delta-positive' if devs['volume_change'] > 0 else 'delta-negative'
                 st.markdown(f"""
-                <div class="mini-metric">
-                    <div class="mini-metric-label">Tickets/Week</div>
-                    <div class="mini-metric-value">{metrics['ticket_volume']:.1f}</div>
-                    <div class="mini-metric-delta {delta_class}">{devs['volume_change']*100:+.0f}% vs baseline</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="mini-metric">
+    <div class="mini-metric-label">Tickets/Week</div>
+    <div class="mini-metric-value">{metrics['ticket_volume']:.1f}</div>
+    <div class="mini-metric-delta {delta_class}">{devs['volume_change']*100:+.0f}% vs baseline</div>
+</div>
+""", unsafe_allow_html=True)
 
             with mc2:
                 delta_class = 'delta-positive' if devs['weekend_change'] > 0 else 'delta-negative'
                 st.markdown(f"""
-                <div class="mini-metric">
-                    <div class="mini-metric-label">Weekend Work</div>
-                    <div class="mini-metric-value">{metrics['weekend_ratio']*100:.0f}%</div>
-                    <div class="mini-metric-delta {delta_class}">{devs['weekend_change']*100:+.1f}% pts</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="mini-metric">
+    <div class="mini-metric-label">Weekend Work</div>
+    <div class="mini-metric-value">{metrics['weekend_ratio']*100:.0f}%</div>
+    <div class="mini-metric-delta {delta_class}">{devs['weekend_change']*100:+.1f}% pts</div>
+</div>
+""", unsafe_allow_html=True)
 
             with mc3:
                 delta_class = 'delta-positive' if devs['after_hours_change'] > 0 else 'delta-negative'
                 st.markdown(f"""
-                <div class="mini-metric">
-                    <div class="mini-metric-label">After-Hours</div>
-                    <div class="mini-metric-value">{metrics['after_hours_ratio']*100:.0f}%</div>
-                    <div class="mini-metric-delta {delta_class}">{devs['after_hours_change']*100:+.1f}% pts</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="mini-metric">
+    <div class="mini-metric-label">After-Hours</div>
+    <div class="mini-metric-value">{metrics['after_hours_ratio']*100:.0f}%</div>
+    <div class="mini-metric-delta {delta_class}">{devs['after_hours_change']*100:+.1f}% pts</div>
+</div>
+""", unsafe_allow_html=True)
 
             with mc4:
                 st.markdown(f"""
-                <div class="mini-metric">
-                    <div class="mini-metric-label">WIP Count</div>
-                    <div class="mini-metric-value">{metrics['wip_count']}</div>
-                    <div class="mini-metric-delta" style="color: #8892b0;">Items in progress</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="mini-metric">
+    <div class="mini-metric-label">WIP Count</div>
+    <div class="mini-metric-value">{metrics['wip_count']}</div>
+    <div class="mini-metric-delta" style="color: #8892b0;">Items in progress</div>
+</div>
+""", unsafe_allow_html=True)
 
             st.markdown("---")
 
         st.markdown('</div>', unsafe_allow_html=True)
+
+        # ========== 1:1 AUTOPILOT - Killer Feature ==========
+        top_risk = high_risk[0]  # Highest risk person
+        prep = generate_oneonone_prep(top_risk)
+        initials = ''.join([n[0].upper() for n in top_risk.user_name.split()[:2]])
+
+        if prep['talking_points']:
+            points_html = ""
+            for point in prep['talking_points']:
+                points_html += f"""
+<div class="talking-point">
+    <div class="point-quote">"{point['quote']}"</div>
+    <div class="point-reason">→ {point['reason']}</div>
+</div>
+"""
+
+            avoid_html = ""
+            if prep['avoid_topics']:
+                avoid_html = f"""
+<div class="avoid-section">
+    <div class="avoid-title">⚠️ Avoid Asking About</div>
+    <div class="avoid-text">{' • '.join(prep['avoid_topics'])}</div>
+</div>
+"""
+
+            st.markdown(f"""
+<div class="oneonone-widget">
+    <div class="oneonone-header">
+        <span class="oneonone-title">👤 1:1 Autopilot • Priority Check-In</span>
+        <span style="color: #93c5fd; font-size: 12px;">AI-Generated Talking Points</span>
+    </div>
+    <div class="oneonone-person">
+        <div class="oneonone-avatar">{initials}</div>
+        <div>
+            <div class="oneonone-name">{top_risk.user_name}</div>
+            <div class="oneonone-score">Risk Score: {top_risk.risk_score:.0f} • {top_risk.trend.title()} trend</div>
+        </div>
+    </div>
+    <div class="talking-points">
+        <div style="color: #93c5fd; font-size: 11px; text-transform: uppercase; margin-bottom: 8px;">Suggested Questions</div>
+        {points_html}
+    </div>
+    {avoid_html}
+</div>
+""", unsafe_allow_html=True)
 
     # ========== ELEVATED RISK WATCHLIST ==========
     if elevated:
@@ -972,22 +1160,22 @@ def main():
             trend_icon = '📈' if profile.trend == 'worsening' else ('📉' if profile.trend == 'improving' else '➡️')
 
             st.markdown(f"""
-            <div class="profile-card elevated-risk">
-                <div class="profile-header">
-                    <div style="display: flex; align-items: center;">
-                        <div class="profile-avatar" style="background: #f39c12;">{initials}</div>
-                        <div class="profile-info">
-                            <div class="profile-name">{profile.user_name}</div>
-                            <div class="profile-role">Score: {profile.risk_score:.0f} • {', '.join(profile.top_risk_factors[:2])}</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="trend-indicator {trend_class}">{trend_icon}</span>
-                        <span class="risk-badge badge-elevated">{profile.risk_score:.0f}</span>
-                    </div>
-                </div>
+<div class="profile-card elevated-risk">
+    <div class="profile-header">
+        <div style="display: flex; align-items: center;">
+            <div class="profile-avatar" style="background: #f39c12;">{initials}</div>
+            <div class="profile-info">
+                <div class="profile-name">{profile.user_name}</div>
+                <div class="profile-role">Score: {profile.risk_score:.0f} • {', '.join(profile.top_risk_factors[:2])}</div>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="trend-indicator {trend_class}">{trend_icon}</span>
+            <span class="risk-badge badge-elevated">{profile.risk_score:.0f}</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1005,12 +1193,12 @@ def main():
 
             with cols[idx % len(cols)]:
                 st.markdown(f"""
-                <div class="team-member-mini">
-                    <div class="member-avatar-mini" style="background: #27ae60;">{initials}</div>
-                    <div class="member-name-mini">{first_name}</div>
-                    <div class="member-score-mini value-healthy">{profile.risk_score:.0f}</div>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="team-member-mini">
+    <div class="member-avatar-mini" style="background: #27ae60;">{initials}</div>
+    <div class="member-name-mini">{first_name}</div>
+    <div class="member-score-mini value-healthy">{profile.risk_score:.0f}</div>
+</div>
+""", unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1024,35 +1212,35 @@ def main():
     with i1:
         worsening = len([p for p in profiles if p.trend == 'worsening'])
         st.markdown(f"""
-        <div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
-            <div style="color: #ef4444; font-weight: 700; font-size: 24px;">{worsening}</div>
-            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
-                Team members with worsening trends that need attention this week
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
+    <div style="color: #ef4444; font-weight: 700; font-size: 24px;">{worsening}</div>
+    <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
+        Team members with worsening trends that need attention this week
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with i2:
         high_wip = len([p for p in profiles if p.current_metrics.get('wip_count', 0) > 5])
         st.markdown(f"""
-        <div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
-            <div style="color: #f59e0b; font-weight: 700; font-size: 24px;">{high_wip}</div>
-            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
-                Engineers with high WIP counts affecting focus and delivery
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
+    <div style="color: #f59e0b; font-weight: 700; font-size: 24px;">{high_wip}</div>
+    <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
+        Engineers with high WIP counts affecting focus and delivery
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with i3:
         improving = len([p for p in profiles if p.trend == 'improving'])
         st.markdown(f"""
-        <div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #22c55e;">
-            <div style="color: #22c55e; font-weight: 700; font-size: 24px;">{improving}</div>
-            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
-                Team members showing improvement trends over the past month
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #22c55e;">
+    <div style="color: #22c55e; font-weight: 700; font-size: 24px;">{improving}</div>
+    <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
+        Team members showing improvement trends over the past month
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 

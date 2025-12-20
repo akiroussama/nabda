@@ -440,15 +440,15 @@ def main():
     try:
         email_data = generate_quick_email(conn)
         st.markdown(f"""
-        <div class="quick-win-widget">
-            <div class="quick-win-header">
-                <span class="quick-win-icon">📧</span>
-                <span class="quick-win-title">QUICK EMAIL • Ready to Send</span>
-            </div>
-            <div class="email-summary">{email_data['email_text']}</div>
-            <div class="copy-hint">💡 Click and Ctrl+C to copy, paste into email</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">📧</span>
+        <span class="quick-win-title">QUICK EMAIL • Ready to Send</span>
+    </div>
+    <div class="email-summary">{email_data['email_text']}</div>
+    <div class="copy-hint">💡 Click and Ctrl+C to copy, paste into email</div>
+</div>
+""", unsafe_allow_html=True)
     except Exception:
         pass
 
@@ -460,53 +460,53 @@ def main():
 
     with col1:
         st.markdown("""
-        <div class="report-card">
-            <div class="report-icon">🏃</div>
-            <div class="report-name">Sprint Health Report</div>
-            <div class="report-description">
-                Comprehensive sprint analysis including completion rates,
-                blocked items, and risk assessment.
-            </div>
-            <div style="margin-top: 12px;">
-                <span class="format-badge format-md">Markdown</span>
-                <span class="format-badge format-csv">CSV</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="report-card">
+    <div class="report-icon">🏃</div>
+    <div class="report-name">Sprint Health Report</div>
+    <div class="report-description">
+        Comprehensive sprint analysis including completion rates,
+        blocked items, and risk assessment.
+    </div>
+    <div style="margin-top: 12px;">
+        <span class="format-badge format-md">Markdown</span>
+        <span class="format-badge format-csv">CSV</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
         sprint_btn = st.button("Generate Sprint Report", key="sprint", type="primary")
 
     with col2:
         st.markdown("""
-        <div class="report-card">
-            <div class="report-icon">👥</div>
-            <div class="report-name">Team Workload Report</div>
-            <div class="report-description">
-                Team capacity analysis, workload distribution,
-                and individual performance metrics.
-            </div>
-            <div style="margin-top: 12px;">
-                <span class="format-badge format-md">Markdown</span>
-                <span class="format-badge format-csv">CSV</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="report-card">
+    <div class="report-icon">👥</div>
+    <div class="report-name">Team Workload Report</div>
+    <div class="report-description">
+        Team capacity analysis, workload distribution,
+        and individual performance metrics.
+    </div>
+    <div style="margin-top: 12px;">
+        <span class="format-badge format-md">Markdown</span>
+        <span class="format-badge format-csv">CSV</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
         team_btn = st.button("Generate Team Report", key="team", type="primary")
 
     with col3:
         st.markdown("""
-        <div class="report-card">
-            <div class="report-icon">📈</div>
-            <div class="report-name">Velocity Report</div>
-            <div class="report-description">
-                Historical velocity trends, sprint-over-sprint
-                comparison, and predictive insights.
-            </div>
-            <div style="margin-top: 12px;">
-                <span class="format-badge format-md">Markdown</span>
-                <span class="format-badge format-csv">CSV</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="report-card">
+    <div class="report-icon">📈</div>
+    <div class="report-name">Velocity Report</div>
+    <div class="report-description">
+        Historical velocity trends, sprint-over-sprint
+        comparison, and predictive insights.
+    </div>
+    <div style="margin-top: 12px;">
+        <span class="format-badge format-md">Markdown</span>
+        <span class="format-badge format-csv">CSV</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
         velocity_btn = st.button("Generate Velocity Report", key="velocity", type="primary")
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -656,11 +656,11 @@ def main():
     # Footer
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #64748b; font-size: 12px;">
-        Reports Center | Export to Markdown & CSV |
-        Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; color: #64748b; font-size: 12px;">
+    Reports Center | Export to Markdown & CSV |
+    Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+</div>
+""", unsafe_allow_html=True)
 
     conn.close()
 

@@ -917,14 +917,14 @@ def render_hero_section(time_saved: int):
         emoji = "🌙"
 
     st.markdown(f"""
-    <div class="action-hero">
-        <div class="hero-title">{emoji} {greeting}</div>
-        <div class="hero-subtitle">Your Daily Action Intelligence is ready</div>
-        <div class="time-saved-badge">
-            ⏱️ Estimated time saved today: <strong>{time_saved} minutes</strong>
-        </div>
+<div class="action-hero">
+    <div class="hero-title">{emoji} {greeting}</div>
+    <div class="hero-subtitle">Your Daily Action Intelligence is ready</div>
+    <div class="time-saved-badge">
+        ⏱️ Estimated time saved today: <strong>{time_saved} minutes</strong>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_action_card(action: ActionItem, index: int):
@@ -943,19 +943,19 @@ def render_action_card(action: ActionItem, index: int):
     }.get(action.category, action.category)
 
     st.markdown(f"""
-    <div class="action-card {action_class}">
-        <div class="action-priority {priority_class}">{index + 1}</div>
-        <div class="action-title">{action.title}</div>
-        <div class="action-meta">
-            <span class="action-tag">{category_label}</span>
-            <span>👤 {action.assignee}</span>
-            <span>📅 {action.age_days} days</span>
-        </div>
-        <div style="margin-top: 8px; font-size: 12px; color: #64ffda;">
-            💡 {action.reason}
-        </div>
+<div class="action-card {action_class}">
+    <div class="action-priority {priority_class}">{index + 1}</div>
+    <div class="action-title">{action.title}</div>
+    <div class="action-meta">
+        <span class="action-tag">{category_label}</span>
+        <span>👤 {action.assignee}</span>
+        <span>📅 {action.age_days} days</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="margin-top: 8px; font-size: 12px; color: #64ffda;">
+        💡 {action.reason}
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_one_on_one_card(profile: TeamMemberProfile):
@@ -964,19 +964,19 @@ def render_one_on_one_card(profile: TeamMemberProfile):
     initials = "".join([n[0] for n in profile.name.split()[:2]]).upper()
 
     st.markdown(f"""
-    <div class="one-on-one-card" style="--member-color: {profile.color}">
-        <div class="member-header">
-            <div class="member-avatar" style="background: {profile.color}">{initials}</div>
-            <div>
-                <div class="member-name">{profile.name}</div>
-                <div class="member-role">
-                    {trend_emoji} {profile.completed_this_week} done this week ·
-                    {profile.in_progress} in progress ·
-                    {profile.stuck_issues} stuck
-                </div>
+<div class="one-on-one-card" style="--member-color: {profile.color}">
+    <div class="member-header">
+        <div class="member-avatar" style="background: {profile.color}">{initials}</div>
+        <div>
+            <div class="member-name">{profile.name}</div>
+            <div class="member-role">
+                {trend_emoji} {profile.completed_this_week} done this week ·
+                {profile.in_progress} in progress ·
+                {profile.stuck_issues} stuck
             </div>
         </div>
-    """, unsafe_allow_html=True)
+    </div>
+""", unsafe_allow_html=True)
 
     if profile.talking_points:
         for point in profile.talking_points[:4]:
@@ -988,21 +988,21 @@ def render_one_on_one_card(profile: TeamMemberProfile):
             }.get(point.category, "💡")
 
             st.markdown(f"""
-            <div class="talking-point {point.category}">
-                <span class="point-icon">{icon}</span>
-                <div>
-                    <div class="point-text">{point.text}</div>
-                    {f'<div class="point-data">{point.data}</div>' if point.data else ''}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="talking-point {point.category}">
+    <span class="point-icon">{icon}</span>
+    <div>
+        <div class="point-text">{point.text}</div>
+        {f'<div class="point-data">{point.data}</div>' if point.data else ''}
+    </div>
+</div>
+""", unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div class="talking-point discuss">
-            <span class="point-icon">✅</span>
-            <div class="point-text">All clear - general check-in and growth discussion</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="talking-point discuss">
+    <span class="point-icon">✅</span>
+    <div class="point-text">All clear - general check-in and growth discussion</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1010,13 +1010,13 @@ def render_one_on_one_card(profile: TeamMemberProfile):
 def render_blocker_card(blocker: pd.Series):
     """Render a blocker card."""
     st.markdown(f"""
-    <div class="blocker-card">
-        <div class="blocker-pulse"></div>
-        <div class="blocker-title">{blocker['key']}: {blocker['summary'][:60]}...</div>
-        <div class="blocker-owner">👤 {blocker['assignee_name'] or 'Unassigned'}</div>
-        <span class="blocker-duration">⏰ Stuck for {int(blocker['days_stale'])} days</span>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="blocker-card">
+    <div class="blocker-pulse"></div>
+    <div class="blocker-title">{blocker['key']}: {blocker['summary'][:60]}...</div>
+    <div class="blocker-owner">👤 {blocker['assignee_name'] or 'Unassigned'}</div>
+    <span class="blocker-duration">⏰ Stuck for {int(blocker['days_stale'])} days</span>
+</div>
+""", unsafe_allow_html=True)
 
 
 def render_priority_item(row: pd.Series, rank: int):
@@ -1025,19 +1025,19 @@ def render_priority_item(row: pd.Series, rank: int):
     impact = "High" if row['impact_score'] > 100 else "Medium" if row['impact_score'] > 60 else "Normal"
 
     st.markdown(f"""
-    <div class="priority-item">
-        <div class="priority-rank {rank_class}">{rank}</div>
-        <div class="priority-content">
-            <div class="priority-title">{row['key']}: {row['summary'][:50]}...</div>
-            <div class="priority-reason">
-                👤 {row['assignee_name'] or 'Unassigned'} ·
-                {row['priority']} priority ·
-                {int(row['age_days'])} days old
-            </div>
+<div class="priority-item">
+    <div class="priority-rank {rank_class}">{rank}</div>
+    <div class="priority-content">
+        <div class="priority-title">{row['key']}: {row['summary'][:50]}...</div>
+        <div class="priority-reason">
+            👤 {row['assignee_name'] or 'Unassigned'} ·
+            {row['priority']} priority ·
+            {int(row['age_days'])} days old
         </div>
-        <span class="priority-impact">{impact} Impact</span>
     </div>
-    """, unsafe_allow_html=True)
+    <span class="priority-impact">{impact} Impact</span>
+</div>
+""", unsafe_allow_html=True)
 
 
 def main():
@@ -1066,29 +1066,29 @@ def main():
     status_color = '#22c55e' if len(blockers) == 0 else '#f59e0b' if len(blockers) <= 2 else '#ef4444'
 
     st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 10 min saved</div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <span style="background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-                💬 SLACK UPDATE READY
-            </span>
+<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 10 min saved</div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+            💬 SLACK UPDATE READY
+        </span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
+        <div style="flex: 1;">
+            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Copy-Paste to #team-channel</div>
+            <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; position: relative;">
+                <div style="position: absolute; top: 8px; right: 12px; font-size: 10px; opacity: 0.6; font-family: system-ui;">📋 Click to copy</div>
+                {slack_update}
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
-            <div style="flex: 1;">
-                <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Copy-Paste to #team-channel</div>
-                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; position: relative;">
-                    <div style="position: absolute; top: 8px; right: 12px; font-size: 10px; opacity: 0.6; font-family: system-ui;">📋 Click to copy</div>
-                    {slack_update}
-                </div>
-            </div>
-            <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 120px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Team Status</div>
-                <div style="font-size: 36px;">{'🟢' if len(blockers) == 0 else '🟡' if len(blockers) <= 2 else '🔴'}</div>
-                <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">{len(blockers)} blockers</div>
-            </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 120px; text-align: center;">
+            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Team Status</div>
+            <div style="font-size: 36px;">{'🟢' if len(blockers) == 0 else '🟡' if len(blockers) <= 2 else '🔴'}</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">{len(blockers)} blockers</div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     # Quick Stats Row
     col1, col2, col3, col4 = st.columns(4)
@@ -1269,11 +1269,11 @@ def main():
     for i, (icon, label) in enumerate(quick_actions):
         with qa_cols[i]:
             st.markdown(f"""
-            <div class="quick-action">
-                <div class="quick-action-icon">{icon}</div>
-                <div class="quick-action-label">{label}</div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="quick-action">
+    <div class="quick-action-icon">{icon}</div>
+    <div class="quick-action-label">{label}</div>
+</div>
+""", unsafe_allow_html=True)
 
     conn.close()
 

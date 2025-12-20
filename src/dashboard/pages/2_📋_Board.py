@@ -399,26 +399,26 @@ def main():
         items_html = ""
         for item in stale_data['items']:
             items_html += f"""
-            <div class="stale-item">
-                <span class="stale-key">{item['key']}</span>
-                <span class="stale-summary">{item['summary']}</span>
-                <span class="stale-days">{item['days']}d stale</span>
-            </div>
-            """
+<div class="stale-item">
+    <span class="stale-key">{item['key']}</span>
+    <span class="stale-summary">{item['summary']}</span>
+    <span class="stale-days">{item['days']}d stale</span>
+</div>
+"""
 
         extra_count = stale_data['total'] - len(stale_data['items'])
         extra_html = f'<div class="stale-count-badge">+ {extra_count} more stale items</div>' if extra_count > 0 else ''
 
         st.markdown(f"""
-        <div class="quick-win-widget">
-            <div class="quick-win-header">
-                <span class="quick-win-icon">🚨</span>
-                <span class="quick-win-title">Stale Items Alert — {stale_data['total']} Items Need Attention</span>
-            </div>
-            {items_html}
-            {extra_html}
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🚨</span>
+        <span class="quick-win-title">Stale Items Alert — {stale_data['total']} Items Need Attention</span>
+    </div>
+    {items_html}
+    {extra_html}
+</div>
+""", unsafe_allow_html=True)
 
     # ========== ULTRATHINK: FLOW BOTTLENECKS ==========
     bottlenecks = get_flow_bottlenecks(conn)
@@ -427,22 +427,22 @@ def main():
         for bn in bottlenecks:
             color = "#ef4444" if bn['severity'] == 'high' else "#f59e0b"
             bn_html += f"""
-            <div style="background: rgba(255,255,255,0.7); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid {color};">
-                <div style="font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 16px;">{'🔥' if bn['severity'] == 'high' else '⚠️'}</span> {bn['title']}
-                </div>
-                <div style="font-size: 13px; color: #475569; margin-top: 4px;">{bn['desc']}</div>
-            </div>
-            """
+<div style="background: rgba(255,255,255,0.7); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid {color};">
+    <div style="font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 16px;">{'🔥' if bn['severity'] == 'high' else '⚠️'}</span> {bn['title']}
+    </div>
+    <div style="font-size: 13px; color: #475569; margin-top: 4px;">{bn['desc']}</div>
+</div>
+"""
             
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid #fed7aa;">
-            <div style="font-size: 12px; font-weight: 600; color: #9a3412; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                <span>🌊 Flow Efficiency Insights</span>
-            </div>
-            {bn_html}
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid #fed7aa;">
+    <div style="font-size: 12px; font-weight: 600; color: #9a3412; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span>🌊 Flow Efficiency Insights</span>
+    </div>
+    {bn_html}
+</div>
+""", unsafe_allow_html=True)
 
     # ========== FILTERS ==========
     st.markdown('<div class="filter-bar">', unsafe_allow_html=True)
@@ -525,11 +525,11 @@ def main():
                 points = col_issues['story_points'].sum() if 'story_points' in col_issues else 0
 
                 st.markdown(f"""
-                <div class="column-header {header_class}">
-                    <span style="color: #fff; font-weight: 600;">{col_name}</span>
-                    <span class="column-count">{count} issues • {int(points or 0)} pts</span>
-                </div>
-                """, unsafe_allow_html=True)
+<div class="column-header {header_class}">
+    <span style="color: #fff; font-weight: 600;">{col_name}</span>
+    <span class="column-count">{count} issues • {int(points or 0)} pts</span>
+</div>
+""", unsafe_allow_html=True)
 
                 # WIP limit warning
                 if wip_limit > 0 and col_name == 'In Progress' and count > wip_limit:
@@ -555,16 +555,16 @@ def main():
 
             total_pts = group_issues['story_points'].sum() or 0
             st.markdown(f"""
-            <div class="swimlane-header">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="card-avatar" style="background: {avatar_color}; width: 36px; height: 36px; font-size: 14px;">{initials}</div>
-                    <div>
-                        <div style="color: #fff; font-weight: 600; font-size: 16px;">{assignee}</div>
-                        <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="swimlane-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="card-avatar" style="background: {avatar_color}; width: 36px; height: 36px; font-size: 14px;">{initials}</div>
+        <div>
+            <div style="color: #fff; font-weight: 600; font-size: 16px;">{assignee}</div>
+            <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             cols = st.columns(3)
             for idx, (col_name, status_list, _) in enumerate(columns):
@@ -586,16 +586,16 @@ def main():
             total_pts = group_issues['story_points'].sum() or 0
 
             st.markdown(f"""
-            <div class="swimlane-header">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 24px;">{icon}</span>
-                    <div>
-                        <div style="color: #fff; font-weight: 600; font-size: 16px;">{issue_type}</div>
-                        <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="swimlane-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 24px;">{icon}</span>
+        <div>
+            <div style="color: #fff; font-weight: 600; font-size: 16px;">{issue_type}</div>
+            <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
             cols = st.columns(3)
             for idx, (col_name, status_list, _) in enumerate(columns):

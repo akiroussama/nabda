@@ -694,18 +694,18 @@ def create_trend_chart(days: int = 90) -> go.Figure:
 def main():
     # Header
     st.markdown("""
-    <div style="text-align: center; padding: 20px 0 30px 0;">
-        <h1 style="font-size: 42px; font-weight: 800; margin: 0;
-                   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f39c12 100%);
-                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                   background-clip: text;">
-            🎯 Strategic Execution Gap™
-        </h1>
-        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
-            Uncover the gap between your stated strategy and actual execution
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; padding: 20px 0 30px 0;">
+    <h1 style="font-size: 42px; font-weight: 800; margin: 0;
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f39c12 100%);
+               -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+               background-clip: text;">
+        🎯 Strategic Execution Gap™
+    </h1>
+    <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
+        Uncover the gap between your stated strategy and actual execution
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
     conn = get_connection()
     if not conn:
@@ -717,27 +717,27 @@ def main():
         drift = get_priority_drift(conn)
         status_class = 'drift-good' if drift['status'] == 'aligned' else 'drift-bad'
         st.markdown(f"""
-        <div class="quick-win-widget">
-            <div class="quick-win-header">
-                <span class="quick-win-icon">🎯</span>
-                <span class="quick-win-title">PRIORITY DRIFT • Are We On Track?</span>
-            </div>
-            <div class="drift-summary">
-                <div class="drift-item">
-                    <div class="drift-label">Alignment</div>
-                    <div class="drift-value {status_class}">{drift['alignment_score']:.0f}%</div>
-                </div>
-                <div class="drift-item">
-                    <div class="drift-label">High Priority Done</div>
-                    <div class="drift-value">{drift['high_done']}/{drift['high_priority']}</div>
-                </div>
-                <div class="drift-item">
-                    <div class="drift-label">Status</div>
-                    <div class="drift-value {status_class}">{'Aligned' if drift['status'] == 'aligned' else 'Drifting'}</div>
-                </div>
-            </div>
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🎯</span>
+        <span class="quick-win-title">PRIORITY DRIFT • Are We On Track?</span>
+    </div>
+    <div class="drift-summary">
+        <div class="drift-item">
+            <div class="drift-label">Alignment</div>
+            <div class="drift-value {status_class}">{drift['alignment_score']:.0f}%</div>
         </div>
-        """, unsafe_allow_html=True)
+        <div class="drift-item">
+            <div class="drift-label">High Priority Done</div>
+            <div class="drift-value">{drift['high_done']}/{drift['high_priority']}</div>
+        </div>
+        <div class="drift-item">
+            <div class="drift-label">Status</div>
+            <div class="drift-value {status_class}">{'Aligned' if drift['status'] == 'aligned' else 'Drifting'}</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
     except Exception:
         pass
 
@@ -745,10 +745,10 @@ def main():
     st.markdown('<div class="section-container">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">🎛️ Configure Stated Strategy</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #8892b0; font-size: 13px; margin-bottom: 20px;">
-        Define your target investment allocation. This represents your strategic intent for resource distribution.
-    </p>
-    """, unsafe_allow_html=True)
+<p style="color: #8892b0; font-size: 13px; margin-bottom: 20px;">
+    Define your target investment allocation. This represents your strategic intent for resource distribution.
+</p>
+""", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -808,48 +808,48 @@ def main():
 
     with m1:
         st.markdown(f"""
-        <div class="gap-metric-card {drift_class}">
-            <div class="metric-label">Strategic Drift Cost (Q)</div>
-            <div class="metric-value {drift_class}">${drift_cost:,.0f}</div>
-            <div class="metric-subtitle">💸 Unaligned Investment</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="gap-metric-card {drift_class}">
+    <div class="metric-label">Strategic Drift Cost (Q)</div>
+    <div class="metric-value {drift_class}">${drift_cost:,.0f}</div>
+    <div class="metric-subtitle">💸 Unaligned Investment</div>
+</div>
+""", unsafe_allow_html=True)
 
     shadow_pct = result['shadow_work_percentage'] * 100
     shadow_class = 'danger' if shadow_pct > 25 else ('warning' if shadow_pct > 15 else 'success')
 
     with m2:
         st.markdown(f"""
-        <div class="gap-metric-card {shadow_class}">
-            <div class="metric-label">Shadow Work</div>
-            <div class="metric-value {shadow_class}">{shadow_pct:.1f}%</div>
-            <div class="metric-subtitle">🕵️ Mislabeled Tickets</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="gap-metric-card {shadow_class}">
+    <div class="metric-label">Shadow Work</div>
+    <div class="metric-value {shadow_class}">{shadow_pct:.1f}%</div>
+    <div class="metric-subtitle">🕵️ Mislabeled Tickets</div>
+</div>
+""", unsafe_allow_html=True)
 
     drift_velocity = result['drift_velocity'] * 100
     velocity_class = 'danger' if drift_velocity > 10 else ('warning' if drift_velocity > 5 else 'success')
 
     with m3:
         st.markdown(f"""
-        <div class="gap-metric-card {velocity_class}">
-            <div class="metric-label">Drift Velocity</div>
-            <div class="metric-value {velocity_class}">+{drift_velocity:.1f}%</div>
-            <div class="metric-subtitle">📈 Month-over-Month</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="gap-metric-card {velocity_class}">
+    <div class="metric-label">Drift Velocity</div>
+    <div class="metric-value {velocity_class}">+{drift_velocity:.1f}%</div>
+    <div class="metric-subtitle">📈 Month-over-Month</div>
+</div>
+""", unsafe_allow_html=True)
 
     alignment_score = 100 - (shadow_pct + drift_velocity) / 2
     alignment_class = 'success' if alignment_score > 80 else ('warning' if alignment_score > 60 else 'danger')
 
     with m4:
         st.markdown(f"""
-        <div class="gap-metric-card {alignment_class}">
-            <div class="metric-label">Alignment Score</div>
-            <div class="metric-value {alignment_class}">{alignment_score:.0f}</div>
-            <div class="metric-subtitle">🎯 Strategy Adherence</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="gap-metric-card {alignment_class}">
+    <div class="metric-label">Alignment Score</div>
+    <div class="metric-value {alignment_class}">{alignment_score:.0f}</div>
+    <div class="metric-subtitle">🎯 Strategy Adherence</div>
+</div>
+""", unsafe_allow_html=True)
 
     # ========== VISUALIZATIONS ==========
     st.markdown('<div class="section-container">', unsafe_allow_html=True)
@@ -899,32 +899,32 @@ def main():
 
         with target_col:
             st.markdown(f"""
-            <div class="category-card">
-                <div class="category-header">
-                    <span class="category-name">{cat}</span>
-                    <span class="category-gap {gap_class}">{delta:+.1f}%</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #8892b0; font-size: 12px;">
-                        <span class="legend-dot legend-stated" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;"></span>
-                        Stated: {stated_pct:.1f}%
-                    </span>
-                    <span style="color: #8892b0; font-size: 12px;">
-                        <span class="legend-dot legend-actual" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;"></span>
-                        Actual: {actual_pct:.1f}%
-                    </span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar progress-stated" style="width: {min(stated_pct, 100)}%;"></div>
-                </div>
-                <div class="progress-bar-container" style="margin-top: 4px;">
-                    <div class="progress-bar progress-actual" style="width: {min(actual_pct, 100)}%;"></div>
-                </div>
-                <div style="color: #8892b0; font-size: 11px; margin-top: 8px; text-align: right;">
-                    Drift Cost: <span style="color: #f39c12;">${cost:,.0f}</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="category-card">
+    <div class="category-header">
+        <span class="category-name">{cat}</span>
+        <span class="category-gap {gap_class}">{delta:+.1f}%</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: #8892b0; font-size: 12px;">
+            <span class="legend-dot legend-stated" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;"></span>
+            Stated: {stated_pct:.1f}%
+        </span>
+        <span style="color: #8892b0; font-size: 12px;">
+            <span class="legend-dot legend-actual" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;"></span>
+            Actual: {actual_pct:.1f}%
+        </span>
+    </div>
+    <div class="progress-bar-container">
+        <div class="progress-bar progress-stated" style="width: {min(stated_pct, 100)}%;"></div>
+    </div>
+    <div class="progress-bar-container" style="margin-top: 4px;">
+        <div class="progress-bar progress-actual" style="width: {min(actual_pct, 100)}%;"></div>
+    </div>
+    <div style="color: #8892b0; font-size: 11px; margin-top: 8px; text-align: right;">
+        Drift Cost: <span style="color: #f39c12;">${cost:,.0f}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -936,15 +936,15 @@ def main():
 
     # Insight box
     st.markdown("""
-    <div class="insight-box">
-        <span class="insight-icon">💡</span>
-        <span class="insight-text">
-            <strong>Trend Insight:</strong> New Feature allocation has been declining over the past 90 days,
-            while Maintenance and Firefighting are creeping up. This pattern suggests growing technical debt
-            may be requiring more reactive work.
-        </span>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="insight-box">
+    <span class="insight-icon">💡</span>
+    <span class="insight-text">
+        <strong>Trend Insight:</strong> New Feature allocation has been declining over the past 90 days,
+        while Maintenance and Firefighting are creeping up. This pattern suggests growing technical debt
+        may be requiring more reactive work.
+    </span>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -952,29 +952,29 @@ def main():
     st.markdown('<div class="section-container">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">🕵️ Shadow Work Detection</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #8892b0; font-size: 13px; margin-bottom: 16px;">
-        Tickets labeled as Features/Stories but semantically matching Maintenance/Firefighting work.
-    </p>
-    """, unsafe_allow_html=True)
+<p style="color: #8892b0; font-size: 13px; margin-bottom: 16px;">
+    Tickets labeled as Features/Stories but semantically matching Maintenance/Firefighting work.
+</p>
+""", unsafe_allow_html=True)
 
     shadow_tickets = result['shadow_tickets']
 
     if not shadow_tickets.empty:
         for _, ticket in shadow_tickets.head(8).iterrows():
             st.markdown(f"""
-            <div class="shadow-ticket">
-                <span class="ticket-key">{ticket['key']}</span>
-                <span class="ticket-summary">{str(ticket['summary'])[:80]}{'...' if len(str(ticket['summary'])) > 80 else ''}</span>
-                <span class="ticket-category">{ticket['work_category']}</span>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="shadow-ticket">
+    <span class="ticket-key">{ticket['key']}</span>
+    <span class="ticket-summary">{str(ticket['summary'])[:80]}{'...' if len(str(ticket['summary'])) > 80 else ''}</span>
+    <span class="ticket-category">{ticket['work_category']}</span>
+</div>
+""", unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div style="text-align: center; padding: 40px; color: #27ae60;">
-            <span style="font-size: 48px;">✓</span>
-            <p style="font-size: 16px; margin-top: 10px;">No significant shadow work detected!</p>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center; padding: 40px; color: #27ae60;">
+    <span style="font-size: 48px;">✓</span>
+    <p style="font-size: 16px; margin-top: 10px;">No significant shadow work detected!</p>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -986,36 +986,36 @@ def main():
 
     with rec1:
         st.markdown("""
-        <div style="background: rgba(231, 76, 60, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c;">
-            <div style="color: #e74c3c; font-weight: 700; margin-bottom: 8px;">🚨 Immediate Action</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
-                Review and properly categorize shadow work tickets to improve visibility
-                into actual resource allocation.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: rgba(231, 76, 60, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c;">
+    <div style="color: #e74c3c; font-weight: 700; margin-bottom: 8px;">🚨 Immediate Action</div>
+    <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+        Review and properly categorize shadow work tickets to improve visibility
+        into actual resource allocation.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with rec2:
         st.markdown("""
-        <div style="background: rgba(243, 156, 18, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12;">
-            <div style="color: #f39c12; font-weight: 700; margin-bottom: 8px;">⚡ Short-term</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
-                Allocate dedicated tech debt sprints to reduce firefighting work
-                and bring allocation back to target levels.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: rgba(243, 156, 18, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12;">
+    <div style="color: #f39c12; font-weight: 700; margin-bottom: 8px;">⚡ Short-term</div>
+    <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+        Allocate dedicated tech debt sprints to reduce firefighting work
+        and bring allocation back to target levels.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with rec3:
         st.markdown("""
-        <div style="background: rgba(39, 174, 96, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60;">
-            <div style="color: #27ae60; font-weight: 700; margin-bottom: 8px;">🌱 Long-term</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
-                Implement automated ticket classification during creation to prevent
-                mislabeling and improve strategic visibility.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="background: rgba(39, 174, 96, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60;">
+    <div style="color: #27ae60; font-weight: 700; margin-bottom: 8px;">🌱 Long-term</div>
+    <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+        Implement automated ticket classification during creation to prevent
+        mislabeling and improve strategic visibility.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 

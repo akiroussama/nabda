@@ -177,6 +177,86 @@ st.markdown("""
         border-radius: 50%;
         animation: pulse 2s infinite;
     }
+
+    /* Meeting Opener Widget - The Killer Feature */
+    .meeting-opener {
+        background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        color: white;
+        box-shadow: 0 8px 32px rgba(6, 78, 59, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .meeting-opener::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+    .opener-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .opener-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #a7f3d0;
+    }
+    .opener-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .opener-script {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #ecfdf5;
+        white-space: pre-line;
+        position: relative;
+        z-index: 1;
+    }
+    .opener-script strong {
+        color: #fff;
+        font-weight: 700;
+    }
+    .opener-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        position: relative;
+        z-index: 1;
+    }
+    .opener-btn {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .opener-btn:hover {
+        background: rgba(255,255,255,0.25);
+    }
+    .opener-hint {
+        font-size: 11px;
+        color: #6ee7b7;
+        margin-top: 12px;
+        font-style: italic;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -184,6 +264,85 @@ st.markdown("""
 def get_connection():
     db_path = Path("data/jira.duckdb")
     return duckdb.connect(str(db_path), read_only=True) if db_path.exists() else None
+
+
+def generate_meeting_opener(conn) -> dict:
+    """Generate a ready-to-read meeting opener script - THE killer feature."""
+    try:
+        # Get sprint info
+        sprint = conn.execute("""
+            SELECT name FROM sprints
+            WHERE state = 'active' ORDER BY start_date DESC LIMIT 1
+        """).fetchone()
+        sprint_name = sprint[0] if sprint else "Current Sprint"
+
+        # Get completion metrics
+        metrics = conn.execute("""
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Terminé(e)' THEN 1 ELSE 0 END) as done
+            FROM issues i
+            JOIN sprints s ON i.sprint_id = s.id AND s.state = 'active'
+        """).fetchone()
+
+        total, done = (metrics[0] or 1), (metrics[1] or 0)
+        completion = int(done / total * 100) if total > 0 else 0
+
+        # Get yesterday's wins
+        wins = conn.execute("""
+            SELECT summary FROM issues
+            WHERE status = 'Terminé(e)'
+            AND updated >= CURRENT_DATE - INTERVAL '1 day'
+            ORDER BY story_points DESC NULLS LAST LIMIT 1
+        """).fetchdf()
+
+        win_text = wins.iloc[0]['summary'][:60] if not wins.empty else "Team making steady progress"
+
+        # Get top concern (stale high-priority)
+        concern = conn.execute("""
+            SELECT assignee_name FROM issues
+            WHERE status NOT IN ('Terminé(e)', 'Done', 'Closed')
+            AND priority IN ('Highest', 'High')
+            AND updated < CURRENT_DATE - INTERVAL '2 days'
+            ORDER BY updated ASC LIMIT 1
+        """).fetchone()
+
+        # Get decision context
+        blockers = conn.execute("""
+            SELECT COUNT(*) FROM issues
+            WHERE priority = 'Highest' AND status NOT IN ('Terminé(e)', 'Done', 'Closed')
+        """).fetchone()[0]
+
+        # Build contextual decision
+        if blockers > 3:
+            decision = "Should we escalate blockers or reassign resources?"
+        elif completion < 50:
+            decision = "Do we cut scope or adjust the timeline?"
+        elif completion < 75:
+            decision = "What can we do to accelerate the remaining work?"
+        else:
+            decision = "No urgent decisions needed - stay the course."
+
+        # Build the script
+        script_lines = [f"We're at **{completion}%** completion for {sprint_name}."]
+        script_lines.append(f"\n**Key win:** {win_text}")
+
+        if concern and concern[0]:
+            script_lines.append(f"\n**Heads up:** {concern[0]}'s high-priority work needs attention.")
+
+        script_lines.append(f"\n**Decision point:** {decision}")
+
+        return {
+            'script': ''.join(script_lines),
+            'completion': completion,
+            'sprint_name': sprint_name
+        }
+    except Exception:
+        return {
+            'script': "Sprint in progress. See dashboard for details.",
+            'completion': 0,
+            'sprint_name': "Sprint"
+        }
 
 
 @st.cache_resource
@@ -417,12 +576,12 @@ def main():
         st.markdown("*Real-time Engineering Organization Health*")
     with col_date:
         st.markdown(f"""
-        <div style="text-align: right; padding: 20px;">
-            <div style="font-size: 12px; color: #64748b;">LAST UPDATED</div>
-            <div style="font-size: 18px; color: #4f46e5; font-weight: 600;">{datetime.now().strftime('%H:%M:%S')}</div>
-            <div style="font-size: 14px; color: #64748b;">{datetime.now().strftime('%B %d, %Y')}</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: right; padding: 20px;">
+    <div style="font-size: 12px; color: #64748b;">LAST UPDATED</div>
+    <div style="font-size: 18px; color: #4f46e5; font-weight: 600;">{datetime.now().strftime('%H:%M:%S')}</div>
+    <div style="font-size: 14px; color: #64748b;">{datetime.now().strftime('%B %d, %Y')}</div>
+</div>
+""", unsafe_allow_html=True)
 
     conn = get_connection()
     if not conn:
@@ -434,21 +593,40 @@ def main():
     indicator_color = '#22c55e' if release_data['score'] >= 80 else '#f59e0b' if release_data['score'] >= 60 else '#ef4444'
 
     st.markdown(f"""
-    <div class="quick-win-widget">
-        <div>
-            <div class="quick-win-title">⚡ RELEASE READINESS</div>
-            <div class="quick-win-value">{release_data['score']}%</div>
-        </div>
-        <div class="quick-win-status">
-            <div class="quick-win-indicator" style="background: {indicator_color};"></div>
-            <span>{release_data['status']}</span>
-        </div>
-        <div>
-            <div style="font-size: 12px; opacity: 0.8;">{release_data.get('done', 0)}/{release_data.get('total', 0)} done • {release_data['blockers']} blockers</div>
-            <div class="quick-win-action">→ {release_data['action']}</div>
-        </div>
+<div class="quick-win-widget">
+    <div>
+        <div class="quick-win-title">⚡ RELEASE READINESS</div>
+        <div class="quick-win-value">{release_data['score']}%</div>
     </div>
-    """, unsafe_allow_html=True)
+    <div class="quick-win-status">
+        <div class="quick-win-indicator" style="background: {indicator_color};"></div>
+        <span>{release_data['status']}</span>
+    </div>
+    <div>
+        <div style="font-size: 12px; opacity: 0.8;">{release_data.get('done', 0)}/{release_data.get('total', 0)} done • {release_data['blockers']} blockers</div>
+        <div class="quick-win-action">→ {release_data['action']}</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ========== KILLER FEATURE: Meeting Opener ==========
+    opener = generate_meeting_opener(conn)
+    # Convert markdown bold to HTML
+    script_html = opener['script'].replace('**', '<strong>', 1)
+    while '**' in script_html:
+        script_html = script_html.replace('**', '</strong>', 1).replace('**', '<strong>', 1)
+    script_html = script_html.replace('\n', '<br>')
+
+    st.markdown(f"""
+<div class="meeting-opener">
+    <div class="opener-header">
+        <span class="opener-title">📢 Meeting Opener • Read This Out Loud</span>
+        <span class="opener-badge">✨ AI-Generated</span>
+    </div>
+    <div class="opener-script">{script_html}</div>
+    <div class="opener-hint">💡 Pro tip: Copy this to start your standup in 10 seconds flat</div>
+</div>
+""", unsafe_allow_html=True)
 
     # Load data
     with st.spinner("🔄 Aggregating Intelligence..."):
@@ -503,23 +681,23 @@ def main():
     # ========== HEALTH SCORE BANNER ==========
     grade_colors = {'A': '#2ed573', 'B': '#7bed9f', 'C': '#ffa502', 'D': '#ff4757'}
     st.markdown(f"""
-    <div class="exec-summary">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h3>🎯 Organization Health Score</h3>
-                <p style="color: #64748b; margin: 0;">Composite score based on Strategy, Team Health, and Delivery Metrics</p>
+<div class="exec-summary">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3>🎯 Organization Health Score</h3>
+            <p style="color: #64748b; margin: 0;">Composite score based on Strategy, Team Health, and Delivery Metrics</p>
+        </div>
+        <div style="text-align: center;">
+            <div class="metric-giant" style="background: {grade_colors[health_grade]}; -webkit-background-clip: text;">
+                {health_score}
             </div>
-            <div style="text-align: center;">
-                <div class="metric-giant" style="background: {grade_colors[health_grade]}; -webkit-background-clip: text;">
-                    {health_score}
-                </div>
-                <span class="score-badge score-{'excellent' if health_grade == 'A' else 'good' if health_grade == 'B' else 'warning' if health_grade == 'C' else 'danger'}">
-                    Grade {health_grade}
-                </span>
-            </div>
+            <span class="score-badge score-{'excellent' if health_grade == 'A' else 'good' if health_grade == 'B' else 'warning' if health_grade == 'C' else 'danger'}">
+                Grade {health_grade}
+            </span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     # ========== THE HOLY TRINITY - GAUGE CHARTS ==========
     st.markdown("### 📊 The Holy Trinity™")
@@ -532,11 +710,11 @@ def main():
         fig = create_gauge_chart(strategy_score, "Strategic Alignment", thresholds=[40, 70])
         st.plotly_chart(fig, use_container_width=True)
         st.markdown(f"""
-        <div style="text-align: center;">
-            <div class="metric-sublabel">💰 ${strat_res.total_drift_cost:,.0f} drift cost</div>
-            <div style="color: #64748b; font-size: 12px;">{strat_res.shadow_work_percentage*100:.1f}% shadow work detected</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center;">
+    <div class="metric-sublabel">💰 ${strat_res.total_drift_cost:,.0f} drift cost</div>
+    <div style="color: #64748b; font-size: 12px;">{strat_res.shadow_work_percentage*100:.1f}% shadow work detected</div>
+</div>
+""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with g2:
@@ -545,11 +723,11 @@ def main():
         fig = create_gauge_chart(team_health, "Team Health", thresholds=[50, 80])
         st.plotly_chart(fig, use_container_width=True)
         st.markdown(f"""
-        <div style="text-align: center;">
-            <div class="metric-sublabel">🚨 {high_risk} high-risk engineers</div>
-            <div style="color: #64748b; font-size: 12px;">{len(df_users)} active team members</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center;">
+    <div class="metric-sublabel">🚨 {high_risk} high-risk engineers</div>
+    <div style="color: #64748b; font-size: 12px;">{len(df_users)} active team members</div>
+</div>
+""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with g3:
@@ -557,11 +735,11 @@ def main():
         fig = create_gauge_chart(del_res.target_date_prob * 100, "Delivery Confidence", thresholds=[50, 80])
         st.plotly_chart(fig, use_container_width=True)
         st.markdown(f"""
-        <div style="text-align: center;">
-            <div class="metric-sublabel">📅 P85: {del_res.p85_date.strftime('%b %d')}</div>
-            <div style="color: #64748b; font-size: 12px;">Bias factor: {del_params['estimation_bias_mean']:.1f}x</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div style="text-align: center;">
+    <div class="metric-sublabel">📅 P85: {del_res.p85_date.strftime('%b %d')}</div>
+    <div style="color: #64748b; font-size: 12px;">Bias factor: {del_params['estimation_bias_mean']:.1f}x</div>
+</div>
+""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ========== TREND SPARKLINES ==========

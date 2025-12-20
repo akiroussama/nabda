@@ -589,65 +589,65 @@ def main():
         for i, item in enumerate(focus_items, 1):
             priority_class = f"focus-{item['priority']}"
             items_html += f"""
-            <div class="focus-item {priority_class}">
-                <div class="focus-number">{i}</div>
-                <div class="focus-content">
-                    <div class="focus-text">
-                        <span class="focus-key">{item['key']}</span> {item['summary']}
-                    </div>
-                    <div class="focus-reason">{item['reason']} • {item['assignee']}</div>
-                </div>
-            </div>
-            """
+<div class="focus-item {priority_class}">
+    <div class="focus-number">{i}</div>
+    <div class="focus-content">
+        <div class="focus-text">
+            <span class="focus-key">{item['key']}</span> {item['summary']}
+        </div>
+        <div class="focus-reason">{item['reason']} • {item['assignee']}</div>
+    </div>
+</div>
+"""
 
         st.markdown(f"""
-        <div class="quick-win-widget">
-            <div class="quick-win-header">
-                <span class="quick-win-icon">🎯</span>
-                <span class="quick-win-title">Today's Focus — Top 3 Items Needing Your Attention</span>
-            </div>
-            {items_html}
-        </div>
-        """, unsafe_allow_html=True)
+<div class="quick-win-widget">
+    <div class="quick-win-header">
+        <span class="quick-win-icon">🎯</span>
+        <span class="quick-win-title">Today's Focus — Top 3 Items Needing Your Attention</span>
+    </div>
+    {items_html}
+</div>
+""", unsafe_allow_html=True)
 
     # ========== ULTRATHINK: EXECUTIVE PULSE ==========
     pulse = get_client_confidence(conn)
     st.markdown(f"""
-    <div class="exec-pulse-widget">
-        <div class="exec-pulse-header">
-            <div class="exec-title">
-                <span>💎 Executive Pulse</span>
-            </div>
-            <div style="font-size: 11px; color: #64748b;">LIVE</div>
+<div class="exec-pulse-widget">
+    <div class="exec-pulse-header">
+        <div class="exec-title">
+            <span>💎 Executive Pulse</span>
         </div>
-        
-        <div class="exec-main-score">
-            <div class="confidence-value">{pulse['score']}</div>
-            <div class="confidence-label">
-                Client Confidence Index<br>
-                <span style="font-size: 12px; color: #94a3b8; font-weight: 400;">Based on Velocity, Quality & ROI</span>
-            </div>
-        </div>
-        
-        <div class="exec-metrics">
-            <div class="exec-metric-item">
-                <div class="exec-metric-label">ROI / Efficiency</div>
-                <div class="exec-metric-val">{pulse['roi']}</div>
-                <div class="metric-trend trend-up">▲ High Value</div>
-            </div>
-            <div class="exec-metric-item">
-                <div class="exec-metric-label">Quality Score</div>
-                <div class="exec-metric-val">{pulse['quality']}</div>
-                <div class="metric-trend {'trend-down' if pulse['open_risks'] > 2 else 'trend-up'}">{pulse['open_risks']} Open Bugs</div>
-            </div>
-            <div class="exec-metric-item">
-                <div class="exec-metric-label">Delivery Forecast</div>
-                <div class="exec-metric-val">On Track</div>
-                <div class="metric-trend trend-up">{pulse['velocity_trend']} vs avg</div>
-            </div>
+        <div style="font-size: 11px; color: #64748b;">LIVE</div>
+    </div>
+    
+    <div class="exec-main-score">
+        <div class="confidence-value">{pulse['score']}</div>
+        <div class="confidence-label">
+            Client Confidence Index<br>
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 400;">Based on Velocity, Quality & ROI</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    
+    <div class="exec-metrics">
+        <div class="exec-metric-item">
+            <div class="exec-metric-label">ROI / Efficiency</div>
+            <div class="exec-metric-val">{pulse['roi']}</div>
+            <div class="metric-trend trend-up">▲ High Value</div>
+        </div>
+        <div class="exec-metric-item">
+            <div class="exec-metric-label">Quality Score</div>
+            <div class="exec-metric-val">{pulse['quality']}</div>
+            <div class="metric-trend {'trend-down' if pulse['open_risks'] > 2 else 'trend-up'}">{pulse['open_risks']} Open Bugs</div>
+        </div>
+        <div class="exec-metric-item">
+            <div class="exec-metric-label">Delivery Forecast</div>
+            <div class="exec-metric-val">On Track</div>
+            <div class="metric-trend trend-up">{pulse['velocity_trend']} vs avg</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     # ========== TOP KPIs ==========
     kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
@@ -674,52 +674,52 @@ def main():
 
     with kpi1:
         st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-label">Total Issues</div>
-            <div class="kpi-value">{total_issues:,}</div>
-            <div class="kpi-delta delta-{'up' if created_this_week > 0 else 'neutral'}">
-                +{created_this_week} this week
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="kpi-box">
+    <div class="kpi-label">Total Issues</div>
+    <div class="kpi-value">{total_issues:,}</div>
+    <div class="kpi-delta delta-{'up' if created_this_week > 0 else 'neutral'}">
+        +{created_this_week} this week
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with kpi2:
         st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-label">Open Issues</div>
-            <div class="kpi-value">{open_issues:,}</div>
-            <div class="kpi-delta delta-neutral">{open_issues/max(total_issues,1)*100:.0f}% of total</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="kpi-box">
+    <div class="kpi-label">Open Issues</div>
+    <div class="kpi-value">{open_issues:,}</div>
+    <div class="kpi-delta delta-neutral">{open_issues/max(total_issues,1)*100:.0f}% of total</div>
+</div>
+""", unsafe_allow_html=True)
 
     with kpi3:
         st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-label">In Progress</div>
-            <div class="kpi-value">{in_progress}</div>
-            <div class="kpi-delta delta-up">Active work</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="kpi-box">
+    <div class="kpi-label">In Progress</div>
+    <div class="kpi-value">{in_progress}</div>
+    <div class="kpi-delta delta-up">Active work</div>
+</div>
+""", unsafe_allow_html=True)
 
     with kpi4:
         st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-label">Blocked</div>
-            <div class="kpi-value" style="color: {'#dc2626' if blocked > 0 else '#16a34a'};">{blocked}</div>
-            <div class="kpi-delta delta-{'down' if blocked > 0 else 'up'}">
-                {'Needs attention' if blocked > 0 else 'All clear'}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="kpi-box">
+    <div class="kpi-label">Blocked</div>
+    <div class="kpi-value" style="color: {'#dc2626' if blocked > 0 else '#16a34a'};">{blocked}</div>
+    <div class="kpi-delta delta-{'down' if blocked > 0 else 'up'}">
+        {'Needs attention' if blocked > 0 else 'All clear'}
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
     with kpi5:
         st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-label">Done Today</div>
-            <div class="kpi-value" style="color: #16a34a;">{completed_today}</div>
-            <div class="kpi-delta delta-up">Keep it up!</div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="kpi-box">
+    <div class="kpi-label">Done Today</div>
+    <div class="kpi-value" style="color: #16a34a;">{completed_today}</div>
+    <div class="kpi-delta delta-up">Keep it up!</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("---")
 

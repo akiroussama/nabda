@@ -5,14 +5,14 @@ Dashboard to compare Stated Strategy vs Actual Execution with advanced insights.
 
 import streamlit as st
 import sys
-
-# Import page guide component
-from src.dashboard.components import render_page_guide
 from pathlib import Path
 
 # Add project root to sys.path so we can import from src
 root_dir = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.append(str(root_dir))
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 
 import pandas as pd
 import duckdb

@@ -623,27 +623,27 @@ def main():
     for factor in risk_data['factors']:
         factors_html += f"""
 <div class="risk-factor">
-    <span class="factor-icon">{factor['icon']}</span>
-    <span class="factor-text">{factor['text']}</span>
-    <span class="factor-value">{factor['value']}</span>
+<span class="factor-icon">{factor['icon']}</span>
+<span class="factor-text">{factor['text']}</span>
+<span class="factor-value">{factor['value']}</span>
 </div>
 """
 
     st.markdown(f"""
 <div class="quick-win-widget">
-    <div class="quick-win-header">
-        <span class="quick-win-icon">🚀</span>
-        <span class="quick-win-title">Release Risk — Is It Safe to Release?</span>
-    </div>
-    <div class="risk-summary">
-        <div class="risk-score-main">
-            <div class="risk-score-value {risk_data['class']}">{risk_data['score']}</div>
-            <div class="risk-label">{risk_data['status']}</div>
-        </div>
-        <div class="risk-factors">
-            {factors_html}
-        </div>
-    </div>
+<div class="quick-win-header">
+<span class="quick-win-icon">🚀</span>
+<span class="quick-win-title">Release Risk — Is It Safe to Release?</span>
+</div>
+<div class="risk-summary">
+<div class="risk-score-main">
+<div class="risk-score-value {risk_data['class']}">{risk_data['score']}</div>
+<div class="risk-label">{risk_data['status']}</div>
+</div>
+<div class="risk-factors">
+{factors_html}
+</div>
+</div>
 </div>
 """, unsafe_allow_html=True)
 

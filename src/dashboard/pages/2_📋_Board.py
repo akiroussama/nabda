@@ -372,18 +372,18 @@ def render_card(issue: pd.Series):
 
     # Important: Do not indent the HTML string to avoid Markdown code block rendering
     return f"""<div class="kanban-card">
-    <div class="card-header">
-        <span class="card-key">{issue['key']}</span>
-        {points_html}
+<div class="card-header">
+    <span class="card-key">{issue['key']}</span>
+    {points_html}
+</div>
+<div class="card-summary">{issue['summary'][:80]}{'...' if len(str(issue['summary'])) > 80 else ''}</div>
+<div class="card-footer">
+    <div class="card-meta">
+        <span class="type-badge type-{type_class}">{issue['issue_type']}</span>
+        <span class="priority-badge priority-{priority}">{issue['priority'] or 'Medium'}</span>
     </div>
-    <div class="card-summary">{issue['summary'][:80]}{'...' if len(str(issue['summary'])) > 80 else ''}</div>
-    <div class="card-footer">
-        <div class="card-meta">
-            <span class="type-badge type-{type_class}">{issue['issue_type']}</span>
-            <span class="priority-badge priority-{priority}">{issue['priority'] or 'Medium'}</span>
-        </div>
-        <div class="card-avatar" style="background: {avatar_color};">{initials}</div>
-    </div>
+    <div class="card-avatar" style="background: {avatar_color};">{initials}</div>
+</div>
 </div>"""
 
 

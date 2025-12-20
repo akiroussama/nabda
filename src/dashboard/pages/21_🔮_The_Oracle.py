@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 import random
 import duckdb
+from pathlib import Path
 
 # Import page guide component
 from src.dashboard.components import render_page_guide
@@ -99,7 +100,8 @@ class OracleAction:
 def get_connection():
     """Get DuckDB connection."""
     try:
-        return duckdb.connect("jira_data.duckdb", read_only=True)
+        db_path = Path("data/jira.duckdb")
+        return duckdb.connect(str(db_path), read_only=True) if db_path.exists() else None
     except Exception as e:
         return None
 
@@ -601,39 +603,34 @@ def render_oracle_widget(action: OracleAction, index: int):
 
     st.markdown(f"""
 <div class="oracle-container">
-    <div class="oracle-card">
-        <div style="text-align: center;">
-            <span class="oracle-urgency">{emoji} {action.urgency}</span>
-        </div>
-
-        <div class="oracle-headline">{action.headline}</div>
-        <div class="oracle-subtext">{action.subtext}</div>
-
-        <div class="oracle-reason">
-            <div class="oracle-reason-label">WHY THIS MATTERS</div>
-            <div class="oracle-reason-text">{action.reason}</div>
-        </div>
-
-        <div class="oracle-action-box">
-            <div class="oracle-action-label">📋 THE EXACT ACTION (READY TO USE)</div>
-            <div class="oracle-action-content">{action.action_content}</div>
-        </div>
-
-        <div class="oracle-metrics">
-            <div class="oracle-metric">
-                <div class="oracle-metric-value">{action.time_saved_minutes}m</div>
-                <div class="oracle-metric-label">Time Saved</div>
-            </div>
-            <div class="oracle-metric">
-                <div class="oracle-metric-value">{int(action.confidence * 100)}%</div>
-                <div class="oracle-metric-label">Confidence</div>
-            </div>
-        </div>
-
-        <div class="oracle-risk">
-            ⚠️ If ignored: {action.risk_if_ignored}
-        </div>
-    </div>
+<div class="oracle-card">
+<div style="text-align: center;">
+<span class="oracle-urgency">{emoji} {action.urgency}</span>
+</div>
+<div class="oracle-headline">{action.headline}</div>
+<div class="oracle-subtext">{action.subtext}</div>
+<div class="oracle-reason">
+<div class="oracle-reason-label">WHY THIS MATTERS</div>
+<div class="oracle-reason-text">{action.reason}</div>
+</div>
+<div class="oracle-action-box">
+<div class="oracle-action-label">📋 THE EXACT ACTION (READY TO USE)</div>
+<div class="oracle-action-content">{action.action_content}</div>
+</div>
+<div class="oracle-metrics">
+<div class="oracle-metric">
+<div class="oracle-metric-value">{action.time_saved_minutes}m</div>
+<div class="oracle-metric-label">Time Saved</div>
+</div>
+<div class="oracle-metric">
+<div class="oracle-metric-value">{int(action.confidence * 100)}%</div>
+<div class="oracle-metric-label">Confidence</div>
+</div>
+</div>
+<div class="oracle-risk">
+⚠️ If ignored: {action.risk_if_ignored}
+</div>
+</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -657,32 +654,18 @@ def render_oracle_widget(action: OracleAction, index: int):
 def render_empty_oracle():
     """Render when there are no actions."""
     st.markdown("""
-<div style="
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-">
-    <div style="
-        text-align: center;
-        padding: 60px;
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
-        border-radius: 30px;
-        border: 2px solid #48bb78;
-        box-shadow: 0 0 60px rgba(72, 187, 120, 0.2);
-    ">
-        <div style="font-size: 4em; margin-bottom: 20px;">🎯</div>
-        <div style="font-size: 2em; font-weight: 800; color: #68d391; margin-bottom: 15px;">
-            ALL CLEAR
-        </div>
-        <div style="color: #a0aec0; font-size: 1.2em;">
-            No actions needed right now.<br>
-            Your project is on autopilot.
-        </div>
-        <div style="color: #4a5568; font-size: 0.9em; margin-top: 30px;">
-            Check back in an hour. The Oracle never sleeps.
-        </div>
-    </div>
+<div style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+<div style="text-align: center; padding: 60px; background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%); border-radius: 30px; border: 2px solid #48bb78; box-shadow: 0 0 60px rgba(72, 187, 120, 0.2);">
+<div style="font-size: 4em; margin-bottom: 20px;">🎯</div>
+<div style="font-size: 2em; font-weight: 800; color: #68d391; margin-bottom: 15px;">ALL CLEAR</div>
+<div style="color: #a0aec0; font-size: 1.2em;">
+No actions needed right now.<br>
+Your project is on autopilot.
+</div>
+<div style="color: #4a5568; font-size: 0.9em; margin-top: 30px;">
+Check back in an hour. The Oracle never sleeps.
+</div>
+</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -711,8 +694,8 @@ def render_oracle_header():
 </style>
 
 <div class="oracle-header">
-    <div class="oracle-title">🔮 THE ORACLE</div>
-    <div class="oracle-tagline">You don't analyze. You don't decide. You just approve.</div>
+<div class="oracle-title">🔮 THE ORACLE</div>
+<div class="oracle-tagline">You don't analyze. You don't decide. You just approve.</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -803,10 +786,10 @@ Reply with:
 
     # Progress indicator
     st.markdown(f"""
-    <div style="text-align: center; color: #4a5568; font-size: 0.85em; padding: 20px;">
-        Action {current_index + 1} of {len(actions)}
-    </div>
-    """, unsafe_allow_html=True)
+<div style="text-align: center; color: #4a5568; font-size: 0.85em; padding: 20px;">
+Action {current_index + 1} of {len(actions)}
+</div>
+""", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

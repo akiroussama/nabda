@@ -25,7 +25,7 @@ sys.path.append(str(root_dir))
 st.set_page_config(page_title="Delivery Forecast", page_icon="🎲", layout="wide")
 
 # Premium Dark Theme CSS
-st.markdown(f"""<style>
+st.markdown("""<style>
     /* Global Light Theme */
     .stApp {
         background-color: #f8f9fa;

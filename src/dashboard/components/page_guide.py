@@ -526,36 +526,6 @@ PAGE_REGISTRY: Dict[str, PageMetadata] = {
         new_features=["AI-powered resolver matching", "Cascade simulation"]
     ),
 
-    "Waiting_On_Inbox": PageMetadata(
-        id="Waiting_On_Inbox",
-        title="Waiting On Inbox",
-        emoji="📬",
-        tagline="Never let follow-ups fall through the cracks",
-        goal="Track all delegated work and external dependencies with automatic nudging.",
-        added_value=[
-            "Automatic follow-up reminders",
-            "Nothing falls through the cracks",
-            "Quantify response times by person/team"
-        ],
-        helps_with=[
-            "Managing external dependencies",
-            "Following up on delegated work",
-            "Building accountability culture",
-            "Reducing 'waiting' as blocker cause"
-        ],
-        key_features=[
-            "Waiting item lifecycle tracking",
-            "Automatic nudge scheduling",
-            "Response time analytics",
-            "Escalation workflows"
-        ],
-        pro_tips=[
-            "Add items immediately when delegating",
-            "Review stale items weekly"
-        ],
-        version="1.2"
-    ),
-
     "Scope_Negotiator": PageMetadata(
         id="Scope_Negotiator",
         title="Scope Negotiator",
@@ -958,7 +928,8 @@ def get_page_metadata(page_id: Optional[str] = None) -> Optional[PageMetadata]:
 
 def render_page_guide(page_id: Optional[str] = None):
     """
-    Render the collapsible page guide panel.
+    Render a floating page guide button and expandable panel.
+    Works independently of sidebar state.
 
     Args:
         page_id: Optional page ID. If None, auto-detects from current page.
@@ -968,206 +939,10 @@ def render_page_guide(page_id: Optional[str] = None):
     if not metadata:
         return
 
-    # Inject CSS for the floating panel
-    st.markdown("""
-    <style>
-        /* Page Guide Toggle Button */
-        .page-guide-toggle {
-            position: fixed;
-            right: 20px;
-            top: 80px;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .page-guide-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-        }
-
-        /* Page Guide Panel */
-        .page-guide-panel {
-            position: fixed;
-            right: 20px;
-            top: 80px;
-            width: 380px;
-            max-height: calc(100vh - 120px);
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 16px;
-            padding: 0;
-            z-index: 999;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .page-guide-header {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            padding: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .page-guide-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
-
-        .page-guide-emoji {
-            font-size: 1.75rem;
-        }
-
-        .page-guide-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .page-guide-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            transition: all 0.2s ease;
-        }
-
-        .page-guide-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .page-guide-content {
-            padding: 1.25rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .page-guide-tagline {
-            font-size: 1rem;
-            color: #94a3b8;
-            font-style: italic;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .page-guide-section {
-            margin-bottom: 1.25rem;
-        }
-
-        .page-guide-section-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #3b82f6;
-            margin-bottom: 0.5rem;
-        }
-
-        .page-guide-section-content {
-            font-size: 0.85rem;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-
-        .page-guide-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .page-guide-list li {
-            padding: 0.4rem 0;
-            padding-left: 1.25rem;
-            position: relative;
-            color: #cbd5e1;
-            font-size: 0.85rem;
-        }
-
-        .page-guide-list li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: #22c55e;
-        }
-
-        .page-guide-tips li::before {
-            content: '💡';
-        }
-
-        .page-guide-version {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            color: #22c55e;
-            margin-top: 1rem;
-        }
-
-        .page-guide-new-badge {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            padding: 0.15rem 0.5rem;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-
-        .page-guide-features-new {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .page-guide-features-new-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #f59e0b;
-            margin-bottom: 0.5rem;
-        }
-
-        .page-guide-features-new-list {
-            font-size: 0.8rem;
-            color: #fbbf24;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Use session state to track panel visibility
-    if 'page_guide_open' not in st.session_state:
-        st.session_state.page_guide_open = False
-
-    # Create columns to place the toggle button/panel on the right
-    # We use a container in the sidebar instead for Streamlit compatibility
+    # Initialize session state for this page's guide
+    guide_key = f"page_guide_{metadata.id}"
+    if guide_key not in st.session_state:
+        st.session_state[guide_key] = False
 
     # Build content HTML
     value_items = "".join([f"<li>{item}</li>" for item in metadata.added_value])
@@ -1185,59 +960,256 @@ def render_page_guide(page_id: Optional[str] = None):
         </div>
         """
 
-    # Use Streamlit's expander in sidebar for the guide
-    with st.sidebar:
-        with st.expander(f"📖 Page Guide", expanded=False):
+    # Inject CSS for floating button and panel
+    st.markdown("""
+    <style>
+        /* Floating Guide Button */
+        .floating-guide-container {
+            position: fixed;
+            right: 24px;
+            top: 80px;
+            z-index: 9999;
+        }
+
+        .floating-guide-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .floating-guide-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        /* Guide Panel */
+        .guide-panel {
+            position: fixed;
+            right: 24px;
+            top: 140px;
+            width: 360px;
+            max-height: calc(100vh - 180px);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            overflow: hidden;
+        }
+
+        .guide-panel-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .guide-panel-emoji {
+            font-size: 1.75rem;
+        }
+
+        .guide-panel-title {
+            flex: 1;
+        }
+
+        .guide-panel-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .guide-panel-tagline {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            margin: 0;
+        }
+
+        .guide-panel-version {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .guide-panel-content {
+            padding: 20px;
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+        }
+
+        .guide-section {
+            margin-bottom: 16px;
+        }
+
+        .guide-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #3b82f6;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guide-section-content {
+            font-size: 0.85rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .guide-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .guide-list li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #475569;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .guide-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .guide-tips li::before {
+            content: '💡';
+        }
+
+        .guide-features-new {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .guide-features-new-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 4px;
+        }
+
+        .guide-features-new-list {
+            font-size: 0.8rem;
+            color: #92400e;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Create floating button using columns at top right
+    # Use popover for better UX (Streamlit 1.33+)
+    try:
+        # Try using popover (newer Streamlit)
+        with st.popover("📖", help="Page Guide", use_container_width=False):
             st.markdown(f"""
-            <div style="padding: 0.5rem 0;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <span style="font-size: 1.5rem;">{metadata.emoji}</span>
-                    <span style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0;">{metadata.title}</span>
-                    <span class="page-guide-version">v{metadata.version}</span>
+            <div style="min-width: 320px;">
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 16px; border-radius: 12px 12px 0 0; margin: -1rem -1rem 1rem -1rem;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.75rem;">{metadata.emoji}</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 1.1rem; font-weight: 700; color: white;">{metadata.title}</div>
+                            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">{metadata.tagline}</div>
+                        </div>
+                        <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; color: white;">v{metadata.version}</span>
+                    </div>
                 </div>
-                <div style="font-style: italic; color: #94a3b8; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(148, 163, 184, 0.2);">
-                    "{metadata.tagline}"
-                </div>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div class="page-guide-section">
-                <div class="page-guide-section-title">🎯 Goal</div>
-                <div class="page-guide-section-content">{metadata.goal}</div>
+            <div class="guide-section">
+                <div class="guide-section-title">🎯 Goal</div>
+                <div class="guide-section-content">{metadata.goal}</div>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div class="page-guide-section">
-                <div class="page-guide-section-title">✨ Added Value</div>
-                <ul class="page-guide-list">{value_items}</ul>
+            <div class="guide-section">
+                <div class="guide-section-title">✨ Added Value</div>
+                <ul class="guide-list">{value_items}</ul>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div class="page-guide-section">
-                <div class="page-guide-section-title">👤 Helps Team Leaders With</div>
-                <ul class="page-guide-list">{helps_items}</ul>
+            <div class="guide-section">
+                <div class="guide-section-title">👤 Helps Team Leaders</div>
+                <ul class="guide-list">{helps_items}</ul>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div class="page-guide-section">
-                <div class="page-guide-section-title">⚡ Key Features</div>
-                <ul class="page-guide-list">{features_items}</ul>
+            <div class="guide-section">
+                <div class="guide-section-title">⚡ Key Features</div>
+                <ul class="guide-list">{features_items}</ul>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div class="page-guide-section">
-                <div class="page-guide-section-title">💡 Pro Tips</div>
-                <ul class="page-guide-list page-guide-tips">{tips_items}</ul>
+            <div class="guide-section">
+                <div class="guide-section-title">💡 Pro Tips</div>
+                <ul class="guide-list guide-tips">{tips_items}</ul>
             </div>
             """, unsafe_allow_html=True)
 
             if new_features_html:
                 st.markdown(new_features_html, unsafe_allow_html=True)
+
+    except Exception:
+        # Fallback for older Streamlit - use expander at top
+        with st.expander("📖 **Page Guide** - Click to learn about this page", expanded=False):
+            col1, col2 = st.columns([1, 4])
+            with col1:
+                st.markdown(f"<div style='font-size: 2.5rem; text-align: center;'>{metadata.emoji}</div>", unsafe_allow_html=True)
+            with col2:
+                st.markdown(f"### {metadata.title}")
+                st.caption(f"*{metadata.tagline}* | v{metadata.version}")
+
+            st.markdown(f"**🎯 Goal:** {metadata.goal}")
+
+            st.markdown("**✨ Added Value:**")
+            for item in metadata.added_value:
+                st.markdown(f"- {item}")
+
+            st.markdown("**👤 Helps Team Leaders With:**")
+            for item in metadata.helps_with:
+                st.markdown(f"- {item}")
+
+            st.markdown("**⚡ Key Features:**")
+            for item in metadata.key_features:
+                st.markdown(f"- {item}")
+
+            st.markdown("**💡 Pro Tips:**")
+            for tip in metadata.pro_tips:
+                st.markdown(f"- 💡 {tip}")
+
+            if metadata.new_features:
+                st.success(f"✨ **New in v{metadata.version}:** {', '.join(metadata.new_features)}")
 
 
 def render_floating_guide(page_id: Optional[str] = None):

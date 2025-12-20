@@ -24,6 +24,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import duckdb
+from pathlib import Path
 
 # Import page guide component
 from src.dashboard.components import render_page_guide
@@ -123,7 +124,8 @@ class ReallocationPlan:
 def get_connection():
     """Get DuckDB connection."""
     try:
-        return duckdb.connect("jira_data.duckdb", read_only=True)
+        db_path = Path("data/jira.duckdb")
+        return duckdb.connect(str(db_path), read_only=True) if db_path.exists() else None
     except Exception as e:
         st.error(f"Database connection failed: {e}")
         return None

@@ -1035,25 +1035,25 @@ def main():
 
         st.markdown(f"""
 <div style="background: linear-gradient(135deg, {severity_color} 0%, {severity_color}dd 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px {severity_color}66; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 20 min saved</div>
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
-            #1 PRIORITY TODAY
-        </span>
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
-        <div style="flex: 1;">
-            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Focus On This First</div>
-            <div style="font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{priority_data['title']}</div>
-            <div style="font-size: 14px; opacity: 0.85;">{priority_data['reason']}</div>
-            {blocked_html}
-        </div>
-        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 180px; text-align: center;">
-            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Impact</div>
-            <div style="font-size: 16px; font-weight: 700; line-height: 1.3;">{priority_data['impact']}</div>
-        </div>
-    </div>
+<div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 20 min saved</div>
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+<span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
+#1 PRIORITY TODAY
+</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
+<div style="flex: 1;">
+<div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Focus On This First</div>
+<div style="font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{priority_data['title']}</div>
+<div style="font-size: 14px; opacity: 0.85;">{priority_data['reason']}</div>
+{blocked_html}
+</div>
+<div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 180px; text-align: center;">
+<div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Impact</div>
+<div style="font-size: 16px; font-weight: 700; line-height: 1.3;">{priority_data['impact']}</div>
+</div>
+</div>
 </div>
 <style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
 """, unsafe_allow_html=True)
@@ -1072,11 +1072,11 @@ def main():
     
     st.markdown(f"""
 <div style="background: white; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-    <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-        <span>🎙️ Standup Cheat Sheet</span>
-        <span style="font-size: 10px; font-weight: 400; text-transform: none; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">Read this aloud</span>
-    </div>
-    <div>{script_html}</div>
+<div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+<span>🎙️ Standup Cheat Sheet</span>
+<span style="font-size: 10px; font-weight: 400; text-transform: none; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">Read this aloud</span>
+</div>
+<div>{script_html}</div>
 </div>
 """, unsafe_allow_html=True)
 

@@ -319,27 +319,6 @@ def get_sprint_stats(conn):
     except Exception:
         return None
 
-def get_waiting_on_summary(conn):
-    """Get waiting-on inbox summary for secondary surface widget."""
-    try:
-        result = conn.execute("""
-            SELECT
-                COUNT(*) as total,
-                SUM(CASE WHEN expected_by < CURRENT_DATE THEN 1 ELSE 0 END) as overdue
-            FROM waiting_on
-            WHERE status IN ('active', 'acknowledged')
-        """).fetchone()
-
-        if result:
-            return {
-                'total': result[0] or 0,
-                'overdue': result[1] or 0
-            }
-    except:
-        pass
-    return {'total': 0, 'overdue': 0}
-
-
 def get_oracle_insights(conn):
     """Generate real data-driven insights."""
     insights = []
@@ -385,17 +364,6 @@ def get_oracle_insights(conn):
         if completed_recently > 0:
             insights.append(f"✅ {completed_recently} items completed in the last 7 days.")
 
-        # Insight 5: Waiting-On overdue items
-        try:
-            waiting_overdue = conn.execute("""
-                SELECT COUNT(*) FROM waiting_on
-                WHERE status = 'active' AND expected_by < CURRENT_DATE
-            """).fetchone()[0]
-            if waiting_overdue > 0:
-                insights.insert(0, f"📬 {waiting_overdue} waiting-on item(s) are overdue. Check your inbox!")
-        except:
-            pass
-            
     except Exception:
         pass
     
@@ -477,29 +445,8 @@ def main():
             st.page_link("pages/4_👥_Team_Workload.py", label="Team Workload", icon="👥", help="Capacity Check")
             st.page_link("pages/9_🎲_Delivery_Forecast.py", label="Forecast", icon="🎲", help="Monte Carlo")
 
-        # Waiting-On Inbox Widget
-        waiting_data = get_waiting_on_summary(conn)
-        if waiting_data['total'] > 0 or True:  # Always show for discoverability
-            overdue_class = "overdue" if waiting_data['overdue'] > 0 else ""
-            overdue_badge = f'<span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 8px;">{waiting_data["overdue"]} overdue</span>' if waiting_data['overdue'] > 0 else ''
-
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%); border-radius: 12px; padding: 16px 20px; margin: 16px 0; border: 1px solid rgba(56, 189, 248, 0.3);">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="font-size: 24px;">📬</span>
-                        <div>
-                            <div style="color: white; font-weight: 600; font-size: 14px;">Waiting-On Inbox {overdue_badge}</div>
-                            <div style="color: rgba(255,255,255,0.8); font-size: 12px;">{waiting_data['total']} active items</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            st.page_link("pages/16_📬_Waiting_On_Inbox.py", label="Open Inbox →", icon="📬")
-
         st.markdown("")
-        
+
         # THE ORACLE - Real Insights
         st.markdown("### 🔮 The Oracle")
         insights = get_oracle_insights(conn)

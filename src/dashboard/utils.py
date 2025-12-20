@@ -4,12 +4,12 @@ import streamlit as st
 import duckdb
 from pathlib import Path
 
-def get_connection():
+def get_connection(read_only: bool = True):
     """Get database connection with caching."""
     db_path = Path("data/jira.duckdb")
     if not db_path.exists():
         raise FileNotFoundError("Database not found. Run 'jira-copilot init' first.")
-    return duckdb.connect(str(db_path))
+    return duckdb.connect(str(db_path), read_only=read_only)
 
 
 def get_predictor():

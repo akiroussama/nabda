@@ -24,25 +24,25 @@ st.set_page_config(page_title="Burnout Barometer", page_icon="🕯️", layout="
 # Premium Dark Theme CSS
 st.markdown("""
 <style>
-    /* Global Dark Theme */
+    /* Global Light Theme */
     .stApp {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        background-color: #f8f9fa;
     }
 
     /* Section Containers */
     .section-container {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 700;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -51,40 +51,29 @@ st.markdown("""
 
     /* Risk Score Cards */
     .risk-metric-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         text-align: center;
         position: relative;
         overflow: hidden;
-        border: 1px solid rgba(102, 126, 234, 0.15);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
 
     .risk-metric-card::before {
         content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
+        position: absolute; top: 0; left: 0; right: 0; height: 4px;
     }
 
-    .risk-critical::before {
-        background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-    }
-
-    .risk-elevated::before {
-        background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
-    }
-
-    .risk-healthy::before {
-        background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
-    }
+    .risk-critical::before { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+    .risk-elevated::before { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+    .risk-healthy::before { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
 
     .metric-label {
         font-size: 11px;
         font-weight: 600;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-bottom: 8px;
@@ -93,56 +82,42 @@ st.markdown("""
     .metric-value {
         font-size: 36px;
         font-weight: 800;
+        color: #1e293b;
     }
 
     .value-critical {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .value-elevated {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .value-healthy {
-        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
-    .metric-subtitle {
-        font-size: 13px;
-        color: #8892b0;
-        margin-top: 8px;
-    }
+    .metric-subtitle { font-size: 13px; color: #64748b; margin-top: 8px; }
 
     /* Profile Cards */
     .profile-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: #f8fafc;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 16px;
-        border: 1px solid rgba(102, 126, 234, 0.15);
+        border: 1px solid #e2e8f0;
         position: relative;
     }
 
-    .profile-card.high-risk {
-        border-left: 4px solid #e74c3c;
-    }
-
-    .profile-card.elevated-risk {
-        border-left: 4px solid #f39c12;
-    }
-
-    .profile-card.healthy {
-        border-left: 4px solid #27ae60;
-    }
+    .profile-card.high-risk { border-left: 4px solid #ef4444; }
+    .profile-card.elevated-risk { border-left: 4px solid #f59e0b; }
+    .profile-card.healthy { border-left: 4px solid #22c55e; }
 
     .profile-header {
         display: flex;
@@ -164,21 +139,16 @@ st.markdown("""
         margin-right: 16px;
     }
 
-    .profile-info {
-        flex: 1;
-    }
+    .profile-info { flex: 1; }
 
     .profile-name {
-        color: #fff;
+        color: #1a202c;
         font-size: 18px;
         font-weight: 700;
         margin-bottom: 4px;
     }
 
-    .profile-role {
-        color: #8892b0;
-        font-size: 13px;
-    }
+    .profile-role { color: #64748b; font-size: 13px; }
 
     .risk-badge {
         padding: 8px 16px;
@@ -187,20 +157,9 @@ st.markdown("""
         font-size: 14px;
     }
 
-    .badge-critical {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-    }
-
-    .badge-elevated {
-        background: rgba(243, 156, 18, 0.2);
-        color: #f39c12;
-    }
-
-    .badge-healthy {
-        background: rgba(39, 174, 96, 0.2);
-        color: #27ae60;
-    }
+    .badge-critical { background: #fee2e2; color: #991b1b; }
+    .badge-elevated { background: #fef3c7; color: #92400e; }
+    .badge-healthy { background: #dcfce7; color: #166534; }
 
     /* Risk Factors */
     .risk-factor {
@@ -212,9 +171,9 @@ st.markdown("""
         font-size: 12px;
         font-weight: 500;
         margin: 4px;
-        background: rgba(231, 76, 60, 0.15);
-        color: #e74c3c;
-        border: 1px solid rgba(231, 76, 60, 0.3);
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
     }
 
     /* Metrics Row */
@@ -226,15 +185,16 @@ st.markdown("""
 
     .mini-metric {
         flex: 1;
-        background: rgba(255, 255, 255, 0.03);
+        background: white;
         border-radius: 10px;
         padding: 12px;
         text-align: center;
+        border: 1px solid #e2e8f0;
     }
 
     .mini-metric-label {
         font-size: 10px;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         margin-bottom: 4px;
     }
@@ -242,21 +202,12 @@ st.markdown("""
     .mini-metric-value {
         font-size: 20px;
         font-weight: 700;
-        color: #fff;
+        color: #1e293b;
     }
 
-    .mini-metric-delta {
-        font-size: 11px;
-        margin-top: 2px;
-    }
-
-    .delta-positive {
-        color: #e74c3c;
-    }
-
-    .delta-negative {
-        color: #27ae60;
-    }
+    .mini-metric-delta { font-size: 11px; margin-top: 2px; }
+    .delta-positive { color: #dc2626; }
+    .delta-negative { color: #16a34a; }
 
     /* Team Overview Grid */
     .team-grid {
@@ -267,15 +218,16 @@ st.markdown("""
     }
 
     .team-member-mini {
-        background: rgba(255, 255, 255, 0.03);
+        background: white;
         border-radius: 12px;
         padding: 16px;
         text-align: center;
         transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
     }
 
     .team-member-mini:hover {
-        background: rgba(255, 255, 255, 0.06);
+        background: #f8fafc;
         transform: translateY(-2px);
     }
 
@@ -294,36 +246,33 @@ st.markdown("""
 
     .member-name-mini {
         font-size: 12px;
-        color: #fff;
+        color: #1e293b;
         margin-bottom: 4px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .member-score-mini {
-        font-size: 14px;
-        font-weight: 700;
-    }
+    .member-score-mini { font-size: 14px; font-weight: 700; }
 
     /* Intervention Card */
     .intervention-card {
-        background: linear-gradient(145deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
         border-radius: 12px;
         padding: 16px;
         margin-top: 12px;
     }
 
     .intervention-title {
-        color: #667eea;
+        color: #4f46e5;
         font-weight: 600;
         font-size: 14px;
         margin-bottom: 8px;
     }
 
     .intervention-text {
-        color: #ccd6f6;
+        color: #1e293b;
         font-size: 13px;
         line-height: 1.5;
     }
@@ -339,19 +288,73 @@ st.markdown("""
         font-weight: 600;
     }
 
-    .trend-worsening {
-        background: rgba(231, 76, 60, 0.15);
-        color: #e74c3c;
-    }
+    .trend-worsening { background: #fee2e2; color: #991b1b; }
+    .trend-improving { background: #dcfce7; color: #166534; }
+    .trend-stable { background: #f1f5f9; color: #64748b; }
 
-    .trend-improving {
-        background: rgba(39, 174, 96, 0.15);
-        color: #27ae60;
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        box-shadow: 0 8px 32px rgba(6, 78, 59, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-
-    .trend-stable {
-        background: rgba(136, 146, 176, 0.15);
-        color: #8892b0;
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon { font-size: 24px; }
+    .quick-win-title {
+        color: #a7f3d0;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .intervention-summary {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .intervention-item {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .intervention-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: white;
+        font-size: 12px;
+    }
+    .intervention-text {
+        color: #ecfdf5;
+        font-size: 13px;
+    }
+    .intervention-reason {
+        color: #fca5a5;
+        font-size: 11px;
+    }
+    .intervention-ok {
+        color: #4ade80;
+        font-size: 14px;
+        text-align: center;
+        padding: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -375,6 +378,22 @@ def get_connection():
     if not db_path.exists():
         return None
     return duckdb.connect(str(db_path), read_only=True)
+
+
+def get_intervention_alerts(profiles: List['RiskProfile']) -> list:
+    """Get team members needing immediate attention today."""
+    urgent = []
+    for p in profiles:
+        if p.risk_level == 'High Risk' and p.trend == 'worsening':
+            initials = ''.join([n[0].upper() for n in p.user_name.split()[:2]])
+            top_factor = p.top_risk_factors[0] if p.top_risk_factors else 'High Risk'
+            urgent.append({
+                'name': p.user_name.split()[0],
+                'initials': initials,
+                'reason': top_factor,
+                'score': p.risk_score
+            })
+    return urgent[:3]  # Top 3 most urgent
 
 
 def analyze_burnout_risks(conn) -> List[RiskProfile]:
@@ -495,27 +514,27 @@ def get_avatar_color(risk_level: str) -> str:
 def create_risk_gauge(score: float) -> go.Figure:
     """Create a premium risk gauge."""
     if score >= 70:
-        color = '#e74c3c'
+        color = '#ef4444'
     elif score >= 45:
-        color = '#f39c12'
+        color = '#f59e0b'
     else:
-        color = '#27ae60'
+        color = '#22c55e'
 
     fig = go.Figure()
 
     fig.add_trace(go.Indicator(
         mode="gauge+number",
         value=score,
-        number={'suffix': '', 'font': {'size': 36, 'color': '#fff'}},
+        number={'suffix': '', 'font': {'size': 36, 'color': '#1e293b'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'tickcolor': 'rgba(0,0,0,0)'},
             'bar': {'color': color, 'thickness': 0.7},
-            'bgcolor': 'rgba(255,255,255,0.1)',
+            'bgcolor': '#f1f5f9',
             'borderwidth': 0,
             'steps': [
-                {'range': [0, 45], 'color': 'rgba(39, 174, 96, 0.15)'},
-                {'range': [45, 70], 'color': 'rgba(243, 156, 18, 0.15)'},
-                {'range': [70, 100], 'color': 'rgba(231, 76, 60, 0.15)'},
+                {'range': [0, 45], 'color': 'rgba(34, 197, 94, 0.2)'},
+                {'range': [45, 70], 'color': 'rgba(245, 158, 11, 0.2)'},
+                {'range': [70, 100], 'color': 'rgba(239, 68, 68, 0.2)'},
             ],
         }
     ))
@@ -523,7 +542,7 @@ def create_risk_gauge(score: float) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#fff'},
+        font={'color': '#64748b'},
         height=180,
         margin=dict(l=20, r=20, t=20, b=20)
     )
@@ -584,10 +603,10 @@ def create_team_heatmap(profiles: List[RiskProfile]) -> go.Figure:
     ))
 
     fig.update_layout(
-        title=dict(text='Team Risk Overview', font=dict(color='#fff', size=16)),
+        title=dict(text='Team Risk Overview', font=dict(color='#1a202c', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(showticklabels=False, showgrid=False),
         yaxis=dict(showticklabels=False, showgrid=False),
         height=300,
@@ -632,15 +651,15 @@ def create_behavioral_trend(profile: RiskProfile) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(
-            tickfont=dict(color='#8892b0'),
+            tickfont=dict(color='#64748b'),
             showgrid=False
         ),
         yaxis=dict(
             title='Weekly Activity',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)'
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0'
         ),
         height=200,
         margin=dict(l=60, r=20, t=20, b=40),
@@ -684,12 +703,12 @@ def main():
     st.markdown("""
     <div style="text-align: center; padding: 20px 0 30px 0;">
         <h1 style="font-size: 42px; font-weight: 800; margin: 0;
-                   background: linear-gradient(135deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+                   background: linear-gradient(135deg, #ef4444 0%, #f59e0b 50%, #22c55e 100%);
                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                    background-clip: text;">
             🕯️ Burnout Barometer™
         </h1>
-        <p style="color: #8892b0; font-size: 16px; margin-top: 10px;">
+        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
             Early Warning System for Behavioral Anomalies
         </p>
     </div>
@@ -702,6 +721,43 @@ def main():
 
     with st.spinner("Analyzing behavioral patterns..."):
         profiles = analyze_burnout_risks(conn)
+
+    # Quick Win Widget - Intervention Alerts (must come after profiles are loaded)
+    try:
+        alerts = get_intervention_alerts(profiles)
+        if alerts:
+            items_html = ""
+            for alert in alerts:
+                items_html += f"""
+                <div class="intervention-item">
+                    <div class="intervention-avatar">{alert['initials']}</div>
+                    <div>
+                        <div class="intervention-text">{alert['name']}</div>
+                        <div class="intervention-reason">{alert['reason']}</div>
+                    </div>
+                </div>
+                """
+            st.markdown(f"""
+            <div class="quick-win-widget">
+                <div class="quick-win-header">
+                    <span class="quick-win-icon">🚨</span>
+                    <span class="quick-win-title">INTERVENTION NEEDED • Check In Today</span>
+                </div>
+                <div class="intervention-summary">{items_html}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="quick-win-widget">
+                <div class="quick-win-header">
+                    <span class="quick-win-icon">✅</span>
+                    <span class="quick-win-title">TEAM HEALTH • All Clear</span>
+                </div>
+                <div class="intervention-ok">No urgent interventions needed today. Team is stable.</div>
+            </div>
+            """, unsafe_allow_html=True)
+    except Exception:
+        pass
 
     if not profiles:
         st.warning("Not enough data to analyze. Need at least some assigned issues.")
@@ -968,9 +1024,9 @@ def main():
     with i1:
         worsening = len([p for p in profiles if p.trend == 'worsening'])
         st.markdown(f"""
-        <div style="background: rgba(231, 76, 60, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c;">
-            <div style="color: #e74c3c; font-weight: 700; font-size: 24px;">{worsening}</div>
-            <div style="color: #ccd6f6; font-size: 13px; margin-top: 4px;">
+        <div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
+            <div style="color: #ef4444; font-weight: 700; font-size: 24px;">{worsening}</div>
+            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
                 Team members with worsening trends that need attention this week
             </div>
         </div>
@@ -979,9 +1035,9 @@ def main():
     with i2:
         high_wip = len([p for p in profiles if p.current_metrics.get('wip_count', 0) > 5])
         st.markdown(f"""
-        <div style="background: rgba(243, 156, 18, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12;">
-            <div style="color: #f39c12; font-weight: 700; font-size: 24px;">{high_wip}</div>
-            <div style="color: #ccd6f6; font-size: 13px; margin-top: 4px;">
+        <div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
+            <div style="color: #f59e0b; font-weight: 700; font-size: 24px;">{high_wip}</div>
+            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
                 Engineers with high WIP counts affecting focus and delivery
             </div>
         </div>
@@ -990,9 +1046,9 @@ def main():
     with i3:
         improving = len([p for p in profiles if p.trend == 'improving'])
         st.markdown(f"""
-        <div style="background: rgba(39, 174, 96, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60;">
-            <div style="color: #27ae60; font-weight: 700; font-size: 24px;">{improving}</div>
-            <div style="color: #ccd6f6; font-size: 13px; margin-top: 4px;">
+        <div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #22c55e;">
+            <div style="color: #22c55e; font-weight: 700; font-size: 24px;">{improving}</div>
+            <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
                 Team members showing improvement trends over the past month
             </div>
         </div>

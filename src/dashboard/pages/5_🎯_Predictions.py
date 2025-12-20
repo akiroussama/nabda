@@ -23,26 +23,33 @@ st.set_page_config(page_title="Predictions", page_icon="🎯", layout="wide")
 # Premium Predictions CSS
 st.markdown("""
 <style>
+    /* Main container styling */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+
     .prediction-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        color: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-container {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -50,38 +57,44 @@ st.markdown("""
     }
 
     .prediction-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         text-align: center;
+        height: 100%;
+        transition: transform 0.2s;
     }
+    .prediction-card:hover { transform: translateY(-2px); }
 
     .prediction-value {
         font-size: 48px;
-        font-weight: 700;
+        font-weight: 800;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
+        margin-bottom: 8px;
     }
 
     .prediction-label {
         font-size: 14px;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 8px;
+        font-weight: 600;
     }
 
     .prediction-sublabel {
         font-size: 12px;
-        color: #667eea;
+        color: #4f46e5;
         margin-top: 4px;
+        font-weight: 500;
     }
 
     .confidence-bar-container {
-        background: rgba(255,255,255,0.05);
+        background: #e2e8f0;
         border-radius: 8px;
         height: 24px;
         position: relative;
@@ -99,34 +112,35 @@ st.markdown("""
         font-size: 12px;
         font-weight: 600;
     }
-    .confidence-high { background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%); }
-    .confidence-medium { background: linear-gradient(90deg, #f39c12 0%, #f1c40f 100%); }
-    .confidence-low { background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); }
+    .confidence-high { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
+    .confidence-medium { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+    .confidence-low { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
 
     .risk-gauge-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 16px;
         padding: 20px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    .feature-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
+    .feature-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 
     .feature-name {
         width: 150px;
         font-size: 13px;
-        color: #ccd6f6;
+        color: #334155;
         text-align: right;
+        font-weight: 500;
     }
 
     .feature-bar-container {
         flex: 1;
-        background: rgba(255,255,255,0.05);
+        background: #e2e8f0;
         border-radius: 6px;
         height: 24px;
         overflow: hidden;
@@ -144,89 +158,146 @@ st.markdown("""
     }
 
     .issue-predictor-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 12px;
         padding: 16px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
         margin-bottom: 12px;
         transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .issue-predictor-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        border-color: #667eea44;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        border-color: #cbd5e1;
     }
 
-    .issue-key {
-        font-size: 12px;
-        color: #667eea;
-        font-weight: 600;
-    }
-
-    .issue-summary {
-        font-size: 14px;
-        color: #ccd6f6;
-        margin: 8px 0;
-    }
+    .issue-key { font-size: 12px; color: #4f46e5; font-weight: 700; }
+    .issue-summary { font-size: 14px; color: #1a202c; margin: 8px 0; font-weight: 500; }
 
     .prediction-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 12px; border-radius: 20px;
+        font-size: 12px; font-weight: 600;
     }
-    .badge-fast { background: #27ae6033; color: #27ae60; }
-    .badge-normal { background: #3498db33; color: #3498db; }
-    .badge-slow { background: #f39c1233; color: #f39c12; }
-    .badge-critical { background: #e74c3c33; color: #e74c3c; }
+    .badge-fast { background: #dcfce7; color: #166534; }
+    .badge-normal { background: #e0f2fe; color: #075985; }
+    .badge-slow { background: #fef3c7; color: #92400e; }
+    .badge-critical { background: #fee2e2; color: #991b1b; }
 
     .model-info {
-        display: flex;
-        gap: 16px;
-        padding: 12px;
-        background: rgba(102, 126, 234, 0.1);
-        border-radius: 8px;
-        margin-top: 16px;
+        display: flex; gap: 16px; padding: 16px;
+        background: #eef2ff; border-radius: 8px; margin-top: 16px;
+        border: 1px solid #c7d2fe;
     }
 
-    .model-stat {
-        text-align: center;
-    }
-
-    .model-stat-value {
-        font-size: 18px;
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .model-stat-label {
-        font-size: 11px;
-        color: #8892b0;
-        text-transform: uppercase;
-    }
+    .model-stat { text-align: center; flex: 1; }
+    .model-stat-value { font-size: 18px; font-weight: 700; color: #4f46e5; }
+    .model-stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
 
     .comparison-row {
-        display: flex;
-        align-items: center;
-        padding: 12px;
-        background: rgba(255,255,255,0.02);
-        border-radius: 8px;
-        margin-bottom: 8px;
+        display: flex; align-items: center; padding: 12px;
+        background: #f8fafc; border-radius: 8px; margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
     }
 
     .sprint-risk-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 12px;
         padding: 16px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
         margin-bottom: 12px;
     }
 
-    .tab-content {
-        padding-top: 20px;
+    .tab-content { padding-top: 20px; }
+
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .quick-win-widget::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon {
+        font-size: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .quick-win-title {
+        color: #93c5fd;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .risk-summary {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    .risk-score-main {
+        text-align: center;
+    }
+    .risk-score-value {
+        font-size: 56px;
+        font-weight: 800;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .risk-green { color: #86efac; }
+    .risk-yellow { color: #fde047; }
+    .risk-red { color: #fca5a5; }
+    .risk-label {
+        color: #93c5fd;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .risk-factors {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .risk-factor {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 8px;
+    }
+    .factor-icon {
+        font-size: 16px;
+    }
+    .factor-text {
+        color: #e2e8f0;
+        font-size: 12px;
+    }
+    .factor-value {
+        margin-left: auto;
+        color: #fbbf24;
+        font-weight: 600;
+        font-size: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -235,6 +306,88 @@ st.markdown("""
 def get_connection():
     db_path = Path("data/jira.duckdb")
     return duckdb.connect(str(db_path), read_only=True) if db_path.exists() else None
+
+
+def calculate_release_risk(conn) -> dict:
+    """
+    Calculate overall release risk score - critical for release managers.
+    Answers: "Is it safe to release this sprint?"
+    """
+    # Get active sprint metrics
+    sprint_data = conn.execute("""
+        SELECT
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'Terminé(e)' THEN 1 ELSE 0 END) as done,
+            SUM(CASE WHEN status = 'En cours' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN priority IN ('Highest', 'High') AND status != 'Terminé(e)' THEN 1 ELSE 0 END) as high_priority_open,
+            SUM(CASE WHEN issue_type = 'Bug' AND status != 'Terminé(e)' THEN 1 ELSE 0 END) as open_bugs
+        FROM issues i
+        JOIN sprints s ON i.sprint_id = s.id
+        WHERE s.state = 'active'
+    """).fetchone()
+
+    if not sprint_data or sprint_data[0] == 0:
+        return {'score': 50, 'status': 'Unknown', 'class': 'risk-yellow', 'factors': []}
+
+    total, done, in_progress, high_pri_open, open_bugs = sprint_data
+    completion_pct = (done / total) * 100 if total > 0 else 0
+
+    # Calculate risk factors
+    factors = []
+    risk_score = 0
+
+    # Factor 1: Completion rate
+    if completion_pct < 50:
+        risk_score += 30
+        factors.append({'icon': '📊', 'text': 'Low completion rate', 'value': f'{completion_pct:.0f}%'})
+    elif completion_pct < 75:
+        risk_score += 15
+        factors.append({'icon': '📊', 'text': 'Moderate completion', 'value': f'{completion_pct:.0f}%'})
+
+    # Factor 2: High priority items
+    if high_pri_open > 3:
+        risk_score += 25
+        factors.append({'icon': '🔴', 'text': 'High-priority items open', 'value': str(high_pri_open)})
+    elif high_pri_open > 0:
+        risk_score += 10
+        factors.append({'icon': '🟡', 'text': 'Some high-priority items', 'value': str(high_pri_open)})
+
+    # Factor 3: Open bugs
+    if open_bugs > 5:
+        risk_score += 25
+        factors.append({'icon': '🐛', 'text': 'Open bugs', 'value': str(open_bugs)})
+    elif open_bugs > 0:
+        risk_score += 10
+        factors.append({'icon': '🐛', 'text': 'Minor bugs open', 'value': str(open_bugs)})
+
+    # Factor 4: WIP items (too much in progress = chaotic)
+    wip_pct = (in_progress / total * 100) if total > 0 else 0
+    if wip_pct > 50:
+        risk_score += 20
+        factors.append({'icon': '🔄', 'text': 'High WIP ratio', 'value': f'{wip_pct:.0f}%'})
+
+    # Determine status
+    risk_score = min(risk_score, 100)
+    if risk_score <= 30:
+        status = "Low Risk - Safe to Release"
+        css_class = "risk-green"
+    elif risk_score <= 60:
+        status = "Medium Risk - Review Needed"
+        css_class = "risk-yellow"
+    else:
+        status = "High Risk - Not Ready"
+        css_class = "risk-red"
+
+    # If no factors found, add a good one
+    if not factors:
+        factors.append({'icon': '✅', 'text': 'All metrics healthy', 'value': 'OK'})
+
+    return {
+        'score': risk_score,
+        'status': status,
+        'class': css_class,
+        'factors': factors[:4]  # Max 4 factors
+    }
 
 
 def create_risk_gauge(score: float, title: str = "Risk Score") -> go.Figure:
@@ -252,13 +405,13 @@ def create_risk_gauge(score: float, title: str = "Risk Score") -> go.Figure:
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
-        number={'suffix': '', 'font': {'size': 48, 'color': '#fff'}},
+        number={'suffix': '', 'font': {'size': 48, 'color': '#1a202c'}},
         title={'text': f"<b>{title}</b><br><span style='font-size:14px;color:{color}'>{status}</span>",
-               'font': {'size': 18, 'color': '#ccd6f6'}},
+               'font': {'size': 18, 'color': '#1a202c'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'tickcolor': "rgba(0,0,0,0)"},
             'bar': {'color': color, 'thickness': 0.75},
-            'bgcolor': "rgba(255,255,255,0.05)",
+            'bgcolor': "#f1f5f9",
             'borderwidth': 0,
             'steps': [
                 {'range': [0, 30], 'color': 'rgba(39, 174, 96, 0.15)'},
@@ -266,7 +419,7 @@ def create_risk_gauge(score: float, title: str = "Risk Score") -> go.Figure:
                 {'range': [60, 100], 'color': 'rgba(231, 76, 60, 0.15)'}
             ],
             'threshold': {
-                'line': {'color': "#fff", 'width': 3},
+                'line': {'color': "#475569", 'width': 3},
                 'thickness': 0.8,
                 'value': score
             }
@@ -278,7 +431,7 @@ def create_risk_gauge(score: float, title: str = "Risk Score") -> go.Figure:
         margin=dict(l=30, r=30, t=80, b=30),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'}
+        font={'color': '#64748b'}
     )
 
     return fig
@@ -314,10 +467,10 @@ def create_feature_importance_chart(factors: dict) -> go.Figure:
         margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Contribution to Risk (%)'
         ),
         yaxis=dict(showgrid=False)
@@ -356,15 +509,15 @@ def create_duration_distribution(predictions: list) -> go.Figure:
         margin=dict(l=20, r=20, t=40, b=40),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Predicted Duration (hours)'
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Number of Issues'
         )
     )
@@ -393,11 +546,11 @@ def create_confidence_chart(lower: float, predicted: float, upper: float) -> go.
         margin=dict(l=20, r=20, t=20, b=40),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         xaxis=dict(showgrid=False),
         yaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Hours'
         )
     )
@@ -457,6 +610,36 @@ def main():
     if not conn:
         st.error("Database not found. Please sync data first.")
         st.stop()
+
+    # ========== QUICK WIN: RELEASE RISK ==========
+    risk_data = calculate_release_risk(conn)
+    factors_html = ""
+    for factor in risk_data['factors']:
+        factors_html += f"""
+        <div class="risk-factor">
+            <span class="factor-icon">{factor['icon']}</span>
+            <span class="factor-text">{factor['text']}</span>
+            <span class="factor-value">{factor['value']}</span>
+        </div>
+        """
+
+    st.markdown(f"""
+    <div class="quick-win-widget">
+        <div class="quick-win-header">
+            <span class="quick-win-icon">🚀</span>
+            <span class="quick-win-title">Release Risk — Is It Safe to Release?</span>
+        </div>
+        <div class="risk-summary">
+            <div class="risk-score-main">
+                <div class="risk-score-value {risk_data['class']}">{risk_data['score']}</div>
+                <div class="risk-label">{risk_data['status']}</div>
+            </div>
+            <div class="risk-factors">
+                {factors_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Tabs
     tab1, tab2, tab3 = st.tabs(["📋 Ticket Duration", "🏃 Sprint Risk", "📊 Batch Predictions"])
@@ -798,7 +981,7 @@ def main():
     # ========== Footer ==========
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #8892b0; font-size: 12px;">
+    <div style="text-align: center; color: #64748b; font-size: 12px;">
         ML Predictions Dashboard | Powered by Gradient Boosting & Neural Networks |
         Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
     </div>

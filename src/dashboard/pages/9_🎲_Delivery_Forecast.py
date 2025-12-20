@@ -24,25 +24,25 @@ st.set_page_config(page_title="Delivery Forecast", page_icon="🎲", layout="wid
 # Premium Dark Theme CSS
 st.markdown("""
 <style>
-    /* Global Dark Theme */
+    /* Global Light Theme */
     .stApp {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        background-color: #f8f9fa;
     }
 
     /* Section Containers */
     .section-container {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 700;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -51,40 +51,29 @@ st.markdown("""
 
     /* Probability Cards */
     .prob-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         text-align: center;
         position: relative;
         overflow: hidden;
-        border: 1px solid rgba(102, 126, 234, 0.15);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
 
     .prob-card::before {
         content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
+        position: absolute; top: 0; left: 0; right: 0; height: 4px;
     }
 
-    .prob-high::before {
-        background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
-    }
-
-    .prob-medium::before {
-        background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
-    }
-
-    .prob-low::before {
-        background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-    }
+    .prob-high::before { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
+    .prob-medium::before { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+    .prob-low::before { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
 
     .prob-label {
         font-size: 11px;
         font-weight: 600;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-bottom: 8px;
@@ -96,46 +85,39 @@ st.markdown("""
     }
 
     .value-high {
-        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .value-medium {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .value-low {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
-    .prob-subtitle {
-        font-size: 13px;
-        color: #8892b0;
-        margin-top: 8px;
-    }
+    .prob-subtitle { font-size: 13px; color: #64748b; margin-top: 8px; }
 
     .prob-date {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: #1a202c;
         margin-top: 4px;
     }
 
     /* Scenario Cards */
     .scenario-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 12px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     .scenario-header {
@@ -145,11 +127,7 @@ st.markdown("""
         margin-bottom: 12px;
     }
 
-    .scenario-name {
-        color: #fff;
-        font-weight: 600;
-        font-size: 14px;
-    }
+    .scenario-name { color: #1a202c; font-weight: 600; font-size: 14px; }
 
     .scenario-delta {
         font-size: 14px;
@@ -158,53 +136,24 @@ st.markdown("""
         border-radius: 20px;
     }
 
-    .delta-positive {
-        background: rgba(39, 174, 96, 0.2);
-        color: #27ae60;
-    }
-
-    .delta-negative {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-    }
+    .delta-positive { background: #dcfce7; color: #166534; }
+    .delta-negative { background: #fee2e2; color: #991b1b; }
 
     /* Risk Factor Cards */
     .risk-factor-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: white;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         padding: 16px;
         text-align: center;
     }
 
-    .risk-factor-label {
-        font-size: 11px;
-        color: #8892b0;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .risk-factor-value {
-        font-size: 24px;
-        font-weight: 700;
-    }
-
-    .risk-good {
-        color: #27ae60;
-    }
-
-    .risk-warning {
-        color: #f39c12;
-    }
-
-    .risk-danger {
-        color: #e74c3c;
-    }
-
-    .risk-factor-desc {
-        font-size: 11px;
-        color: #8892b0;
-        margin-top: 4px;
-    }
+    .risk-factor-label { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+    .risk-factor-value { font-size: 24px; font-weight: 700; }
+    .risk-good { color: #16a34a; }
+    .risk-warning { color: #d97706; }
+    .risk-danger { color: #dc2626; }
+    .risk-factor-desc { font-size: 11px; color: #64748b; margin-top: 4px; }
 
     /* Confidence Bands */
     .confidence-band {
@@ -212,61 +161,50 @@ st.markdown("""
         align-items: center;
         gap: 12px;
         padding: 12px;
-        background: rgba(255, 255, 255, 0.03);
+        background: #f8fafc;
         border-radius: 8px;
         margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
     }
 
-    .band-label {
-        width: 60px;
-        font-size: 12px;
-        color: #8892b0;
-        font-weight: 600;
-    }
+    .band-label { width: 60px; font-size: 12px; color: #64748b; font-weight: 600; }
 
     .band-bar {
         flex: 1;
         height: 8px;
-        background: rgba(255, 255, 255, 0.1);
+        background: #e2e8f0;
         border-radius: 4px;
         position: relative;
         overflow: hidden;
     }
 
-    .band-fill {
-        height: 100%;
-        border-radius: 4px;
-    }
+    .band-fill { height: 100%; border-radius: 4px; }
 
     .band-date {
         width: 100px;
         text-align: right;
         font-size: 13px;
-        color: #fff;
+        color: #1a202c;
         font-weight: 500;
     }
 
     /* Comparison Table */
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
-    }
+    .comparison-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 
     .comparison-table th {
         text-align: left;
         padding: 12px;
-        color: #8892b0;
+        color: #64748b;
         font-size: 12px;
         text-transform: uppercase;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid #e2e8f0;
     }
 
     .comparison-table td {
         padding: 12px;
-        color: #fff;
+        color: #1e293b;
         font-size: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid #e2e8f0;
     }
 
     /* Simulation Stats */
@@ -274,18 +212,66 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    .sim-stat-label {
-        color: #8892b0;
-        font-size: 13px;
-    }
+    .sim-stat-label { color: #64748b; font-size: 13px; }
+    .sim-stat-value { color: #1a202c; font-weight: 600; font-size: 13px; }
 
-    .sim-stat-value {
-        color: #fff;
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        box-shadow: 0 8px 32px rgba(6, 78, 59, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon { font-size: 24px; }
+    .quick-win-title {
+        color: #a7f3d0;
+        font-size: 14px;
         font-weight: 600;
-        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .confidence-summary {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .confidence-score {
+        font-size: 48px;
+        font-weight: 800;
+        color: #ecfdf5;
+    }
+    .confidence-details {
+        flex: 1;
+    }
+    .confidence-message {
+        color: #ecfdf5;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .confidence-stats {
+        display: flex;
+        gap: 16px;
+    }
+    .confidence-stat {
+        color: #a7f3d0;
+        font-size: 12px;
+    }
+    .confidence-stat strong {
+        color: #ecfdf5;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -309,6 +295,53 @@ def get_connection():
     if not db_path.exists():
         return None
     return duckdb.connect(str(db_path), read_only=True)
+
+
+def get_release_confidence(conn) -> dict:
+    """Calculate quick release confidence score - the #1 question every release manager asks."""
+    try:
+        # Get completion rate
+        metrics = conn.execute("""
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Terminé(e)' THEN 1 ELSE 0 END) as done,
+                SUM(CASE WHEN priority = 'Highest' AND status != 'Terminé(e)' THEN 1 ELSE 0 END) as blockers,
+                COALESCE(SUM(story_points), 0) as total_pts,
+                COALESCE(SUM(CASE WHEN status = 'Terminé(e)' THEN story_points END), 0) as done_pts
+            FROM issues i
+            JOIN sprints s ON i.sprint_id = s.id AND s.state = 'active'
+        """).fetchone()
+
+        total = metrics[0] or 1
+        done = metrics[1] or 0
+        blockers = metrics[2] or 0
+        total_pts = metrics[3] or 0
+        done_pts = metrics[4] or 0
+
+        # Calculate confidence score (0-100)
+        completion_factor = (done / total * 50) if total > 0 else 50
+        blocker_penalty = min(30, blockers * 10)
+        pts_factor = (done_pts / total_pts * 30) if total_pts > 0 else 15
+
+        confidence = max(0, min(100, completion_factor + pts_factor - blocker_penalty + 10))
+
+        if confidence >= 75:
+            message = "Looking good! High confidence for on-time delivery."
+        elif confidence >= 50:
+            message = "Moderate confidence. Monitor blockers closely."
+        else:
+            message = "At risk. Consider scope reduction or deadline extension."
+
+        return {
+            'score': int(confidence),
+            'message': message,
+            'done': done,
+            'total': total,
+            'blockers': blockers,
+            'status': 'high' if confidence >= 75 else 'medium' if confidence >= 50 else 'low'
+        }
+    except Exception:
+        return {'score': 50, 'message': 'Unable to calculate', 'done': 0, 'total': 0, 'blockers': 0, 'status': 'medium'}
 
 
 def analyze_historical_performance(df_completed: pd.DataFrame, df_sprints: pd.DataFrame) -> dict:
@@ -440,16 +473,16 @@ def create_probability_gauge(prob: float) -> go.Figure:
     fig.add_trace(go.Indicator(
         mode="gauge+number",
         value=prob * 100,
-        number={'suffix': '%', 'font': {'size': 42, 'color': '#fff'}},
+        number={'suffix': '%', 'font': {'size': 42, 'color': '#1a202c'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'tickcolor': 'rgba(0,0,0,0)'},
             'bar': {'color': color, 'thickness': 0.7},
-            'bgcolor': 'rgba(255,255,255,0.1)',
+            'bgcolor': '#f1f5f9',
             'borderwidth': 0,
             'steps': [
-                {'range': [0, 40], 'color': 'rgba(231, 76, 60, 0.15)'},
-                {'range': [40, 70], 'color': 'rgba(243, 156, 18, 0.15)'},
-                {'range': [70, 100], 'color': 'rgba(39, 174, 96, 0.15)'},
+                {'range': [0, 40], 'color': 'rgba(231, 76, 60, 0.2)'},
+                {'range': [40, 70], 'color': 'rgba(243, 156, 18, 0.2)'},
+                {'range': [70, 100], 'color': 'rgba(39, 174, 96, 0.2)'},
             ],
         }
     ))
@@ -457,7 +490,7 @@ def create_probability_gauge(prob: float) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#fff'},
+        font={'color': '#64748b'},
         height=200,
         margin=dict(l=20, r=20, t=20, b=20)
     )
@@ -511,19 +544,19 @@ def create_distribution_chart(baseline: SimulationResult, whatif: Optional[Simul
                   annotation_text='85%', annotation_font_color='#3498db', annotation_position='top')
 
     fig.update_layout(
-        title=dict(text='Simulated Completion Distribution', font=dict(color='#fff', size=16)),
+        title=dict(text='Simulated Completion Distribution', font=dict(color='#1a202c', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(
             title='Days from Now',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)'
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0'
         ),
         yaxis=dict(
             title='Frequency',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)'
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0'
         ),
         legend=dict(
             orientation='h',
@@ -531,7 +564,7 @@ def create_distribution_chart(baseline: SimulationResult, whatif: Optional[Simul
             y=1.02,
             xanchor='right',
             x=1,
-            font=dict(color='#8892b0')
+            font=dict(color='#64748b')
         ),
         barmode='overlay',
         height=400,
@@ -562,18 +595,18 @@ def create_scenario_comparison(scenarios: List[dict]) -> go.Figure:
     ))
 
     fig.update_layout(
-        title=dict(text='Scenario Comparison', font=dict(color='#fff', size=16)),
+        title=dict(text='Scenario Comparison', font=dict(color='#1a202c', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(
-            tickfont=dict(color='#fff'),
+            tickfont=dict(color='#64748b'),
             showgrid=False
         ),
         yaxis=dict(
             title='Probability (%)',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)',
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0',
             range=[0, 100]
         ),
         height=300,
@@ -593,7 +626,7 @@ def main():
                    background-clip: text;">
             🎲 Delivery Forecast
         </h1>
-        <p style="color: #8892b0; font-size: 16px; margin-top: 10px;">
+        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
             Monte Carlo Simulation for Probabilistic Delivery Dates
         </p>
     </div>
@@ -603,6 +636,30 @@ def main():
     if not conn:
         st.error("Database not found. Please sync data first.")
         st.stop()
+
+    # Quick Win Widget - Release Confidence
+    try:
+        conf = get_release_confidence(conn)
+        st.markdown(f"""
+        <div class="quick-win-widget">
+            <div class="quick-win-header">
+                <span class="quick-win-icon">🚀</span>
+                <span class="quick-win-title">RELEASE CONFIDENCE • Quick Check</span>
+            </div>
+            <div class="confidence-summary">
+                <div class="confidence-score">{conf['score']}%</div>
+                <div class="confidence-details">
+                    <div class="confidence-message">{conf['message']}</div>
+                    <div class="confidence-stats">
+                        <span class="confidence-stat"><strong>{conf['done']}/{conf['total']}</strong> items done</span>
+                        <span class="confidence-stat"><strong>{conf['blockers']}</strong> blockers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception:
+        pass
 
     # Load data
     try:
@@ -660,8 +717,8 @@ def main():
         target_date = datetime.now() + timedelta(weeks=target_weeks)
         st.markdown(f"""
         <div style="text-align: center; padding-top: 8px;">
-            <div style="color: #8892b0; font-size: 12px;">Target Date</div>
-            <div style="color: #fff; font-size: 18px; font-weight: 600;">{target_date.strftime('%b %d, %Y')}</div>
+            <div style="color: #64748b; font-size: 12px;">Target Date</div>
+            <div style="color: #1a202c; font-size: 18px; font-weight: 600;">{target_date.strftime('%b %d, %Y')}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -952,9 +1009,9 @@ def main():
 
     if prob < 0.5:
         st.markdown("""
-        <div style="background: rgba(231, 76, 60, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c; margin-bottom: 12px;">
+        <div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c; margin-bottom: 12px;">
             <div style="color: #e74c3c; font-weight: 700; margin-bottom: 8px;">🚨 High Risk of Missing Target</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+            <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 Consider scope reduction, team augmentation, or adjusting the target date.
                 Use the What-If scenarios to explore mitigation options.
             </div>
@@ -962,9 +1019,9 @@ def main():
         """, unsafe_allow_html=True)
     elif prob < 0.7:
         st.markdown("""
-        <div style="background: rgba(243, 156, 18, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12; margin-bottom: 12px;">
+        <div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12; margin-bottom: 12px;">
             <div style="color: #f39c12; font-weight: 700; margin-bottom: 8px;">⚠️ Moderate Risk</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+            <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 The target is achievable but with significant risk. Monitor progress closely
                 and have contingency plans ready.
             </div>
@@ -972,9 +1029,9 @@ def main():
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div style="background: rgba(39, 174, 96, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60; margin-bottom: 12px;">
+        <div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60; margin-bottom: 12px;">
             <div style="color: #27ae60; font-weight: 700; margin-bottom: 8px;">✓ On Track</div>
-            <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+            <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 Good probability of hitting the target. Continue monitoring and
                 re-run simulations weekly as data evolves.
             </div>
@@ -982,9 +1039,9 @@ def main():
         """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style="background: rgba(102, 126, 234, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid #667eea;">
+    <div style="background: #eef2ff; border-radius: 12px; padding: 20px; border-left: 4px solid #667eea;">
         <div style="color: #667eea; font-weight: 700; margin-bottom: 8px;">📊 Best Practice</div>
-        <div style="color: #ccd6f6; font-size: 13px; line-height: 1.5;">
+        <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
             Use the <strong>85% confidence date</strong> for external commitments.
             This provides a realistic buffer while remaining achievable.
         </div>

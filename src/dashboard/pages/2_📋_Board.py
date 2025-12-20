@@ -167,6 +167,89 @@ st.markdown("""
         border: 1px solid #e2e8f0;
         border-left-width: 4px;
     }
+
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #7c2d12 0%, #c2410c 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(251, 146, 60, 0.3);
+        box-shadow: 0 8px 32px rgba(124, 45, 18, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .quick-win-widget::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(251, 146, 60, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon {
+        font-size: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .quick-win-title {
+        color: #fed7aa;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .stale-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 3px solid #fb923c;
+    }
+    .stale-item:hover {
+        background: rgba(255,255,255,0.15);
+    }
+    .stale-key {
+        color: #fdba74;
+        font-weight: 600;
+        font-family: monospace;
+        font-size: 12px;
+    }
+    .stale-summary {
+        color: #fff;
+        font-size: 13px;
+        flex: 1;
+        margin: 0 12px;
+    }
+    .stale-days {
+        background: rgba(0,0,0,0.2);
+        color: #fef3c7;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .stale-count-badge {
+        display: inline-block;
+        background: rgba(0,0,0,0.3);
+        color: #fef3c7;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 12px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -179,6 +262,92 @@ def get_connection():
 def get_avatar_color(name: str) -> str:
     colors = ['#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#10b981']
     return colors[hash(name or '') % len(colors)]
+
+
+def get_stale_items(conn) -> dict:
+    """
+    Get stale items alert - items not updated in 5+ days that are still open.
+    Critical for release managers to identify stuck work.
+    """
+    stale_df = conn.execute("""
+        SELECT key, summary, assignee_name, updated, status
+        FROM issues
+        WHERE status NOT IN ('Terminé(e)', 'Done', 'Closed')
+        AND updated < CURRENT_DATE - INTERVAL '5 days'
+        ORDER BY updated ASC
+        LIMIT 5
+    """).fetchdf()
+
+    total_stale = conn.execute("""
+        SELECT COUNT(*) FROM issues
+        WHERE status NOT IN ('Terminé(e)', 'Done', 'Closed')
+        AND updated < CURRENT_DATE - INTERVAL '5 days'
+    """).fetchone()[0]
+
+    items = []
+    for _, row in stale_df.iterrows():
+        try:
+            updated = pd.to_datetime(row['updated'])
+            if updated.tzinfo:
+                updated = updated.replace(tzinfo=None)
+            days_stale = (datetime.now() - updated).days
+        except:
+            days_stale = 5
+        items.append({
+            'key': row['key'],
+            'summary': row['summary'][:40] + ('...' if len(row['summary']) > 40 else ''),
+            'days': days_stale,
+            'assignee': row['assignee_name'] or 'Unassigned'
+        })
+
+    return {'items': items, 'total': total_stale}
+
+
+def get_flow_bottlenecks(conn) -> dict:
+    """
+    Identify potential bottlenecks in the workflow.
+    Ultrathink value: Identifying 'waste' (mura) in the system.
+    """
+    try:
+        # 1. Check for 'In Progress' overload (Context Switching)
+        wip_counts = conn.execute("""
+            SELECT assignee_name, COUNT(*) as cnt
+            FROM issues
+            WHERE status = 'En cours'
+            GROUP BY assignee_name
+            ORDER BY cnt DESC
+            LIMIT 1
+        """).fetchone()
+        
+        # 2. Check for 'To Do' pileup (Backlog refinement needed)
+        todo_count = conn.execute("SELECT COUNT(*) FROM issues WHERE status = 'À faire'").fetchone()[0]
+        
+        # 3. Check for specific column bottlenecks
+        # Assuming simple workflow: To Do -> In Progress -> Done
+        
+        bottlenecks = []
+        
+        if wip_counts and wip_counts[1] > 3:
+            assignee = wip_counts[0] or 'Unassigned'
+            bottlenecks.append({
+                'type': 'Overload',
+                'title': f"High Context Switching Risk",
+                'desc': f"**{assignee}** has {wip_counts[1]} items in progress. Focus on finishing before starting new.",
+                'severity': 'high' if wip_counts[1] > 5 else 'medium'
+            })
+            
+        if todo_count > 15:
+            bottlenecks.append({
+                'type': 'Backlog',
+                'title': "Backlog Congestion",
+                'desc': f"{todo_count} items in 'To Do'. Consider archiving or moving to Icebox to reduce cognitive load.",
+                'severity': 'low'
+            })
+            
+        return bottlenecks
+    except Exception:
+        return []
+
 
 
 def render_card(issue: pd.Series):
@@ -223,6 +392,57 @@ def main():
     if not conn:
         st.error("Database not found. Please sync data first.")
         st.stop()
+
+    # ========== QUICK WIN: STALE ITEMS ALERT ==========
+    stale_data = get_stale_items(conn)
+    if stale_data['items']:
+        items_html = ""
+        for item in stale_data['items']:
+            items_html += f"""
+            <div class="stale-item">
+                <span class="stale-key">{item['key']}</span>
+                <span class="stale-summary">{item['summary']}</span>
+                <span class="stale-days">{item['days']}d stale</span>
+            </div>
+            """
+
+        extra_count = stale_data['total'] - len(stale_data['items'])
+        extra_html = f'<div class="stale-count-badge">+ {extra_count} more stale items</div>' if extra_count > 0 else ''
+
+        st.markdown(f"""
+        <div class="quick-win-widget">
+            <div class="quick-win-header">
+                <span class="quick-win-icon">🚨</span>
+                <span class="quick-win-title">Stale Items Alert — {stale_data['total']} Items Need Attention</span>
+            </div>
+            {items_html}
+            {extra_html}
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ========== ULTRATHINK: FLOW BOTTLENECKS ==========
+    bottlenecks = get_flow_bottlenecks(conn)
+    if bottlenecks:
+        bn_html = ""
+        for bn in bottlenecks:
+            color = "#ef4444" if bn['severity'] == 'high' else "#f59e0b"
+            bn_html += f"""
+            <div style="background: rgba(255,255,255,0.7); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid {color};">
+                <div style="font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">{'🔥' if bn['severity'] == 'high' else '⚠️'}</span> {bn['title']}
+                </div>
+                <div style="font-size: 13px; color: #475569; margin-top: 4px;">{bn['desc']}</div>
+            </div>
+            """
+            
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid #fed7aa;">
+            <div style="font-size: 12px; font-weight: 600; color: #9a3412; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>🌊 Flow Efficiency Insights</span>
+            </div>
+            {bn_html}
+        </div>
+        """, unsafe_allow_html=True)
 
     # ========== FILTERS ==========
     st.markdown('<div class="filter-bar">', unsafe_allow_html=True)

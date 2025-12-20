@@ -31,20 +31,25 @@ st.set_page_config(page_title="Executive Cockpit", page_icon="🏆", layout="wid
 # Premium CSS
 st.markdown("""
 <style>
-    /* Premium Dark Theme Cards */
+    /* Global Light Theme */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+
+    /* Premium Cards */
     .exec-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin: 8px 0;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
     }
 
     .metric-giant {
         font-size: 56px;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
@@ -55,16 +60,17 @@ st.markdown("""
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 2px;
-        color: #8892b0;
+        color: #64748b;
         text-align: center;
         margin-bottom: 8px;
     }
 
     .metric-sublabel {
         font-size: 14px;
-        color: #64ffda;
+        color: #059669;
         text-align: center;
         margin-top: 8px;
+        font-weight: 600;
     }
 
     /* Traffic Lights */
@@ -74,25 +80,27 @@ st.markdown("""
         height: 20px;
         border-radius: 50%;
         margin-right: 8px;
-        box-shadow: 0 0 10px currentColor;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .light-red { background: #ff4757; color: #ff4757; }
-    .light-amber { background: #ffa502; color: #ffa502; }
-    .light-green { background: #2ed573; color: #2ed573; }
+    .light-red { background: #ef4444; color: #ef4444; }
+    .light-amber { background: #f59e0b; color: #f59e0b; }
+    .light-green { background: #22c55e; color: #22c55e; }
 
     /* Action Cards */
     .action-card {
-        background: rgba(255,255,255,0.05);
+        background: white;
         border-radius: 12px;
         padding: 16px;
         margin: 8px 0;
+        border: 1px solid #e2e8f0;
         border-left: 4px solid;
         transition: transform 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .action-card:hover { transform: translateX(8px); }
-    .action-critical { border-left-color: #ff4757; }
-    .action-warning { border-left-color: #ffa502; }
-    .action-info { border-left-color: #3498db; }
+    .action-critical { border-left-color: #ef4444; }
+    .action-warning { border-left-color: #f59e0b; }
+    .action-info { border-left-color: #3b82f6; }
 
     /* Pulse Animation */
     @keyframes pulse {
@@ -110,22 +118,64 @@ st.markdown("""
         font-weight: 700;
         font-size: 14px;
     }
-    .score-excellent { background: #2ed573; color: #000; }
-    .score-good { background: #7bed9f; color: #000; }
-    .score-warning { background: #ffa502; color: #000; }
-    .score-danger { background: #ff4757; color: #fff; }
+    .score-excellent { background: #dcfce7; color: #166534; }
+    .score-good { background: #d1fae5; color: #065f46; }
+    .score-warning { background: #fef3c7; color: #92400e; }
+    .score-danger { background: #fee2e2; color: #991b1b; }
 
     /* Executive Summary */
     .exec-summary {
-        background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin: 16px 0;
-        border: 1px solid #00d9ff33;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
     .exec-summary h3 {
-        color: #00d9ff;
+        color: #1a202c;
         margin-bottom: 16px;
+        font-weight: 700;
+    }
+
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    .quick-win-title {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 4px;
+    }
+    .quick-win-value {
+        font-size: 32px;
+        font-weight: 800;
+    }
+    .quick-win-action {
+        background: rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .quick-win-status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .quick-win-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -145,30 +195,30 @@ def create_gauge_chart(value: float, title: str, max_val: float = 100,
                        thresholds: List[float] = [30, 70]) -> go.Figure:
     """Create a premium gauge chart."""
     if value <= thresholds[0]:
-        color = "#ff4757"
+        color = "#ef4444"
     elif value <= thresholds[1]:
-        color = "#ffa502"
+        color = "#f59e0b"
     else:
-        color = "#2ed573"
+        color = "#22c55e"
 
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=value,
         domain={'x': [0, 1], 'y': [0, 1]},
-        title={'text': title, 'font': {'size': 14, 'color': '#8892b0'}},
+        title={'text': title, 'font': {'size': 14, 'color': '#64748b'}},
         number={'font': {'size': 40, 'color': color}, 'suffix': '%'},
         gauge={
-            'axis': {'range': [0, max_val], 'tickcolor': '#8892b0'},
+            'axis': {'range': [0, max_val], 'tickcolor': '#64748b'},
             'bar': {'color': color, 'thickness': 0.75},
-            'bgcolor': 'rgba(255,255,255,0.1)',
+            'bgcolor': '#f1f5f9',
             'borderwidth': 0,
             'steps': [
-                {'range': [0, thresholds[0]], 'color': 'rgba(255,71,87,0.2)'},
-                {'range': [thresholds[0], thresholds[1]], 'color': 'rgba(255,165,2,0.2)'},
-                {'range': [thresholds[1], max_val], 'color': 'rgba(46,213,115,0.2)'}
+                {'range': [0, thresholds[0]], 'color': 'rgba(239, 68, 68, 0.2)'},
+                {'range': [thresholds[0], thresholds[1]], 'color': 'rgba(245, 158, 11, 0.2)'},
+                {'range': [thresholds[1], max_val], 'color': 'rgba(34, 197, 94, 0.2)'}
             ],
             'threshold': {
-                'line': {'color': '#fff', 'width': 2},
+                'line': {'color': '#1a202c', 'width': 2},
                 'thickness': 0.8,
                 'value': value
             }
@@ -178,7 +228,7 @@ def create_gauge_chart(value: float, title: str, max_val: float = 100,
         height=200,
         margin=dict(t=40, b=20, l=20, r=20),
         paper_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#fff'}
+        font={'color': '#64748b'}
     )
     return fig
 
@@ -239,7 +289,7 @@ def create_risk_heatmap(data: Dict[str, Dict[str, float]]) -> go.Figure:
         margin=dict(t=20, b=20, l=100, r=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#fff')
+        font=dict(color='#64748b')
     )
     return fig
 
@@ -297,6 +347,68 @@ def calculate_health_score(strategy_score: float, burnout_risk: float, delivery_
     return score, grade
 
 
+def calculate_release_readiness(conn) -> Dict:
+    """Calculate release readiness score for quick win widget."""
+    # Get active sprint data
+    sprint = conn.execute("""
+        SELECT id, name FROM sprints
+        WHERE state = 'active' ORDER BY start_date DESC LIMIT 1
+    """).fetchone()
+
+    if not sprint:
+        sprint = conn.execute("""
+            SELECT id, name FROM sprints ORDER BY start_date DESC LIMIT 1
+        """).fetchone()
+
+    if not sprint:
+        return {'score': 0, 'status': 'No Sprint', 'blockers': 0, 'action': 'Create a sprint'}
+
+    sprint_id, sprint_name = sprint
+
+    # Get sprint metrics
+    metrics = conn.execute("""
+        SELECT
+            COUNT(*) as total,
+            SUM(CASE WHEN status IN ('Done', 'Terminé(e)', 'Closed') THEN 1 ELSE 0 END) as done,
+            SUM(CASE WHEN status IN ('Blocked', 'Bloqué') OR priority = 'Highest' THEN 1 ELSE 0 END) as blockers,
+            SUM(CASE WHEN status IN ('In Progress', 'En cours') THEN 1 ELSE 0 END) as wip
+        FROM issues WHERE sprint_id = ?
+    """, [sprint_id]).fetchone()
+
+    total, done, blockers, wip = metrics or (0, 0, 0, 0)
+
+    if total == 0:
+        return {'score': 0, 'status': 'Empty Sprint', 'blockers': 0, 'action': 'Add items to sprint'}
+
+    # Calculate readiness score
+    completion_pct = (done / total) * 100
+    blocker_penalty = min(30, blockers * 10)
+    wip_penalty = max(0, (wip - 5) * 2) if wip > 5 else 0
+
+    score = max(0, min(100, completion_pct - blocker_penalty - wip_penalty))
+
+    # Determine status and action
+    if score >= 80 and blockers == 0:
+        status = '🟢 Ready to Ship'
+        action = 'Proceed with release'
+    elif score >= 60:
+        status = '🟡 Almost Ready'
+        action = f'Clear {blockers} blocker(s)' if blockers > 0 else 'Complete remaining items'
+    else:
+        status = '🔴 Not Ready'
+        action = f'{total - done} items remaining'
+
+    return {
+        'score': int(score),
+        'status': status,
+        'blockers': blockers,
+        'action': action,
+        'sprint_name': sprint_name,
+        'done': done,
+        'total': total
+    }
+
+
 def main():
     # Header
     col_title, col_date = st.columns([3, 1])
@@ -306,9 +418,9 @@ def main():
     with col_date:
         st.markdown(f"""
         <div style="text-align: right; padding: 20px;">
-            <div style="font-size: 12px; color: #8892b0;">LAST UPDATED</div>
-            <div style="font-size: 18px; color: #64ffda;">{datetime.now().strftime('%H:%M:%S')}</div>
-            <div style="font-size: 14px; color: #8892b0;">{datetime.now().strftime('%B %d, %Y')}</div>
+            <div style="font-size: 12px; color: #64748b;">LAST UPDATED</div>
+            <div style="font-size: 18px; color: #4f46e5; font-weight: 600;">{datetime.now().strftime('%H:%M:%S')}</div>
+            <div style="font-size: 14px; color: #64748b;">{datetime.now().strftime('%B %d, %Y')}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -316,6 +428,27 @@ def main():
     if not conn:
         st.error("⚠️ Database not found. Please sync data first.")
         st.stop()
+
+    # ========== QUICK WIN: Release Readiness ==========
+    release_data = calculate_release_readiness(conn)
+    indicator_color = '#22c55e' if release_data['score'] >= 80 else '#f59e0b' if release_data['score'] >= 60 else '#ef4444'
+
+    st.markdown(f"""
+    <div class="quick-win-widget">
+        <div>
+            <div class="quick-win-title">⚡ RELEASE READINESS</div>
+            <div class="quick-win-value">{release_data['score']}%</div>
+        </div>
+        <div class="quick-win-status">
+            <div class="quick-win-indicator" style="background: {indicator_color};"></div>
+            <span>{release_data['status']}</span>
+        </div>
+        <div>
+            <div style="font-size: 12px; opacity: 0.8;">{release_data.get('done', 0)}/{release_data.get('total', 0)} done • {release_data['blockers']} blockers</div>
+            <div class="quick-win-action">→ {release_data['action']}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Load data
     with st.spinner("🔄 Aggregating Intelligence..."):
@@ -374,7 +507,7 @@ def main():
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h3>🎯 Organization Health Score</h3>
-                <p style="color: #8892b0; margin: 0;">Composite score based on Strategy, Team Health, and Delivery Metrics</p>
+                <p style="color: #64748b; margin: 0;">Composite score based on Strategy, Team Health, and Delivery Metrics</p>
             </div>
             <div style="text-align: center;">
                 <div class="metric-giant" style="background: {grade_colors[health_grade]}; -webkit-background-clip: text;">
@@ -401,7 +534,7 @@ def main():
         st.markdown(f"""
         <div style="text-align: center;">
             <div class="metric-sublabel">💰 ${strat_res.total_drift_cost:,.0f} drift cost</div>
-            <div style="color: #8892b0; font-size: 12px;">{strat_res.shadow_work_percentage*100:.1f}% shadow work detected</div>
+            <div style="color: #64748b; font-size: 12px;">{strat_res.shadow_work_percentage*100:.1f}% shadow work detected</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -414,7 +547,7 @@ def main():
         st.markdown(f"""
         <div style="text-align: center;">
             <div class="metric-sublabel">🚨 {high_risk} high-risk engineers</div>
-            <div style="color: #8892b0; font-size: 12px;">{len(df_users)} active team members</div>
+            <div style="color: #64748b; font-size: 12px;">{len(df_users)} active team members</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -426,7 +559,7 @@ def main():
         st.markdown(f"""
         <div style="text-align: center;">
             <div class="metric-sublabel">📅 P85: {del_res.p85_date.strftime('%b %d')}</div>
-            <div style="color: #8892b0; font-size: 12px;">Bias factor: {del_params['estimation_bias_mean']:.1f}x</div>
+            <div style="color: #64748b; font-size: 12px;">Bias factor: {del_params['estimation_bias_mean']:.1f}x</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -552,9 +685,9 @@ def main():
         for action in actions[:4]:
             st.markdown(f"""
             <div class="action-card action-{action['priority']}">
-                <strong>{action['title']}</strong>
-                <p style="color: #8892b0; margin: 8px 0 4px 0; font-size: 14px;">{action['action']}</p>
-                <span style="color: #64ffda; font-size: 12px;">Impact: {action['impact']}</span>
+                <strong style="color: #1a202c;">{action['title']}</strong>
+                <p style="color: #64748b; margin: 8px 0 4px 0; font-size: 14px;">{action['action']}</p>
+                <span style="color: #059669; font-size: 12px;">Impact: {action['impact']}</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -568,8 +701,8 @@ def main():
         status = "🟢" if strategy_score > 70 else "🟡" if strategy_score > 40 else "🔴"
         st.markdown(f"""
         <div class="exec-card">
-            <h4>{status} Are we building the right things?</h4>
-            <p style="color: #8892b0;">
+            <h4 style="color: #1a202c;">{status} Are we building the right things?</h4>
+            <p style="color: #64748b;">
                 {"Yes - " if strategy_score > 70 else "Partially - " if strategy_score > 40 else "No - "}
                 {strat_res.shadow_work_percentage*100:.0f}% of work is unplanned.
                 ${strat_res.total_drift_cost:,.0f} spent on non-strategic work.
@@ -581,8 +714,8 @@ def main():
         status = "🟢" if team_health > 80 else "🟡" if team_health > 50 else "🔴"
         st.markdown(f"""
         <div class="exec-card">
-            <h4>{status} Is the team sustainable?</h4>
-            <p style="color: #8892b0;">
+            <h4 style="color: #1a202c;">{status} Is the team sustainable?</h4>
+            <p style="color: #64748b;">
                 {"Yes - " if team_health > 80 else "Caution - " if team_health > 50 else "No - "}
                 {high_risk} of {len(df_users)} engineers showing burnout signals.
                 {"Workload is balanced." if high_risk == 0 else "Immediate intervention needed."}
@@ -595,8 +728,8 @@ def main():
         status = "🟢" if prob > 80 else "🟡" if prob > 50 else "🔴"
         st.markdown(f"""
         <div class="exec-card">
-            <h4>{status} Will we deliver on time?</h4>
-            <p style="color: #8892b0;">
+            <h4 style="color: #1a202c;">{status} Will we deliver on time?</h4>
+            <p style="color: #64748b;">
                 {"Likely - " if prob > 80 else "Uncertain - " if prob > 50 else "Unlikely - "}
                 {prob:.0f}% confidence for 90-day target.
                 P85 delivery: {del_res.p85_date.strftime('%B %d, %Y')}.

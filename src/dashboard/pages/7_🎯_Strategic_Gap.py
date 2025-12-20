@@ -20,28 +20,28 @@ import numpy as np
 
 st.set_page_config(page_title="Strategic Execution Gap", page_icon="🎯", layout="wide")
 
-# Premium Dark Theme CSS
+# Premium Light Theme CSS
 st.markdown("""
 <style>
-    /* Global Dark Theme */
+    /* Global Light Theme */
     .stApp {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        background-color: #f8f9fa;
     }
 
     /* Section Containers */
     .section-container {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 700;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -50,10 +50,11 @@ st.markdown("""
 
     /* Premium Metric Cards */
     .gap-metric-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
-        border: 1px solid rgba(102, 126, 234, 0.15);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         text-align: center;
         position: relative;
         overflow: hidden;
@@ -61,30 +62,18 @@ st.markdown("""
 
     .gap-metric-card::before {
         content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
+        position: absolute; top: 0; left: 0; right: 0; height: 4px;
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     }
 
-    .gap-metric-card.danger::before {
-        background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-    }
-
-    .gap-metric-card.warning::before {
-        background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
-    }
-
-    .gap-metric-card.success::before {
-        background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
-    }
+    .gap-metric-card.danger::before { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+    .gap-metric-card.warning::before { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+    .gap-metric-card.success::before { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
 
     .metric-label {
         font-size: 11px;
         font-weight: 600;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-bottom: 8px;
@@ -96,44 +85,45 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .metric-value.danger {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .metric-value.warning {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .metric-value.success {
-        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .metric-subtitle {
         font-size: 13px;
-        color: #8892b0;
+        color: #64748b;
         margin-top: 8px;
+        font-weight: 500;
     }
 
     /* Strategy Slider Container */
     .strategy-control {
-        background: linear-gradient(145deg, #252542 0%, #1e1e32 100%);
+        background: white;
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
+        border: 1px solid #e2e8f0;
         margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .strategy-label {
-        color: #fff;
+        color: #1a202c;
         font-weight: 600;
         font-size: 14px;
         margin-bottom: 8px;
@@ -141,11 +131,11 @@ st.markdown("""
 
     /* Category Cards */
     .category-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 12px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     .category-header {
@@ -156,7 +146,7 @@ st.markdown("""
     }
 
     .category-name {
-        color: #fff;
+        color: #1a202c;
         font-weight: 600;
         font-size: 14px;
     }
@@ -168,24 +158,13 @@ st.markdown("""
         border-radius: 20px;
     }
 
-    .gap-positive {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-    }
-
-    .gap-negative {
-        background: rgba(39, 174, 96, 0.2);
-        color: #27ae60;
-    }
-
-    .gap-neutral {
-        background: rgba(136, 146, 176, 0.2);
-        color: #8892b0;
-    }
+    .gap-positive { background: #fee2e2; color: #991b1b; }
+    .gap-negative { background: #dcfce7; color: #166534; }
+    .gap-neutral { background: #f1f5f9; color: #64748b; }
 
     .progress-bar-container {
         height: 8px;
-        background: rgba(255, 255, 255, 0.1);
+        background: #e2e8f0;
         border-radius: 4px;
         overflow: hidden;
         margin-top: 8px;
@@ -197,42 +176,29 @@ st.markdown("""
         transition: width 0.3s ease;
     }
 
-    .progress-stated {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .progress-actual {
-        background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
-    }
+    .progress-stated { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+    .progress-actual { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
 
     /* Shadow Work Table */
     .shadow-ticket {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 10px;
         padding: 14px;
         margin-bottom: 10px;
-        border-left: 4px solid #e74c3c;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #ef4444;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    .ticket-key {
-        color: #667eea;
-        font-weight: 700;
-        font-size: 12px;
-    }
-
-    .ticket-summary {
-        color: #fff;
-        font-size: 13px;
-        flex: 1;
-        margin: 0 16px;
-    }
+    .ticket-key { color: #4f46e5; font-weight: 700; font-size: 12px; }
+    .ticket-summary { color: #1a202c; font-size: 13px; flex: 1; margin: 0 16px; font-weight: 500; }
 
     .ticket-category {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
+        background: #fee2e2;
+        color: #991b1b;
         padding: 4px 10px;
         border-radius: 12px;
         font-size: 11px;
@@ -240,57 +206,30 @@ st.markdown("""
     }
 
     /* Trend Indicator */
-    .trend-up {
-        color: #e74c3c;
-    }
-
-    .trend-down {
-        color: #27ae60;
-    }
+    .trend-up { color: #ef4444; }
+    .trend-down { color: #22c55e; }
 
     /* Allocation Legend */
     .legend-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-right: 20px;
-        color: #8892b0;
-        font-size: 13px;
+        display: inline-flex; align-items: center; gap: 8px; margin-right: 20px;
+        color: #64748b; font-size: 13px; font-weight: 500;
     }
 
-    .legend-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-
-    .legend-stated {
-        background: #667eea;
-    }
-
-    .legend-actual {
-        background: #f39c12;
-    }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .legend-stated { background: #667eea; }
+    .legend-actual { background: #f59e0b; }
 
     /* Insight Box */
     .insight-box {
-        background: linear-gradient(145deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
         border-radius: 12px;
         padding: 16px;
         margin-top: 16px;
     }
 
-    .insight-icon {
-        font-size: 18px;
-        margin-right: 8px;
-    }
-
-    .insight-text {
-        color: #ccd6f6;
-        font-size: 14px;
-        line-height: 1.5;
-    }
+    .insight-icon { font-size: 18px; margin-right: 8px; }
+    .insight-text { color: #1e293b; font-size: 14px; line-height: 1.5; }
 
     /* Total Allocation Badge */
     .allocation-total {
@@ -301,15 +240,58 @@ st.markdown("""
         font-size: 14px;
     }
 
-    .total-valid {
-        background: rgba(39, 174, 96, 0.2);
-        color: #27ae60;
-    }
+    .total-valid { background: #dcfce7; color: #166534; }
+    .total-invalid { background: #fee2e2; color: #991b1b; }
 
-    .total-invalid {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        box-shadow: 0 8px 32px rgba(6, 78, 59, 0.3);
+        position: relative;
+        overflow: hidden;
     }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon { font-size: 24px; }
+    .quick-win-title {
+        color: #a7f3d0;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .drift-summary {
+        display: flex;
+        gap: 20px;
+    }
+    .drift-item {
+        flex: 1;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+    }
+    .drift-label {
+        color: #a7f3d0;
+        font-size: 11px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    .drift-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #ecfdf5;
+    }
+    .drift-good { color: #4ade80; }
+    .drift-bad { color: #fca5a5; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -319,6 +301,45 @@ def get_connection():
     if not db_path.exists():
         return None
     return duckdb.connect(str(db_path), read_only=True)
+
+
+def get_priority_drift(conn) -> dict:
+    """Calculate quick priority drift summary - Are we doing what we committed to?"""
+    try:
+        # Get current sprint work
+        sprint_work = conn.execute("""
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN priority IN ('Highest', 'High') THEN 1 ELSE 0 END) as high_priority,
+                SUM(CASE WHEN status = 'Terminé(e)' THEN 1 ELSE 0 END) as done,
+                SUM(CASE WHEN status = 'Terminé(e)' AND priority IN ('Highest', 'High') THEN 1 ELSE 0 END) as high_done
+            FROM issues i
+            JOIN sprints s ON i.sprint_id = s.id AND s.state = 'active'
+        """).fetchone()
+
+        total = sprint_work[0] or 0
+        high_priority = sprint_work[1] or 0
+        done = sprint_work[2] or 0
+        high_done = sprint_work[3] or 0
+
+        # Calculate alignment
+        high_pct = (high_priority / total * 100) if total > 0 else 0
+        high_completion = (high_done / high_priority * 100) if high_priority > 0 else 100
+        low_items_done = done - high_done
+        low_priority_total = total - high_priority
+
+        # Alignment score: are we completing high-priority items first?
+        alignment_score = min(100, high_completion + 20) if high_priority > 0 else 100
+
+        return {
+            'high_priority': high_priority,
+            'high_done': high_done,
+            'high_completion': high_completion,
+            'alignment_score': alignment_score,
+            'status': 'aligned' if alignment_score >= 70 else 'drifting'
+        }
+    except Exception:
+        return {'high_priority': 0, 'high_done': 0, 'high_completion': 0, 'alignment_score': 100, 'status': 'aligned'}
 
 
 def classify_issue(issue_type: str, labels: object, summary: str) -> str:
@@ -457,17 +478,17 @@ def create_gap_gauge(stated: float, actual: float, title: str) -> go.Figure:
         value=actual * 100,
         delta={'reference': stated * 100, 'relative': False, 'valueformat': '.1f'},
         title={'text': title, 'font': {'size': 14, 'color': '#8892b0'}},
-        number={'suffix': '%', 'font': {'size': 32, 'color': '#fff'}},
+        number={'suffix': '%', 'font': {'size': 32, 'color': '#1a202c'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'tickcolor': 'rgba(0,0,0,0)'},
-            'bar': {'color': '#f39c12', 'thickness': 0.7},
-            'bgcolor': 'rgba(255,255,255,0.1)',
+            'bar': {'color': '#f59e0b', 'thickness': 0.7},
+            'bgcolor': '#f1f5f9',
             'borderwidth': 0,
             'steps': [
-                {'range': [0, stated * 100], 'color': 'rgba(102, 126, 234, 0.3)'},
+                {'range': [0, stated * 100], 'color': 'rgba(102, 126, 234, 0.2)'},
             ],
             'threshold': {
-                'line': {'color': '#667eea', 'width': 4},
+                'line': {'color': '#4f46e5', 'width': 4},
                 'thickness': 0.75,
                 'value': stated * 100
             }
@@ -477,7 +498,7 @@ def create_gap_gauge(stated: float, actual: float, title: str) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#fff'},
+        font={'color': '#64748b'},
         height=200,
         margin=dict(l=20, r=20, t=40, b=20)
     )
@@ -526,18 +547,18 @@ def create_allocation_radar(stated: dict, actual: dict) -> go.Figure:
                 visible=True,
                 range=[0, max(max(stated_values), max(actual_values)) + 10],
                 showline=False,
-                tickfont=dict(color='#8892b0', size=10),
-                gridcolor='rgba(255,255,255,0.1)'
+                tickfont=dict(color='#64748b', size=10),
+                gridcolor='#e2e8f0'
             ),
             angularaxis=dict(
-                tickfont=dict(color='#fff', size=12),
-                gridcolor='rgba(255,255,255,0.1)'
+                tickfont=dict(color='#1a202c', size=12),
+                gridcolor='#e2e8f0'
             ),
             bgcolor='rgba(0,0,0,0)'
         ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#fff'},
+        font={'color': '#64748b'},
         showlegend=True,
         legend=dict(
             orientation='h',
@@ -545,7 +566,7 @@ def create_allocation_radar(stated: dict, actual: dict) -> go.Figure:
             y=-0.15,
             xanchor='center',
             x=0.5,
-            font=dict(color='#8892b0')
+            font=dict(color='#64748b')
         ),
         height=400,
         margin=dict(l=80, r=80, t=40, b=60)
@@ -584,18 +605,18 @@ def create_gap_waterfall(gap_breakdown: dict) -> go.Figure:
     fig.add_hline(y=0, line_dash='dash', line_color='rgba(255,255,255,0.3)')
 
     fig.update_layout(
-        title=dict(text='Gap by Category', font=dict(color='#fff', size=16)),
+        title=dict(text='Gap by Category', font=dict(color='#1a202c', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(
-            tickfont=dict(color='#fff'),
+            tickfont=dict(color='#64748b'),
             showgrid=False
         ),
         yaxis=dict(
             title='Gap (%)',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)',
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0',
             zeroline=False
         ),
         height=350,
@@ -641,18 +662,18 @@ def create_trend_chart(days: int = 90) -> go.Figure:
         ))
 
     fig.update_layout(
-        title=dict(text='90-Day Allocation Trend', font=dict(color='#fff', size=16)),
+        title=dict(text='90-Day Allocation Trend', font=dict(color='#1a202c', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#8892b0'},
+        font={'color': '#64748b'},
         xaxis=dict(
-            tickfont=dict(color='#8892b0'),
+            tickfont=dict(color='#64748b'),
             showgrid=False
         ),
         yaxis=dict(
             title='Allocation (%)',
-            tickfont=dict(color='#8892b0'),
-            gridcolor='rgba(255,255,255,0.05)'
+            tickfont=dict(color='#64748b'),
+            gridcolor='#e2e8f0'
         ),
         legend=dict(
             orientation='h',
@@ -660,7 +681,7 @@ def create_trend_chart(days: int = 90) -> go.Figure:
             y=1.02,
             xanchor='right',
             x=1,
-            font=dict(color='#8892b0')
+            font=dict(color='#64748b')
         ),
         height=350,
         margin=dict(l=60, r=40, t=80, b=40),
@@ -680,7 +701,7 @@ def main():
                    background-clip: text;">
             🎯 Strategic Execution Gap™
         </h1>
-        <p style="color: #8892b0; font-size: 16px; margin-top: 10px;">
+        <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
             Uncover the gap between your stated strategy and actual execution
         </p>
     </div>
@@ -690,6 +711,35 @@ def main():
     if not conn:
         st.error("Database not found. Please sync data first.")
         st.stop()
+
+    # Quick Win Widget - Priority Drift
+    try:
+        drift = get_priority_drift(conn)
+        status_class = 'drift-good' if drift['status'] == 'aligned' else 'drift-bad'
+        st.markdown(f"""
+        <div class="quick-win-widget">
+            <div class="quick-win-header">
+                <span class="quick-win-icon">🎯</span>
+                <span class="quick-win-title">PRIORITY DRIFT • Are We On Track?</span>
+            </div>
+            <div class="drift-summary">
+                <div class="drift-item">
+                    <div class="drift-label">Alignment</div>
+                    <div class="drift-value {status_class}">{drift['alignment_score']:.0f}%</div>
+                </div>
+                <div class="drift-item">
+                    <div class="drift-label">High Priority Done</div>
+                    <div class="drift-value">{drift['high_done']}/{drift['high_priority']}</div>
+                </div>
+                <div class="drift-item">
+                    <div class="drift-label">Status</div>
+                    <div class="drift-value {status_class}">{'Aligned' if drift['status'] == 'aligned' else 'Drifting'}</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception:
+        pass
 
     # ========== STRATEGY CONFIGURATION ==========
     st.markdown('<div class="section-container">', unsafe_allow_html=True)

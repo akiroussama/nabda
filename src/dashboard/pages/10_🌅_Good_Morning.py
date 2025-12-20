@@ -27,9 +27,9 @@ st.set_page_config(
 # Premium Dark Theme CSS
 st.markdown("""
 <style>
-    /* Global Dark Theme */
+    /* Global Light Theme */
     .stApp {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        background-color: #f8f9fa;
     }
 
     /* Main layout */
@@ -39,18 +39,18 @@ st.markdown("""
 
     /* Section Containers */
     .section-container {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 700;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -59,12 +59,13 @@ st.markdown("""
 
     /* Greeting Card */
     .greeting-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         border-radius: 20px;
         padding: 32px;
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 
     .greeting-card::before {
@@ -74,25 +75,25 @@ st.markdown("""
         right: -50%;
         width: 100%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
     }
 
     .greeting-card.morning {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
     }
 
     .greeting-card.afternoon {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
 
     .greeting-card.evening {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     }
 
     .greeting-text {
         font-size: 36px;
         font-weight: 800;
-        color: #fff;
+        color: white;
         margin-bottom: 8px;
         position: relative;
         z-index: 1;
@@ -100,9 +101,10 @@ st.markdown("""
 
     .greeting-date {
         font-size: 16px;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.95);
         position: relative;
         z-index: 1;
+        font-weight: 500;
     }
 
     .greeting-icon {
@@ -111,45 +113,47 @@ st.markdown("""
         top: 50%;
         transform: translateY(-50%);
         font-size: 64px;
-        opacity: 0.3;
+        opacity: 0.25;
+        color: white;
     }
 
     /* Quick Stats Cards */
     .stat-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #252542 100%);
+        background: white;
         border-radius: 12px;
         padding: 16px;
         text-align: center;
-        border: 1px solid rgba(102, 126, 234, 0.15);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .stat-value {
         font-size: 32px;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 
     .stat-value.positive {
-        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .stat-value.negative {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .stat-label {
         font-size: 11px;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-top: 8px;
+        font-weight: 600;
     }
 
     .stat-delta {
@@ -157,9 +161,9 @@ st.markdown("""
         margin-top: 4px;
     }
 
-    .delta-up { color: #27ae60; }
-    .delta-down { color: #e74c3c; }
-    .delta-neutral { color: #8892b0; }
+    .delta-up { color: #16a34a; }
+    .delta-down { color: #dc2626; }
+    .delta-neutral { color: #64748b; }
 
     /* Briefing Cards */
     .briefing-section {
@@ -169,103 +173,100 @@ st.markdown("""
     .briefing-header {
         font-size: 16px;
         font-weight: 700;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 12px;
     }
 
     .good-news-card {
-        background: linear-gradient(145deg, rgba(39, 174, 96, 0.1) 0%, rgba(46, 204, 113, 0.05) 100%);
-        border-left: 4px solid #27ae60;
+        background: #f0fdf4;
+        border-left: 4px solid #16a34a;
         border-radius: 0 12px 12px 0;
         padding: 16px;
         margin-bottom: 12px;
+        border: 1px solid #dcfce7;
+        border-left-width: 4px;
     }
 
     .concern-card {
-        background: linear-gradient(145deg, rgba(243, 156, 18, 0.1) 0%, rgba(230, 126, 34, 0.05) 100%);
-        border-left: 4px solid #f39c12;
+        background: #fff7ed;
+        border-left: 4px solid #ea580c;
         border-radius: 0 12px 12px 0;
         padding: 16px;
         margin-bottom: 12px;
+        border: 1px solid #ffedd5;
+        border-left-width: 4px;
     }
 
     .risk-card {
-        background: linear-gradient(145deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.05) 100%);
-        border-left: 4px solid #e74c3c;
+        background: #fef2f2;
+        border-left: 4px solid #dc2626;
         border-radius: 0 12px 12px 0;
         padding: 16px;
         margin-bottom: 12px;
+        border: 1px solid #fee2e2;
+        border-left-width: 4px;
     }
 
     .card-text {
-        color: #ccd6f6;
+        color: #334155;
         font-size: 14px;
         line-height: 1.6;
     }
 
     .evidence-badge {
         display: inline-block;
-        background: rgba(102, 126, 234, 0.2);
-        color: #667eea;
+        background: #e0e7ff;
+        color: #4338ca;
         padding: 2px 8px;
         border-radius: 4px;
         font-size: 11px;
         font-family: monospace;
         margin-left: 8px;
+        font-weight: 600;
     }
 
     /* Recommendation Card */
     .recommendation-card {
-        background: linear-gradient(145deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border: 1px solid rgba(102, 126, 234, 0.4);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 16px;
         padding: 20px;
         margin-top: 16px;
     }
 
     .recommendation-title {
-        color: #667eea;
+        color: #4f46e5;
         font-weight: 700;
         font-size: 14px;
         margin-bottom: 8px;
     }
 
     .recommendation-text {
-        color: #fff;
+        color: #1e293b;
         font-size: 15px;
         line-height: 1.5;
     }
 
     /* Decision Queue */
     .decision-item {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 12px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
+        border: 1px solid #e2e8f0;
         transition: all 0.2s ease;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
 
     .decision-item:hover {
         transform: translateX(4px);
-        border-color: rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .decision-item.critical {
-        border-left: 4px solid #e74c3c;
-    }
-
-    .decision-item.high {
-        border-left: 4px solid #f39c12;
-    }
-
-    .decision-item.medium {
-        border-left: 4px solid #3498db;
-    }
-
-    .decision-item.low {
-        border-left: 4px solid #27ae60;
-    }
+    .decision-item.critical { border-left: 4px solid #ef4444; }
+    .decision-item.high { border-left: 4px solid #f59e0b; }
+    .decision-item.medium { border-left: 4px solid #3b82f6; }
+    .decision-item.low { border-left: 4px solid #22c55e; }
 
     .decision-priority {
         display: inline-block;
@@ -279,48 +280,34 @@ st.markdown("""
         margin-right: 12px;
     }
 
-    .priority-critical {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-    }
-
-    .priority-high {
-        background: rgba(243, 156, 18, 0.2);
-        color: #f39c12;
-    }
-
-    .priority-medium {
-        background: rgba(52, 152, 219, 0.2);
-        color: #3498db;
-    }
-
-    .priority-low {
-        background: rgba(39, 174, 96, 0.2);
-        color: #27ae60;
-    }
+    .priority-critical { background: #fee2e2; color: #991b1b; }
+    .priority-high { background: #fef3c7; color: #92400e; }
+    .priority-medium { background: #dbeafe; color: #1e40af; }
+    .priority-low { background: #dcfce7; color: #166534; }
 
     .decision-key {
-        color: #667eea;
+        color: #4f46e5;
         font-weight: 700;
         font-size: 12px;
     }
 
     .decision-summary {
-        color: #fff;
+        color: #1e293b;
         font-size: 13px;
         margin-top: 4px;
+        font-weight: 500;
     }
 
     .decision-reason {
-        color: #8892b0;
+        color: #64748b;
         font-size: 11px;
         margin-top: 8px;
     }
 
     /* AI Insights */
     .ai-insight {
-        background: linear-gradient(145deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
-        border: 1px solid rgba(102, 126, 234, 0.2);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 12px;
@@ -332,7 +319,7 @@ st.markdown("""
     }
 
     .ai-text {
-        color: #ccd6f6;
+        color: #334155;
         font-size: 13px;
         line-height: 1.5;
     }
@@ -342,9 +329,10 @@ st.markdown("""
         display: flex;
         align-items: center;
         padding: 12px;
-        background: rgba(255, 255, 255, 0.02);
+        background: white;
         border-radius: 8px;
         margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
     }
 
     .team-avatar {
@@ -360,25 +348,28 @@ st.markdown("""
     }
 
     .team-name {
-        color: #fff;
-        font-weight: 500;
+        color: #1e293b;
+        font-weight: 600;
         font-size: 14px;
         flex: 1;
     }
 
     .team-stat {
-        color: #8892b0;
+        color: #64748b;
         font-size: 12px;
+        background: #f1f5f9;
+        padding: 2px 8px;
+        border-radius: 12px;
     }
 
     /* Footer */
     .dashboard-footer {
         text-align: center;
-        color: #8892b0;
+        color: #94a3b8;
         font-size: 12px;
         padding: 16px;
         margin-top: 24px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-top: 1px solid #e2e8f0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -407,6 +398,70 @@ def get_avatar_color(name: str) -> str:
     """Generate consistent color for avatar based on name."""
     colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#fa709a']
     return colors[hash(name or '') % len(colors)]
+
+
+def get_morning_priority(conn, project_key: str) -> Dict[str, Any]:
+    """Get the #1 priority item for today - the thing to focus on first."""
+    # Find the most critical item: highest priority + oldest + in progress or blocked
+    try:
+        priority_item = conn.execute(f"""
+            SELECT
+                key,
+                summary,
+                priority,
+                status,
+                assignee_name,
+                DATEDIFF('day', updated, CURRENT_TIMESTAMP) as days_stale,
+                DATEDIFF('day', created, CURRENT_TIMESTAMP) as age_days
+            FROM issues
+            WHERE project_key = '{project_key}'
+            AND status != 'Terminé(e)'
+            ORDER BY
+                CASE priority WHEN 'Highest' THEN 1 WHEN 'High' THEN 2 WHEN 'Medium' THEN 3 ELSE 4 END,
+                CASE WHEN status = 'En cours' AND DATEDIFF('day', updated, CURRENT_TIMESTAMP) >= 3 THEN 0 ELSE 1 END,
+                DATEDIFF('day', created, CURRENT_TIMESTAMP) DESC
+            LIMIT 1
+        """).fetchone()
+
+        if not priority_item:
+            return None
+
+        key, summary, priority, status, assignee, days_stale, age_days = priority_item
+
+        # Determine severity and reason
+        if priority == 'Highest' or days_stale >= 5:
+            severity = 'high'
+            reason = f"Highest priority • {age_days} days old" if priority == 'Highest' else f"Stale for {days_stale} days"
+        elif priority == 'High' or days_stale >= 3:
+            severity = 'normal'
+            reason = f"High priority • {age_days} days old"
+        else:
+            severity = 'low'
+            reason = f"Next in queue • {age_days} days old"
+
+        # Check if blocked (stale in progress)
+        blocked_by = None
+        if status == 'En cours' and days_stale >= 3:
+            blocked_by = f"No updates for {days_stale} days - may need help"
+
+        # Determine impact
+        if priority == 'Highest':
+            impact = "Critical path item"
+        elif priority == 'High':
+            impact = "High business value"
+        else:
+            impact = "Keep momentum"
+
+        return {
+            'title': f"{key}: {summary[:50]}{'...' if len(summary) > 50 else ''}",
+            'reason': reason,
+            'severity': severity,
+            'blocked_by': blocked_by,
+            'impact': impact,
+            'assignee': assignee or 'Unassigned'
+        }
+    except Exception:
+        return None
 
 
 def generate_briefing_data(conn, project_key: str) -> Dict[str, Any]:
@@ -578,6 +633,40 @@ def generate_ai_insights(data: Dict[str, Any]) -> List[str]:
         insights.append("✅ **All systems nominal**: No significant patterns detected. Continue steady progress.")
 
     return insights
+
+
+def get_standup_script(data: Dict[str, Any], priority_item: Dict[str, Any]) -> List[str]:
+    """
+    Generate a 'Standup Cheat Sheet' - exactly what to say in the meeting.
+    Ultrathink: Removes the cognitive load of preparing for standup.
+    """
+    script = []
+    
+    # Yesterday
+    completed = data.get('completed', pd.DataFrame())
+    if not completed.empty:
+        count = len(completed)
+        keys = ", ".join(completed['key'].head(2).tolist())
+        script.append(f"✅ **Yesterday:** Completed {count} items ({keys}).")
+    else:
+        script.append("✅ **Yesterday:** Focused on progress, no tickets closed yet.")
+        
+    # Today
+    if priority_item:
+        script.append(f"🎯 **Today:** Focusing on {priority_item['title'].split(':')[0]} (Critical).")
+    else:
+        script.append("🎯 **Today:** Picking up next highest priority item.")
+        
+    # Blockers
+    blockers = data.get('blockers', pd.DataFrame())
+    if not blockers.empty:
+        top_blocker = blockers.iloc[0]['key']
+        script.append(f"⛔ **Blockers:** I am blocked on {top_blocker}. Need assistance.")
+    else:
+        script.append("🚀 **Blockers:** No blockers. Green light.")
+        
+    return script
+
 
 
 def render_greeting():
@@ -792,9 +881,9 @@ def render_decision_queue(data: Dict[str, Any]):
 
     if not items:
         st.markdown("""
-        <div style="text-align: center; padding: 40px; color: #27ae60;">
+        <div style="text-align: center; padding: 40px; color: #16a34a;">
             <span style="font-size: 32px;">✓</span>
-            <p style="color: #8892b0; margin-top: 10px;">No items requiring immediate attention!</p>
+            <p style="color: #64748b; margin-top: 10px;">No items requiring immediate attention!</p>
         </div>
         """, unsafe_allow_html=True)
     else:
@@ -930,12 +1019,61 @@ def main():
     # Render greeting
     render_greeting()
 
+    # ========== QUICK WIN: YOUR #1 PRIORITY TODAY ==========
+    priority_data = get_morning_priority(conn, project_key)
+    if priority_data:
+        severity = priority_data.get('severity', 'normal')
+        severity_colors = {'low': '#3b82f6', 'normal': '#f59e0b', 'high': '#ef4444'}
+        severity_color = severity_colors.get(severity, '#667eea')
+        blocked_html = f'<div style="margin-top: 8px; color: #ff6b81;">⚠️ Blocked by: {priority_data["blocked_by"]}</div>' if priority_data.get('blocked_by') else ''
+
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, {severity_color} 0%, {severity_color}dd 100%); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px {severity_color}66; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 20 min saved</div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; animation: pulse 2s infinite; margin-right: 6px;"></span>
+                    #1 PRIORITY TODAY
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px;">
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Focus On This First</div>
+                    <div style="font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 8px;">{priority_data['title']}</div>
+                    <div style="font-size: 14px; opacity: 0.85;">{priority_data['reason']}</div>
+                    {blocked_html}
+                </div>
+                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 180px; text-align: center;">
+                    <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Impact</div>
+                    <div style="font-size: 16px; font-weight: 700; line-height: 1.3;">{priority_data['impact']}</div>
+                </div>
+            </div>
+        </div>
+        <style>@keyframes pulse {{ 0%, 100% {{ opacity: 1; transform: scale(1); }} 50% {{ opacity: 0.5; transform: scale(1.3); }} }}</style>
+        """, unsafe_allow_html=True)
+
     # Generate data
     with st.spinner("Loading your briefing..."):
         data = generate_briefing_data(conn, project_key)
 
     # Quick Stats
     render_quick_stats(data)
+
+    # ========== ULTRATHINK: STANDUP CHEAT SHEET ==========
+    standup_script = get_standup_script(data, priority_data)
+    
+    script_html = "".join([f'<div style="margin-bottom: 8px; font-size: 14px; color: #334155;">{line}</div>' for line in standup_script])
+    
+    st.markdown(f"""
+    <div style="background: white; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>🎙️ Standup Cheat Sheet</span>
+            <span style="font-size: 10px; font-weight: 400; text-transform: none; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">Read this aloud</span>
+        </div>
+        <div>{script_html}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 
     # Main content layout
     col_left, col_right = st.columns([2, 1])

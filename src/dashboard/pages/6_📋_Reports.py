@@ -21,34 +21,41 @@ st.set_page_config(page_title="Reports", page_icon="📋", layout="wide")
 # Premium Reports CSS
 st.markdown("""
 <style>
+    /* Main container styling */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+
     .section-container {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
     }
 
     .report-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         margin-bottom: 16px;
         cursor: pointer;
         transition: all 0.2s ease;
     }
     .report-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        border-color: #667eea44;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        border-color: #cbd5e1;
     }
 
     .report-icon {
@@ -59,13 +66,13 @@ st.markdown("""
     .report-name {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 8px;
     }
 
     .report-description {
         font-size: 13px;
-        color: #8892b0;
+        color: #64748b;
         line-height: 1.5;
     }
 
@@ -77,16 +84,17 @@ st.markdown("""
         font-weight: 600;
         margin: 4px 4px 0 0;
     }
-    .format-pdf { background: #e74c3c33; color: #e74c3c; }
-    .format-excel { background: #27ae6033; color: #27ae60; }
-    .format-csv { background: #3498db33; color: #3498db; }
-    .format-md { background: #9b59b633; color: #9b59b6; }
+    .format-pdf { background: #fee2e2; color: #991b1b; }
+    .format-excel { background: #dcfce7; color: #166534; }
+    .format-csv { background: #e0f2fe; color: #075985; }
+    .format-md { background: #f3e8ff; color: #6b21a8; }
 
     .preview-section {
-        background: rgba(255,255,255,0.02);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 20px;
         margin-top: 16px;
+        border: 1px solid #e2e8f0;
     }
 
     .metric-row {
@@ -96,35 +104,78 @@ st.markdown("""
     }
 
     .mini-metric {
-        background: rgba(255,255,255,0.03);
+        background: white;
         padding: 12px 16px;
         border-radius: 8px;
         text-align: center;
         flex: 1;
+        border: 1px solid #e2e8f0;
     }
 
     .mini-metric-value {
         font-size: 24px;
         font-weight: 700;
-        color: #667eea;
+        color: #4f46e5;
     }
 
     .mini-metric-label {
         font-size: 11px;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
     }
 
     .report-preview {
-        background: #1a1a2e;
-        border: 1px solid rgba(255,255,255,0.1);
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 16px;
         font-family: monospace;
         font-size: 12px;
-        color: #ccd6f6;
+        color: #334155;
         max-height: 400px;
         overflow-y: auto;
+    }
+
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        box-shadow: 0 8px 32px rgba(6, 78, 59, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .quick-win-icon { font-size: 24px; }
+    .quick-win-title {
+        color: #a7f3d0;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .email-summary {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 16px;
+        font-family: monospace;
+        font-size: 13px;
+        color: #f0fdf4;
+        white-space: pre-line;
+        line-height: 1.6;
+    }
+    .copy-hint {
+        color: #6ee7b7;
+        font-size: 11px;
+        margin-top: 10px;
+        text-align: right;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -133,6 +184,77 @@ st.markdown("""
 def get_connection():
     db_path = Path("data/jira.duckdb")
     return duckdb.connect(str(db_path), read_only=True) if db_path.exists() else None
+
+
+def generate_quick_email(conn) -> dict:
+    """Generate a ready-to-send executive summary email - saves 10 minutes every morning."""
+    today = datetime.now().strftime('%B %d, %Y')
+
+    # Get sprint status
+    sprint = conn.execute("""
+        SELECT name, state FROM sprints
+        WHERE state = 'active' ORDER BY start_date DESC LIMIT 1
+    """).fetchone()
+    sprint_name = sprint[0] if sprint else "No active sprint"
+
+    # Get completion metrics
+    metrics = conn.execute("""
+        SELECT
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'Terminé(e)' THEN 1 ELSE 0 END) as done,
+            SUM(CASE WHEN status = 'En cours' THEN 1 ELSE 0 END) as wip,
+            COALESCE(SUM(CASE WHEN status = 'Terminé(e)' THEN story_points END), 0) as pts_done,
+            COALESCE(SUM(story_points), 0) as pts_total
+        FROM issues i
+        JOIN sprints s ON i.sprint_id = s.id AND s.state = 'active'
+    """).fetchone()
+
+    total, done, wip = (metrics[0] or 0), (metrics[1] or 0), (metrics[2] or 0)
+    pts_done, pts_total = (metrics[3] or 0), (metrics[4] or 0)
+    completion = (done / total * 100) if total > 0 else 0
+
+    # Get blockers/risks
+    blockers = conn.execute("""
+        SELECT COUNT(*) FROM issues
+        WHERE status NOT IN ('Terminé(e)', 'Done', 'Closed')
+        AND priority = 'Highest'
+        AND sprint_id IN (SELECT id FROM sprints WHERE state = 'active')
+    """).fetchone()[0]
+
+    # Get yesterday's completed
+    yesterday_done = conn.execute("""
+        SELECT COUNT(*) FROM issues
+        WHERE status = 'Terminé(e)'
+        AND updated >= CURRENT_DATE - INTERVAL '1 day'
+    """).fetchone()[0]
+
+    # Generate email text
+    status_emoji = "🟢" if completion >= 70 else "🟡" if completion >= 40 else "🔴"
+
+    email_text = f"""Subject: {status_emoji} Sprint Status - {today}
+
+Hi Team,
+
+Quick update on {sprint_name}:
+
+📊 SPRINT PROGRESS
+• Completion: {completion:.0f}% ({done}/{total} items)
+• Points: {pts_done:.0f}/{pts_total:.0f} done
+• In Progress: {wip} items
+
+📈 YESTERDAY
+• Completed: {yesterday_done} items
+
+⚠️ ATTENTION NEEDED
+• High Priority Items: {blockers}
+
+Best regards"""
+
+    return {
+        'email_text': email_text,
+        'completion': completion,
+        'status': 'healthy' if completion >= 70 else 'warning' if completion >= 40 else 'critical'
+    }
 
 
 def df_to_markdown(df: pd.DataFrame) -> str:
@@ -314,6 +436,22 @@ def main():
         st.error("Database not found. Please sync data first.")
         st.stop()
 
+    # Quick Win Widget - Quick Email Generator
+    try:
+        email_data = generate_quick_email(conn)
+        st.markdown(f"""
+        <div class="quick-win-widget">
+            <div class="quick-win-header">
+                <span class="quick-win-icon">📧</span>
+                <span class="quick-win-title">QUICK EMAIL • Ready to Send</span>
+            </div>
+            <div class="email-summary">{email_data['email_text']}</div>
+            <div class="copy-hint">💡 Click and Ctrl+C to copy, paste into email</div>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception:
+        pass
+
     # Report Types
     st.markdown('<div class="section-container">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Select Report Type</div>', unsafe_allow_html=True)
@@ -485,9 +623,9 @@ def main():
                     margin=dict(l=20, r=20, t=20, b=60),
                     paper_bgcolor='rgba(0,0,0,0)',
                     plot_bgcolor='rgba(0,0,0,0)',
-                    font={'color': '#ccd6f6'},
+                    font={'color': '#64748b'},
                     xaxis=dict(tickangle=-45, showgrid=False),
-                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)')
+                    yaxis=dict(showgrid=True, gridcolor='#e2e8f0')
                 )
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
@@ -518,7 +656,7 @@ def main():
     # Footer
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #8892b0; font-size: 12px;">
+    <div style="text-align: center; color: #64748b; font-size: 12px;">
         Reports Center | Export to Markdown & CSV |
         Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
     </div>

@@ -23,23 +23,30 @@ st.set_page_config(page_title="Team Workload", page_icon="👥", layout="wide")
 # Premium Team Workload CSS
 st.markdown("""
 <style>
+    /* Main container styling */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+
     .team-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
-        color: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .team-title {
         font-size: 28px;
         font-weight: 700;
+        color: #1a202c;
         margin-bottom: 8px;
     }
 
     .team-subtitle {
         font-size: 14px;
-        opacity: 0.9;
+        color: #64748b;
     }
 
     .metric-row {
@@ -49,51 +56,46 @@ st.markdown("""
     }
 
     .kpi-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
+        background: white;
         border-radius: 16px;
         padding: 20px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         text-align: center;
         flex: 1;
+        transition: transform 0.2s;
     }
+    .kpi-card:hover { transform: translateY(-2px); }
 
     .kpi-value {
         font-size: 36px;
-        font-weight: 700;
+        font-weight: 800;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
+        margin-bottom: 4px;
     }
 
-    .kpi-label {
-        font-size: 12px;
-        color: #8892b0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 4px;
-    }
+    .kpi-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .kpi-trend {
-        font-size: 14px;
-        margin-top: 8px;
-    }
-    .trend-up { color: #27ae60; }
-    .trend-down { color: #e74c3c; }
-    .trend-neutral { color: #f39c12; }
+    .kpi-trend { font-size: 13px; font-weight: 500; margin-top: 8px; }
+    .trend-up { color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+    .trend-down { color: #991b1b; background: #fee2e2; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+    .trend-neutral { color: #854d0e; background: #fef3c7; padding: 2px 8px; border-radius: 10px; display: inline-block; }
 
     .section-container {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .section-title {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: #1a202c;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -101,17 +103,18 @@ st.markdown("""
     }
 
     .developer-card {
-        background: linear-gradient(145deg, #252541 0%, #1e1e32 100%);
-        border-radius: 12px;
+        background: white;
+        border-radius: 16px;
         padding: 20px;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         margin-bottom: 16px;
         transition: all 0.2s ease;
     }
     .developer-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        border-color: #667eea44;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        border-color: #cbd5e1;
     }
 
     .dev-header {
@@ -122,42 +125,28 @@ st.markdown("""
     }
 
     .dev-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        font-weight: 700;
-        color: white;
+        width: 56px; height: 56px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; font-weight: 700; color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .dev-info {
-        flex: 1;
-    }
+    .dev-info { flex: 1; }
 
-    .dev-name {
-        font-size: 18px;
-        font-weight: 600;
-        color: #fff;
-    }
-
-    .dev-role {
-        font-size: 13px;
-        color: #8892b0;
-    }
+    .dev-name { font-size: 18px; font-weight: 700; color: #1a202c; }
+    .dev-role { font-size: 13px; color: #64748b; margin-top: 4px; }
 
     .dev-status-badge {
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        border: 1px solid transparent;
     }
-    .status-optimal { background: #27ae6033; color: #27ae60; }
-    .status-high { background: #f39c1233; color: #f39c12; }
-    .status-overloaded { background: #e74c3c33; color: #e74c3c; }
-    .status-underloaded { background: #3498db33; color: #3498db; }
+    .status-optimal { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .status-high { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .status-overloaded { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+    .status-underloaded { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
 
     .dev-metrics {
         display: grid;
@@ -167,50 +156,39 @@ st.markdown("""
     }
 
     .dev-metric {
-        background: rgba(255,255,255,0.03);
+        background: #f8fafc;
         padding: 12px;
         border-radius: 8px;
         text-align: center;
+        border: 1px solid #e2e8f0;
     }
 
-    .dev-metric-value {
-        font-size: 20px;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    .dev-metric-label {
-        font-size: 11px;
-        color: #8892b0;
-        text-transform: uppercase;
-    }
+    .dev-metric-value { font-size: 20px; font-weight: 700; color: #1a202c; }
+    .dev-metric-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; }
 
     .capacity-bar-container {
-        background: rgba(255,255,255,0.05);
+        background: #e2e8f0;
         border-radius: 8px;
         height: 12px;
         overflow: hidden;
         margin-top: 8px;
     }
 
-    .capacity-bar {
-        height: 100%;
-        border-radius: 8px;
-        transition: width 0.3s ease;
-    }
-    .capacity-low { background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%); }
-    .capacity-medium { background: linear-gradient(90deg, #f39c12 0%, #f1c40f 100%); }
-    .capacity-high { background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); }
+    .capacity-bar { height: 100%; border-radius: 8px; transition: width 0.3s ease; }
+    .capacity-low { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
+    .capacity-medium { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+    .capacity-high { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
 
     .skill-tag {
         display: inline-block;
-        padding: 4px 10px;
+        padding: 2px 8px;
         border-radius: 12px;
         font-size: 11px;
         font-weight: 600;
         margin: 2px 4px 2px 0;
-        background: rgba(102, 126, 234, 0.2);
-        color: #667eea;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #c7d2fe;
     }
 
     .workload-row {
@@ -219,43 +197,25 @@ st.markdown("""
         padding: 12px 16px;
         border-radius: 10px;
         margin-bottom: 8px;
-        background: rgba(255,255,255,0.02);
-        transition: background 0.2s;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
     }
-    .workload-row:hover {
-        background: rgba(255,255,255,0.05);
-    }
+    .workload-row:hover { background: #f1f5f9; transform: translateX(2px); }
 
     .row-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        color: white;
-        font-size: 14px;
-        margin-right: 14px;
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 600; color: white; font-size: 14px; margin-right: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .row-name {
-        flex: 1;
-        font-size: 14px;
-        font-weight: 500;
-        color: #fff;
-    }
-
-    .row-stat {
-        text-align: center;
-        width: 80px;
-        font-size: 13px;
-        color: #ccd6f6;
-    }
+    .row-name { flex: 1; font-size: 14px; font-weight: 600; color: #1a202c; }
+    .row-stat { text-align: center; width: 80px; font-size: 13px; color: #475569; font-weight: 500; }
 
     .row-bar-container {
         width: 150px;
-        background: rgba(255,255,255,0.05);
+        background: #e2e8f0;
         border-radius: 6px;
         height: 8px;
         overflow: hidden;
@@ -269,15 +229,123 @@ st.markdown("""
         padding: 16px;
         border-radius: 12px;
         margin-bottom: 12px;
+        border: 1px solid transparent;
     }
-    .alert-warning { background: rgba(241, 196, 15, 0.15); border-left: 4px solid #f1c40f; }
-    .alert-danger { background: rgba(231, 76, 60, 0.15); border-left: 4px solid #e74c3c; }
-    .alert-success { background: rgba(39, 174, 96, 0.15); border-left: 4px solid #27ae60; }
+    .alert-warning { background: #fffbeb; border-color: #ffe4e6; border-left: 4px solid #f59e0b; color: #92400e; }
+    .alert-danger { background: #fef2f2; border-color: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; }
+    .alert-success { background: #ecfdf5; border-color: #d1fae5; border-left: 4px solid #10b981; color: #065f46; }
 
     .capacity-gauge-container {
         display: flex;
         justify-content: center;
         gap: 24px;
+    }
+
+    /* Quick Win Widget */
+    .quick-win-widget {
+        background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        border: 1px solid rgba(167, 139, 250, 0.3);
+        box-shadow: 0 8px 32px rgba(88, 28, 135, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .quick-win-widget::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .quick-win-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .quick-win-icon {
+        font-size: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .quick-win-title {
+        color: #e9d5ff;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .capacity-alerts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .capacity-person {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        border-left: 3px solid;
+    }
+    .capacity-overload { border-left-color: #ef4444; }
+    .capacity-available { border-left-color: #22c55e; }
+    .capacity-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 12px;
+    }
+    .capacity-info {
+        flex: 1;
+    }
+    .capacity-name {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .capacity-status {
+        font-size: 11px;
+    }
+    .capacity-status-red { color: #fca5a5; }
+    .capacity-status-green { color: #86efac; }
+    .capacity-percent {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .percent-high { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+    .percent-low { background: rgba(34, 197, 94, 0.3); color: #86efac; }
+    .capacity-summary {
+        display: flex;
+        gap: 20px;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .summary-stat {
+        text-align: center;
+    }
+    .summary-value {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .summary-label {
+        color: #c4b5fd;
+        font-size: 10px;
+        text-transform: uppercase;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -300,6 +368,62 @@ def get_initials(name: str) -> str:
     return ''.join(p[0].upper() for p in parts if p)
 
 
+def get_capacity_alerts(conn) -> dict:
+    """
+    Get capacity alerts - who needs help or has bandwidth?
+    Critical question for team leaders during daily standups.
+    """
+    team_data = conn.execute("""
+        SELECT
+            COALESCE(assignee_name, 'Unassigned') as name,
+            COUNT(*) as total_issues,
+            COALESCE(SUM(CASE WHEN status = 'En cours' THEN story_points ELSE 0 END), 0) as wip_points,
+            COALESCE(SUM(CASE WHEN status = 'Terminé(e)' THEN story_points ELSE 0 END), 0) as done_points
+        FROM issues
+        WHERE assignee_name IS NOT NULL AND assignee_name != ''
+        GROUP BY assignee_name
+    """).fetchdf()
+
+    if team_data.empty:
+        return {'overloaded': [], 'available': [], 'team_size': 0, 'avg_wip': 0}
+
+    # Calculate capacity used (WIP relative to velocity)
+    team_data['capacity_used'] = (team_data['wip_points'] / (team_data['done_points'].clip(lower=5) / 2) * 100).clip(0, 200)
+
+    # Find overloaded (>100%)
+    overloaded = team_data[team_data['capacity_used'] > 100].nlargest(3, 'capacity_used')
+
+    # Find available (<40%)
+    available = team_data[(team_data['capacity_used'] < 40) & (team_data['name'] != 'Unassigned')].nsmallest(3, 'capacity_used')
+
+    overloaded_list = []
+    for _, row in overloaded.iterrows():
+        overloaded_list.append({
+            'name': row['name'],
+            'capacity': int(row['capacity_used']),
+            'wip': int(row['wip_points']),
+            'color': get_avatar_color(row['name']),
+            'initials': get_initials(row['name'])
+        })
+
+    available_list = []
+    for _, row in available.iterrows():
+        available_list.append({
+            'name': row['name'],
+            'capacity': int(row['capacity_used']),
+            'wip': int(row['wip_points']),
+            'color': get_avatar_color(row['name']),
+            'initials': get_initials(row['name'])
+        })
+
+    return {
+        'overloaded': overloaded_list,
+        'available': available_list,
+        'team_size': len(team_data),
+        'avg_wip': team_data['wip_points'].mean()
+    }
+
+
 def create_capacity_gauge(utilized: float, title: str) -> go.Figure:
     """Create capacity utilization gauge."""
     if utilized <= 70:
@@ -315,13 +439,13 @@ def create_capacity_gauge(utilized: float, title: str) -> go.Figure:
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=min(utilized, 100),
-        number={'suffix': '%', 'font': {'size': 28, 'color': '#fff'}},
-        title={'text': f"<b>{title}</b><br><span style='font-size:11px;color:#8892b0'>{status}</span>",
-               'font': {'size': 14, 'color': '#ccd6f6'}},
+        number={'suffix': '%', 'font': {'size': 28, 'color': '#1a202c'}},
+        title={'text': f"<b>{title}</b><br><span style='font-size:11px;color:#64748b'>{status}</span>",
+               'font': {'size': 14, 'color': '#1a202c'}},
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 0, 'tickcolor': "rgba(0,0,0,0)"},
             'bar': {'color': color, 'thickness': 0.8},
-            'bgcolor': "rgba(255,255,255,0.05)",
+            'bgcolor': "#f1f5f9",
             'borderwidth': 0,
             'steps': [
                 {'range': [0, 70], 'color': 'rgba(39, 174, 96, 0.1)'},
@@ -336,7 +460,7 @@ def create_capacity_gauge(utilized: float, title: str) -> go.Figure:
         margin=dict(l=20, r=20, t=50, b=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'}
+        font={'color': '#64748b'}
     )
 
     return fig
@@ -380,7 +504,7 @@ def create_workload_heatmap(team_data: pd.DataFrame) -> go.Figure:
         margin=dict(l=80, r=20, t=20, b=60),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         xaxis=dict(tickangle=-45, showgrid=False),
         yaxis=dict(showgrid=False)
     )
@@ -432,18 +556,19 @@ def create_workload_distribution(team_data: pd.DataFrame) -> go.Figure:
         margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         barmode='stack',
         legend=dict(
             orientation='h',
             yanchor='bottom',
             y=1.02,
             xanchor='center',
-            x=0.5
+            x=0.5,
+            font=dict(color='#64748b')
         ),
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Story Points'
         ),
         yaxis=dict(showgrid=False)
@@ -501,13 +626,14 @@ def create_velocity_trend(conn) -> go.Figure:
         margin=dict(l=20, r=40, t=20, b=60),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         legend=dict(
             orientation='h',
             yanchor='bottom',
             y=1.02,
             xanchor='center',
-            x=0.5
+            x=0.5,
+            font=dict(color='#64748b')
         ),
         xaxis=dict(
             showgrid=False,
@@ -515,7 +641,7 @@ def create_velocity_trend(conn) -> go.Figure:
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Team Points'
         ),
         yaxis2=dict(
@@ -564,18 +690,19 @@ def create_issue_type_by_dev(team_data: pd.DataFrame, issues_df: pd.DataFrame) -
         margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': '#ccd6f6'},
+        font={'color': '#64748b'},
         barmode='stack',
         legend=dict(
             orientation='h',
             yanchor='bottom',
             y=1.02,
             xanchor='center',
-            x=0.5
+            x=0.5,
+            font=dict(color='#64748b')
         ),
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.05)',
+            gridcolor='#e2e8f0',
             title='Issues'
         ),
         yaxis=dict(showgrid=False)
@@ -592,6 +719,61 @@ def main():
     if not conn:
         st.error("Database not found. Please sync data first.")
         st.stop()
+
+    # ========== QUICK WIN: CAPACITY ALERT ==========
+    cap_alerts = get_capacity_alerts(conn)
+    if cap_alerts['overloaded'] or cap_alerts['available']:
+        people_html = ""
+
+        for person in cap_alerts['overloaded']:
+            people_html += f"""
+            <div class="capacity-person capacity-overload">
+                <div class="capacity-avatar" style="background: {person['color']};">{person['initials']}</div>
+                <div class="capacity-info">
+                    <div class="capacity-name">{person['name']}</div>
+                    <div class="capacity-status capacity-status-red">Needs help • {person['wip']} WIP pts</div>
+                </div>
+                <span class="capacity-percent percent-high">{person['capacity']}%</span>
+            </div>
+            """
+
+        for person in cap_alerts['available']:
+            people_html += f"""
+            <div class="capacity-person capacity-available">
+                <div class="capacity-avatar" style="background: {person['color']};">{person['initials']}</div>
+                <div class="capacity-info">
+                    <div class="capacity-name">{person['name']}</div>
+                    <div class="capacity-status capacity-status-green">Has bandwidth • {person['wip']} WIP pts</div>
+                </div>
+                <span class="capacity-percent percent-low">{person['capacity']}%</span>
+            </div>
+            """
+
+        st.markdown(f"""
+        <div class="quick-win-widget">
+            <div class="quick-win-header">
+                <span class="quick-win-icon">⚡</span>
+                <span class="quick-win-title">Capacity Alert — Who Needs Help? Who Has Bandwidth?</span>
+            </div>
+            <div class="capacity-alerts">
+                {people_html}
+            </div>
+            <div class="capacity-summary">
+                <div class="summary-stat">
+                    <div class="summary-value">{len(cap_alerts['overloaded'])}</div>
+                    <div class="summary-label">Overloaded</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value">{len(cap_alerts['available'])}</div>
+                    <div class="summary-label">Available</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value">{cap_alerts['avg_wip']:.0f}</div>
+                    <div class="summary-label">Avg WIP Pts</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Get team workload data
     team_query = conn.execute("""
@@ -855,7 +1037,7 @@ def main():
     # ========== Summary Footer ==========
     st.markdown("---")
     st.markdown(f"""
-    <div style="text-align: center; color: #8892b0; font-size: 12px;">
+    <div style="text-align: center; color: #64748b; font-size: 12px;">
         Team Workload Dashboard | {team_size} team members | {total_wip:.0f} WIP points |
         Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
     </div>

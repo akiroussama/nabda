@@ -5,6 +5,9 @@ Dashboard to compare Stated Strategy vs Actual Execution with advanced insights.
 
 import streamlit as st
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 
 # Add project root to sys.path so we can import from src
@@ -692,6 +695,9 @@ def create_trend_chart(days: int = 90) -> go.Figure:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     # Header
     st.markdown("""
 <div style="text-align: center; padding: 20px 0 30px 0;">

@@ -5,6 +5,9 @@ Early Warning System for Behavioral Anomalies with Individual Profiles.
 
 import streamlit as st
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 import pandas as pd
 import duckdb
 from pathlib import Path
@@ -842,6 +845,9 @@ def get_intervention_recommendation(profile: RiskProfile) -> dict:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     # Header
     st.markdown("""
 <div style="text-align: center; padding: 20px 0 30px 0;">

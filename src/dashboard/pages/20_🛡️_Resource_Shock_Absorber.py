@@ -25,6 +25,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 import duckdb
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 # Page configuration
 st.set_page_config(
     page_title="Resource Shock Absorber",
@@ -834,6 +837,8 @@ def render_quick_coverage_widget(team: List[TeamMemberProfile]):
 
 def main():
     """Main application entry point."""
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
     if not conn:
         st.error("Cannot connect to database")

@@ -35,6 +35,9 @@ from enum import Enum
 import random
 import duckdb
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 # Page configuration - MINIMAL, FOCUSED
 st.set_page_config(
     page_title="The Oracle",
@@ -720,6 +723,8 @@ def render_oracle_header():
 
 def main():
     """Main application entry point."""
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
 
     # Render minimal header

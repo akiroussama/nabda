@@ -22,6 +22,9 @@ from enum import Enum
 import duckdb
 import hashlib
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 # Page configuration
 st.set_page_config(
     page_title="Next Domino",
@@ -1253,6 +1256,8 @@ def render_why_number_one(domino: DominoCandidate):
 
 def main():
     """Main application entry point."""
+    # Render page guide in sidebar
+    render_page_guide()
 
     # Initialize
     conn = get_connection()

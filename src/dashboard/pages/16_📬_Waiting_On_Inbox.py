@@ -14,6 +14,9 @@ from datetime import datetime, timedelta, date
 from typing import Optional, List, Dict, Any
 import hashlib
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="Waiting-On Inbox", page_icon="📬", layout="wide")
 
 # ============================================================================
@@ -806,6 +809,9 @@ def calculate_days_remaining(expected_by) -> tuple:
 # ============================================================================
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
     if not conn:
         st.error("Database not found. Please sync data first.")

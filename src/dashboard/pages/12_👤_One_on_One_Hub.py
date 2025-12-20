@@ -17,6 +17,9 @@ from typing import Dict, List, Any, Tuple, Optional
 import hashlib
 import json
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="1-on-1 Hub", page_icon="👤", layout="wide")
 
 # Premium 1-on-1 Hub CSS
@@ -837,6 +840,9 @@ def create_type_distribution_chart(type_df: pd.DataFrame) -> go.Figure:
 
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     # Header
     st.markdown("""
 <div class="hub-header">

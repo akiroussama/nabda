@@ -26,6 +26,9 @@ from src.features.strategic_alignment import StrategicAlignmentAnalyzer
 from src.features.burnout_models import BurnoutAnalyzer
 from src.features.delivery_forecast import DeliveryForecaster
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="Executive Cockpit", page_icon="🏆", layout="wide")
 
 # Premium CSS
@@ -569,6 +572,9 @@ def calculate_release_readiness(conn) -> Dict:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     # Header
     col_title, col_date = st.columns([3, 1])
     with col_title:

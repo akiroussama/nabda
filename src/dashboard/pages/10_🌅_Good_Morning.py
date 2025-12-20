@@ -4,6 +4,9 @@ Your personalized morning briefing with AI-powered insights.
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 
 # Add project root to sys.path so we can import from src
@@ -988,6 +991,9 @@ def render_recent_activity(data: Dict[str, Any]):
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     """Main dashboard function."""
     conn = get_connection()
     if not conn:

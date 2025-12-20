@@ -5,6 +5,9 @@ Probabilistic forecasting for project delivery dates with scenario analysis.
 
 import streamlit as st
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 import pandas as pd
 import numpy as np
 import duckdb
@@ -22,8 +25,7 @@ sys.path.append(str(root_dir))
 st.set_page_config(page_title="Delivery Forecast", page_icon="🎲", layout="wide")
 
 # Premium Dark Theme CSS
-st.markdown("""
-<style>
+st.markdown(f"""<style>
     /* Global Light Theme */
     .stApp {
         background-color: #f8f9fa;
@@ -617,9 +619,11 @@ def create_scenario_comparison(scenarios: List[dict]) -> go.Figure:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     # Header
-    st.markdown("""
-<div style="text-align: center; padding: 20px 0 30px 0;">
+    st.markdown(f"""<div style="text-align: center; padding: 20px 0 30px 0;">
     <h1 style="font-size: 42px; font-weight: 800; margin: 0;
                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #3498db 100%);
                -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -640,8 +644,7 @@ def main():
     # Quick Win Widget - Release Confidence
     try:
         conf = get_release_confidence(conn)
-        st.markdown(f"""
-<div class="quick-win-widget">
+        st.markdown(f"""<div class="quick-win-widget">
     <div class="quick-win-header">
         <span class="quick-win-icon">🚀</span>
         <span class="quick-win-title">RELEASE CONFIDENCE • Quick Check</span>
@@ -715,8 +718,7 @@ def main():
 
     with col4:
         target_date = datetime.now() + timedelta(weeks=target_weeks)
-        st.markdown(f"""
-<div style="text-align: center; padding-top: 8px;">
+        st.markdown(f"""<div style="text-align: center; padding-top: 8px;">
     <div style="color: #64748b; font-size: 12px;">Target Date</div>
     <div style="color: #1a202c; font-size: 18px; font-weight: 600;">{target_date.strftime('%b %d, %Y')}</div>
 </div>
@@ -792,8 +794,7 @@ def main():
     m1, m2, m3, m4 = st.columns(4)
 
     with m1:
-        st.markdown(f"""
-<div class="prob-card prob-{prob_class}">
+        st.markdown(f"""<div class="prob-card prob-{prob_class}">
     <div class="prob-label">On-Time Probability</div>
     <div class="prob-value value-{prob_class}">{prob*100:.0f}%</div>
     <div class="prob-subtitle">Target: {target_date.strftime('%b %d')}</div>
@@ -801,8 +802,7 @@ def main():
 """, unsafe_allow_html=True)
 
     with m2:
-        st.markdown(f"""
-        <div class="prob-card prob-high">
+        st.markdown(f"""<div class="prob-card prob-high">
             <div class="prob-label">50% Confidence</div>
             <div class="prob-date">{baseline.p50_date.strftime('%b %d, %Y')}</div>
             <div class="prob-subtitle">Optimistic Estimate</div>
@@ -810,8 +810,7 @@ def main():
         """, unsafe_allow_html=True)
 
     with m3:
-        st.markdown(f"""
-        <div class="prob-card prob-medium">
+        st.markdown(f"""<div class="prob-card prob-medium">
             <div class="prob-label">85% Confidence</div>
             <div class="prob-date">{baseline.p85_date.strftime('%b %d, %Y')}</div>
             <div class="prob-subtitle">Realistic Estimate</div>
@@ -819,8 +818,7 @@ def main():
         """, unsafe_allow_html=True)
 
     with m4:
-        st.markdown(f"""
-        <div class="prob-card prob-low">
+        st.markdown(f"""<div class="prob-card prob-low">
             <div class="prob-label">95% Confidence</div>
             <div class="prob-date">{baseline.p95_date.strftime('%b %d, %Y')}</div>
             <div class="prob-subtitle">Conservative Estimate</div>
@@ -839,8 +837,7 @@ def main():
 
         with c1:
             delta_class = 'delta-positive' if delta_prob > 0 else 'delta-negative'
-            st.markdown(f"""
-            <div class="scenario-card">
+            st.markdown(f"""<div class="scenario-card">
                 <div class="scenario-header">
                     <span class="scenario-name">Probability Change</span>
                     <span class="scenario-delta {delta_class}">{delta_prob:+.0f}%</span>
@@ -853,8 +850,7 @@ def main():
 
         with c2:
             days_class = 'delta-positive' if days_saved > 0 else 'delta-negative'
-            st.markdown(f"""
-            <div class="scenario-card">
+            st.markdown(f"""<div class="scenario-card">
                 <div class="scenario-header">
                     <span class="scenario-name">Days Saved (85%)</span>
                     <span class="scenario-delta {days_class}">{days_saved:+d} days</span>
@@ -869,8 +865,7 @@ def main():
             # Risk reduction
             risk_reduction = (1 - whatif.target_date_prob) / max((1 - baseline.target_date_prob), 0.01) * 100
             risk_class = 'delta-positive' if risk_reduction < 100 else 'delta-negative'
-            st.markdown(f"""
-            <div class="scenario-card">
+            st.markdown(f"""<div class="scenario-card">
                 <div class="scenario-header">
                     <span class="scenario-name">Risk Level</span>
                     <span class="scenario-delta {risk_class}">{100 - risk_reduction:+.0f}%</span>
@@ -899,8 +894,7 @@ def main():
     ]
 
     for label, date, pct, color in bands:
-        st.markdown(f"""
-        <div class="confidence-band">
+        st.markdown(f"""<div class="confidence-band">
             <span class="band-label">{label}</span>
             <div class="band-bar">
                 <div class="band-fill" style="width: {pct}%; background: {color};"></div>
@@ -920,8 +914,7 @@ def main():
     with r1:
         bias = params['estimation_bias_mean']
         bias_class = 'risk-good' if bias < 1.2 else ('risk-warning' if bias < 1.5 else 'risk-danger')
-        st.markdown(f"""
-        <div class="risk-factor-card">
+        st.markdown(f"""<div class="risk-factor-card">
             <div class="risk-factor-label">Estimation Bias</div>
             <div class="risk-factor-value {bias_class}">{bias:.1f}x</div>
             <div class="risk-factor-desc">Actual vs Estimated</div>
@@ -931,8 +924,7 @@ def main():
     with r2:
         vel_var = params['velocity_std'] / max(params['velocity_mean'], 0.1) * 100
         var_class = 'risk-good' if vel_var < 20 else ('risk-warning' if vel_var < 40 else 'risk-danger')
-        st.markdown(f"""
-        <div class="risk-factor-card">
+        st.markdown(f"""<div class="risk-factor-card">
             <div class="risk-factor-label">Velocity Variance</div>
             <div class="risk-factor-value {var_class}">±{vel_var:.0f}%</div>
             <div class="risk-factor-desc">Throughput Stability</div>
@@ -942,8 +934,7 @@ def main():
     with r3:
         creep = params['scope_creep_mean'] * 100
         creep_class = 'risk-good' if creep < 10 else ('risk-warning' if creep < 20 else 'risk-danger')
-        st.markdown(f"""
-        <div class="risk-factor-card">
+        st.markdown(f"""<div class="risk-factor-card">
             <div class="risk-factor-label">Scope Creep</div>
             <div class="risk-factor-value {creep_class}">{creep:.0f}%</div>
             <div class="risk-factor-desc">Expected Addition</div>
@@ -953,8 +944,7 @@ def main():
     with r4:
         uncertainty = baseline.std_days / max(baseline.mean_days, 1) * 100
         unc_class = 'risk-good' if uncertainty < 15 else ('risk-warning' if uncertainty < 30 else 'risk-danger')
-        st.markdown(f"""
-        <div class="risk-factor-card">
+        st.markdown(f"""<div class="risk-factor-card">
             <div class="risk-factor-label">Uncertainty</div>
             <div class="risk-factor-value {unc_class}">±{uncertainty:.0f}%</div>
             <div class="risk-factor-desc">Prediction Spread</div>
@@ -978,8 +968,7 @@ def main():
             ('Simulated Backlog', backlog_size),
         ]
         for label, value in stats:
-            st.markdown(f"""
-            <div class="sim-stat">
+            st.markdown(f"""<div class="sim-stat">
                 <span class="sim-stat-label">{label}</span>
                 <span class="sim-stat-value">{value}</span>
             </div>
@@ -994,8 +983,7 @@ def main():
             ('Mean Completion', f"{baseline.mean_days:.0f} days"),
         ]
         for label, value in perf_stats:
-            st.markdown(f"""
-            <div class="sim-stat">
+            st.markdown(f"""<div class="sim-stat">
                 <span class="sim-stat-label">{label}</span>
                 <span class="sim-stat-value">{value}</span>
             </div>
@@ -1008,8 +996,7 @@ def main():
     st.markdown('<div class="section-title">💡 Recommendations</div>', unsafe_allow_html=True)
 
     if prob < 0.5:
-        st.markdown("""
-        <div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c; margin-bottom: 12px;">
+        st.markdown(f"""<div style="background: #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #e74c3c; margin-bottom: 12px;">
             <div style="color: #e74c3c; font-weight: 700; margin-bottom: 8px;">🚨 High Risk of Missing Target</div>
             <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 Consider scope reduction, team augmentation, or adjusting the target date.
@@ -1018,8 +1005,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     elif prob < 0.7:
-        st.markdown("""
-        <div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12; margin-bottom: 12px;">
+        st.markdown(f"""<div style="background: #fef3c7; border-radius: 12px; padding: 20px; border-left: 4px solid #f39c12; margin-bottom: 12px;">
             <div style="color: #f39c12; font-weight: 700; margin-bottom: 8px;">⚠️ Moderate Risk</div>
             <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 The target is achievable but with significant risk. Monitor progress closely
@@ -1028,8 +1014,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     else:
-        st.markdown("""
-        <div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60; margin-bottom: 12px;">
+        st.markdown(f"""<div style="background: #dcfce7; border-radius: 12px; padding: 20px; border-left: 4px solid #27ae60; margin-bottom: 12px;">
             <div style="color: #27ae60; font-weight: 700; margin-bottom: 8px;">✓ On Track</div>
             <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
                 Good probability of hitting the target. Continue monitoring and
@@ -1038,8 +1023,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style="background: #eef2ff; border-radius: 12px; padding: 20px; border-left: 4px solid #667eea;">
+    st.markdown(f"""<div style="background: #eef2ff; border-radius: 12px; padding: 20px; border-left: 4px solid #667eea;">
         <div style="color: #667eea; font-weight: 700; margin-bottom: 8px;">📊 Best Practice</div>
         <div style="color: #1e293b; font-size: 13px; line-height: 1.5;">
             Use the <strong>85% confidence date</strong> for external commitments.

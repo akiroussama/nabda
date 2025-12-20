@@ -15,6 +15,9 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Tuple
 import random
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="SM Command Center", page_icon="🎖️", layout="wide")
 
 # Premium Command Center CSS
@@ -1003,6 +1006,9 @@ def create_team_radar(dynamics: Dict) -> go.Figure:
 
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     # Header
     st.markdown("""
     <div class="command-header">

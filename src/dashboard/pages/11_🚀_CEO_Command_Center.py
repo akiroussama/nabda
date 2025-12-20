@@ -15,6 +15,9 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 # Add project root to sys.path
 root_dir = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.append(str(root_dir))
@@ -967,6 +970,8 @@ def create_radar_chart(health: OrganizationHealth) -> go.Figure:
 
 def main():
     """Main command center function."""
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
     if not conn:
         st.error("Database not found. Please sync data first.")

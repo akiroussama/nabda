@@ -4,6 +4,9 @@ Interactive burndown/burnup charts, velocity tracking, and real-time sprint metr
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -815,6 +818,9 @@ def create_issue_type_breakdown(issues_df: pd.DataFrame) -> go.Figure:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     st.markdown("# 🏃 Sprint Health Dashboard")
     st.markdown("*Real-time sprint analytics with burndown tracking and team insights*")
 

@@ -9,6 +9,9 @@ Allows Product Managers to:
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -342,6 +345,9 @@ def create_timeline_chart(start_date, target_date, projected_date):
     return fig
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     # Hero Section
     st.markdown("""
 <div class="scope-hero">

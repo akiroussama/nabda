@@ -4,6 +4,9 @@ Ticket duration predictions, sprint risk analysis, and feature importance insigh
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -603,6 +606,9 @@ def simulate_predictions(issues_df: pd.DataFrame) -> list:
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     st.markdown("# 🎯 ML Predictions Dashboard")
     st.markdown("*Advanced machine learning insights for tickets and sprints*")
 

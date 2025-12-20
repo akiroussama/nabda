@@ -4,6 +4,9 @@ Generate comprehensive reports with export to multiple formats.
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -428,6 +431,9 @@ Generated: {now}
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     st.markdown("# 📋 Reports Center")
     st.markdown("*Generate comprehensive reports and export to multiple formats*")
 

@@ -29,6 +29,9 @@ sys.path.append(str(root_dir))
 
 from src.dashboard.utils.status_mapping import STATUS_TODO, STATUS_IN_PROGRESS, STATUS_DONE
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(
     page_title="Daily Action Intelligence",
     page_icon="⚡",
@@ -36,12 +39,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Premium Action Intelligence CSS
+# Premium Action Intelligence CSS - Light Mode
 st.markdown("""
 <style>
-    /* Global Theme - Action-Focused */
+    /* Global Theme - Light Mode */
     .stApp {
-        background: linear-gradient(135deg, #0c0c1e 0%, #1a1a3e 50%, #0f2027 100%);
+        background: #f8f9fa;
     }
 
     /* Hero Section */
@@ -84,23 +87,27 @@ st.markdown("""
 
     /* Critical Action Cards */
     .action-card {
-        background: linear-gradient(145deg, #1e1e38 0%, #252550 100%);
+        background: white;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 16px;
         border-left: 4px solid;
+        border-top: 1px solid #e5e7eb;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .action-card:hover {
         transform: translateX(8px);
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
     }
-    .action-critical { border-left-color: #ff4757; }
-    .action-warning { border-left-color: #ffa502; }
-    .action-info { border-left-color: #3498db; }
-    .action-success { border-left-color: #2ed573; }
+    .action-critical { border-left-color: #ef4444; }
+    .action-warning { border-left-color: #f59e0b; }
+    .action-info { border-left-color: #3b82f6; }
+    .action-success { border-left-color: #22c55e; }
 
     .action-priority {
         position: absolute;
@@ -115,26 +122,26 @@ st.markdown("""
         font-weight: 800;
         font-size: 14px;
     }
-    .priority-1 { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; }
-    .priority-2 { background: linear-gradient(135deg, #ffa502, #ffcd38); color: #1a1a2e; }
-    .priority-3 { background: linear-gradient(135deg, #3498db, #74b9ff); color: white; }
+    .priority-1 { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+    .priority-2 { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1e293b; }
+    .priority-3 { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: white; }
 
     .action-title {
         font-size: 16px;
         font-weight: 600;
-        color: #fff;
+        color: #1e293b;
         margin-bottom: 8px;
         padding-right: 40px;
     }
     .action-meta {
         font-size: 12px;
-        color: #8892b0;
+        color: #64748b;
         display: flex;
         gap: 16px;
         flex-wrap: wrap;
     }
     .action-tag {
-        background: rgba(102, 126, 234, 0.2);
+        background: rgba(102, 126, 234, 0.1);
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 11px;
@@ -143,12 +150,13 @@ st.markdown("""
 
     /* 1:1 Prep Cards */
     .one-on-one-card {
-        background: linear-gradient(145deg, #1a1a2e 0%, #252542 100%);
+        background: white;
         border-radius: 20px;
         padding: 24px;
         margin-bottom: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
+        border: 1px solid #e5e7eb;
         position: relative;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .one-on-one-card::before {
         content: '';
@@ -175,20 +183,20 @@ st.markdown("""
         font-size: 24px;
         font-weight: 700;
         color: white;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
     .member-name {
         font-size: 20px;
         font-weight: 700;
-        color: #fff;
+        color: #1e293b;
     }
     .member-role {
         font-size: 13px;
-        color: #8892b0;
+        color: #64748b;
     }
 
     .talking-point {
-        background: rgba(255,255,255,0.03);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 14px 18px;
         margin-bottom: 12px;
@@ -197,65 +205,67 @@ st.markdown("""
         align-items: flex-start;
         gap: 12px;
     }
-    .talking-point.celebrate { border-left-color: #2ed573; }
-    .talking-point.discuss { border-left-color: #ffa502; }
-    .talking-point.concern { border-left-color: #ff4757; }
-    .talking-point.growth { border-left-color: #a55eea; }
+    .talking-point.celebrate { border-left-color: #22c55e; background: #f0fdf4; }
+    .talking-point.discuss { border-left-color: #f59e0b; background: #fffbeb; }
+    .talking-point.concern { border-left-color: #ef4444; background: #fef2f2; }
+    .talking-point.growth { border-left-color: #8b5cf6; background: #faf5ff; }
 
     .point-icon {
         font-size: 18px;
         flex-shrink: 0;
     }
     .point-text {
-        color: #ccd6f6;
+        color: #334155;
         font-size: 14px;
         line-height: 1.5;
     }
     .point-data {
-        color: #64ffda;
+        color: #059669;
         font-size: 12px;
         margin-top: 4px;
     }
 
     /* Decision Queue */
     .decision-card {
-        background: linear-gradient(145deg, #2d1f3d 0%, #1e1e32 100%);
+        background: white;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 12px;
-        border: 1px solid rgba(165, 94, 234, 0.3);
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #8b5cf6;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .decision-title {
         font-size: 15px;
         font-weight: 600;
-        color: #fff;
+        color: #1e293b;
         margin-bottom: 8px;
     }
     .decision-context {
         font-size: 13px;
-        color: #8892b0;
+        color: #64748b;
         margin-bottom: 12px;
     }
     .decision-age {
-        background: rgba(165, 94, 234, 0.2);
-        color: #a55eea;
+        background: rgba(139, 92, 246, 0.1);
+        color: #7c3aed;
         padding: 4px 12px;
         border-radius: 12px;
         font-size: 11px;
         font-weight: 600;
     }
     .decision-age.overdue {
-        background: rgba(255, 71, 87, 0.2);
-        color: #ff4757;
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
     }
 
     /* Blocker Section */
     .blocker-card {
-        background: linear-gradient(145deg, #3d1f1f 0%, #1e1e32 100%);
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 12px;
-        border: 1px solid rgba(255, 71, 87, 0.3);
+        border: 1px solid #fecaca;
         position: relative;
     }
     .blocker-pulse {
@@ -265,7 +275,7 @@ st.markdown("""
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background: #ff4757;
+        background: #ef4444;
         animation: pulse 2s infinite;
     }
     @keyframes pulse {
@@ -275,18 +285,18 @@ st.markdown("""
     .blocker-title {
         font-size: 15px;
         font-weight: 600;
-        color: #fff;
+        color: #991b1b;
         margin-bottom: 4px;
         padding-right: 30px;
     }
     .blocker-owner {
         font-size: 13px;
-        color: #ff6b81;
+        color: #b91c1c;
         margin-bottom: 8px;
     }
     .blocker-duration {
-        background: rgba(255, 71, 87, 0.2);
-        color: #ff4757;
+        background: rgba(239, 68, 68, 0.15);
+        color: #dc2626;
         padding: 4px 12px;
         border-radius: 12px;
         font-size: 11px;
@@ -301,7 +311,7 @@ st.markdown("""
         gap: 12px;
         margin-bottom: 20px;
         padding-bottom: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid #e5e7eb;
     }
     .section-icon {
         font-size: 28px;
@@ -309,10 +319,10 @@ st.markdown("""
     .section-title {
         font-size: 20px;
         font-weight: 700;
-        color: #fff;
+        color: #1e293b;
     }
     .section-count {
-        background: rgba(102, 126, 234, 0.2);
+        background: rgba(102, 126, 234, 0.1);
         color: #667eea;
         padding: 4px 12px;
         border-radius: 12px;
@@ -320,25 +330,27 @@ st.markdown("""
         font-weight: 600;
     }
     .section-count.critical {
-        background: rgba(255, 71, 87, 0.2);
-        color: #ff4757;
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
     }
 
     /* Priority Stack */
     .priority-item {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 12px;
         padding: 16px 20px;
         margin-bottom: 10px;
         display: flex;
         align-items: center;
         gap: 16px;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid #e5e7eb;
         transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .priority-item:hover {
         border-color: rgba(102, 126, 234, 0.3);
         transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
     }
     .priority-rank {
         width: 36px;
@@ -351,10 +363,10 @@ st.markdown("""
         font-size: 16px;
         flex-shrink: 0;
     }
-    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #1a1a2e; }
-    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); color: #1a1a2e; }
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #1e293b; }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); color: #1e293b; }
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa06d); color: white; }
-    .rank-other { background: rgba(255,255,255,0.1); color: #8892b0; }
+    .rank-other { background: #f1f5f9; color: #64748b; }
 
     .priority-content {
         flex: 1;
@@ -362,16 +374,16 @@ st.markdown("""
     .priority-title {
         font-size: 15px;
         font-weight: 600;
-        color: #fff;
+        color: #1e293b;
         margin-bottom: 4px;
     }
     .priority-reason {
         font-size: 12px;
-        color: #8892b0;
+        color: #64748b;
     }
     .priority-impact {
-        background: rgba(46, 213, 115, 0.15);
-        color: #2ed573;
+        background: rgba(34, 197, 94, 0.1);
+        color: #16a34a;
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
@@ -380,11 +392,12 @@ st.markdown("""
 
     /* Stat Cards */
     .stat-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252542 100%);
+        background: white;
         border-radius: 16px;
         padding: 24px;
         text-align: center;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .stat-value {
         font-size: 42px;
@@ -395,18 +408,18 @@ st.markdown("""
         background-clip: text;
     }
     .stat-value.critical {
-        background: linear-gradient(135deg, #ff4757, #ff6b81);
+        background: linear-gradient(135deg, #ef4444, #f87171);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     .stat-value.success {
-        background: linear-gradient(135deg, #2ed573, #7bed9f);
+        background: linear-gradient(135deg, #22c55e, #4ade80);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     .stat-label {
         font-size: 12px;
-        color: #8892b0;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 8px;
@@ -414,18 +427,18 @@ st.markdown("""
 
     /* Follow-up Cards */
     .followup-card {
-        background: rgba(255,255,255,0.03);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 10px;
-        border-left: 3px solid #ffa502;
+        border-left: 3px solid #f59e0b;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
     .followup-card.overdue {
-        border-left-color: #ff4757;
-        background: rgba(255, 71, 87, 0.05);
+        border-left-color: #ef4444;
+        background: #fef2f2;
     }
     .followup-content {
         flex: 1;
@@ -433,12 +446,12 @@ st.markdown("""
     .followup-title {
         font-size: 14px;
         font-weight: 600;
-        color: #fff;
+        color: #1e293b;
         margin-bottom: 4px;
     }
     .followup-meta {
         font-size: 12px;
-        color: #8892b0;
+        color: #64748b;
     }
     .followup-due {
         padding: 6px 14px;
@@ -446,14 +459,14 @@ st.markdown("""
         font-size: 11px;
         font-weight: 600;
     }
-    .due-today { background: rgba(255, 165, 2, 0.2); color: #ffa502; }
-    .due-overdue { background: rgba(255, 71, 87, 0.2); color: #ff4757; }
-    .due-upcoming { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+    .due-today { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+    .due-overdue { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+    .due-upcoming { background: rgba(102, 126, 234, 0.1); color: #667eea; }
 
     /* Time Estimation */
     .time-box {
-        background: linear-gradient(135deg, rgba(46, 213, 115, 0.1), rgba(102, 126, 234, 0.1));
-        border: 1px solid rgba(46, 213, 115, 0.3);
+        background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+        border: 1px solid #86efac;
         border-radius: 16px;
         padding: 20px;
         text-align: center;
@@ -462,30 +475,31 @@ st.markdown("""
     .time-saved {
         font-size: 48px;
         font-weight: 800;
-        background: linear-gradient(135deg, #2ed573, #667eea);
+        background: linear-gradient(135deg, #22c55e, #667eea);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     .time-label {
-        color: #8892b0;
+        color: #64748b;
         font-size: 14px;
         margin-top: 4px;
     }
 
     /* Quick Actions */
     .quick-action {
-        background: linear-gradient(145deg, #252542 0%, #1e1e32 100%);
-        border: 1px solid rgba(102, 126, 234, 0.2);
+        background: white;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
         padding: 16px;
         text-align: center;
         cursor: pointer;
         transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .quick-action:hover {
         border-color: #667eea;
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
     }
     .quick-action-icon {
         font-size: 28px;
@@ -493,7 +507,7 @@ st.markdown("""
     }
     .quick-action-label {
         font-size: 12px;
-        color: #ccd6f6;
+        color: #334155;
         font-weight: 500;
     }
 
@@ -501,7 +515,7 @@ st.markdown("""
     .empty-state {
         text-align: center;
         padding: 40px;
-        color: #8892b0;
+        color: #64748b;
     }
     .empty-icon {
         font-size: 48px;
@@ -951,7 +965,7 @@ def render_action_card(action: ActionItem, index: int):
         <span>👤 {action.assignee}</span>
         <span>📅 {action.age_days} days</span>
     </div>
-    <div style="margin-top: 8px; font-size: 12px; color: #64ffda;">
+    <div style="margin-top: 8px; font-size: 12px; color: #059669;">
         💡 {action.reason}
     </div>
 </div>
@@ -1042,6 +1056,8 @@ def render_priority_item(row: pd.Series, rank: int):
 
 def main():
     """Main dashboard function."""
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
 
     # Get all data
@@ -1066,25 +1082,25 @@ def main():
     status_color = '#22c55e' if len(blockers) == 0 else '#f59e0b' if len(blockers) <= 2 else '#ef4444'
 
     st.markdown(f"""
-<div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;">⏱️ 10 min saved</div>
+<div style="background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 24px 28px; margin-bottom: 24px; color: #1e293b; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 16px; right: 16px; background: #f1f5f9; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; color: #64748b;">⏱️ 10 min saved</div>
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-        <span style="background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+        <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px;">
             💬 SLACK UPDATE READY
         </span>
     </div>
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
         <div style="flex: 1;">
-            <div style="font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Copy-Paste to #team-channel</div>
-            <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; position: relative;">
-                <div style="position: absolute; top: 8px; right: 12px; font-size: 10px; opacity: 0.6; font-family: system-ui;">📋 Click to copy</div>
+            <div style="font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Copy-Paste to #team-channel</div>
+            <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; position: relative; color: #334155;">
+                <div style="position: absolute; top: 8px; right: 12px; font-size: 10px; color: #94a3b8; font-family: system-ui;">📋 Click to copy</div>
                 {slack_update}
             </div>
         </div>
-        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 16px 20px; min-width: 120px; text-align: center;">
-            <div style="font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Team Status</div>
+        <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px 20px; min-width: 120px; text-align: center;">
+            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Team Status</div>
             <div style="font-size: 36px;">{'🟢' if len(blockers) == 0 else '🟡' if len(blockers) <= 2 else '🔴'}</div>
-            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">{len(blockers)} blockers</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{len(blockers)} blockers</div>
         </div>
     </div>
 </div>
@@ -1241,7 +1257,7 @@ def main():
     <div class="time-box">
         <div class="time-saved">{time_saved} min</div>
         <div class="time-label">Estimated time saved with Daily Action Intelligence</div>
-        <div style="color: #64ffda; margin-top: 12px; font-size: 14px;">
+        <div style="color: #059669; margin-top: 12px; font-size: 14px;">
             That's <strong>{time_saved // 60}h {time_saved % 60}m</strong> you can spend on strategic work instead
         </div>
     </div>

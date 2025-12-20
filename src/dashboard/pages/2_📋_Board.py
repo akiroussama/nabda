@@ -9,6 +9,9 @@ import duckdb
 from pathlib import Path
 from datetime import datetime, timedelta
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="Board", page_icon="📋", layout="wide")
 
 # Premium Kanban CSS - LIGHT MODE ADAPTED
@@ -385,6 +388,9 @@ def render_card(issue: pd.Series):
 
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     st.markdown("# 📋 Kanban Board")
     st.markdown("*Visual work management with real-time updates*")
 
@@ -524,12 +530,10 @@ def main():
                 count = len(col_issues)
                 points = col_issues['story_points'].sum() if 'story_points' in col_issues else 0
 
-                st.markdown(f"""
-<div class="column-header {header_class}">
-    <span style="color: #fff; font-weight: 600;">{col_name}</span>
-    <span class="column-count">{count} issues • {int(points or 0)} pts</span>
-</div>
-""", unsafe_allow_html=True)
+                st.markdown(f"""<div class="column-header {header_class}">
+<span style="color: #fff; font-weight: 600;">{col_name}</span>
+<span class="column-count">{count} issues • {int(points or 0)} pts</span>
+</div>""", unsafe_allow_html=True)
 
                 # WIP limit warning
                 if wip_limit > 0 and col_name == 'In Progress' and count > wip_limit:
@@ -554,17 +558,15 @@ def main():
             initials = ''.join([n[0].upper() for n in str(assignee).split()[:2]])
 
             total_pts = group_issues['story_points'].sum() or 0
-            st.markdown(f"""
-<div class="swimlane-header">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="card-avatar" style="background: {avatar_color}; width: 36px; height: 36px; font-size: 14px;">{initials}</div>
-        <div>
-            <div style="color: #fff; font-weight: 600; font-size: 16px;">{assignee}</div>
-            <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
-        </div>
+            st.markdown(f"""<div class="swimlane-header">
+<div style="display: flex; align-items: center; gap: 12px;">
+    <div class="card-avatar" style="background: {avatar_color}; width: 36px; height: 36px; font-size: 14px;">{initials}</div>
+    <div>
+        <div style="color: #fff; font-weight: 600; font-size: 16px;">{assignee}</div>
+        <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
             cols = st.columns(3)
             for idx, (col_name, status_list, _) in enumerate(columns):
@@ -585,17 +587,15 @@ def main():
             icon = type_icons.get(issue_type, '📋')
             total_pts = group_issues['story_points'].sum() or 0
 
-            st.markdown(f"""
-<div class="swimlane-header">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 24px;">{icon}</span>
-        <div>
-            <div style="color: #fff; font-weight: 600; font-size: 16px;">{issue_type}</div>
-            <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
-        </div>
+            st.markdown(f"""<div class="swimlane-header">
+<div style="display: flex; align-items: center; gap: 12px;">
+    <span style="font-size: 24px;">{icon}</span>
+    <div>
+        <div style="color: #fff; font-weight: 600; font-size: 16px;">{issue_type}</div>
+        <div style="color: #8892b0; font-size: 12px;">{len(group_issues)} issues • {int(total_pts)} points</div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
             cols = st.columns(3)
             for idx, (col_name, status_list, _) in enumerate(columns):

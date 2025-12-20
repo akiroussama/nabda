@@ -24,6 +24,9 @@ import hashlib
 import json
 import math
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="The Sixth Sense", page_icon="🧿", layout="wide")
 
 # ============================================================================
@@ -1124,6 +1127,9 @@ def get_avatar_color(name: str) -> str:
 # ============================================================================
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     conn = get_connection()
     if not conn:
         st.error("Database not found. Please sync data first.")

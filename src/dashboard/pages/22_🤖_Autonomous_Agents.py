@@ -48,6 +48,9 @@ try:
 except ImportError:
     LLM_AVAILABLE = False
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 # Page configuration
 st.set_page_config(
     page_title="Autonomous Agents",
@@ -1350,6 +1353,9 @@ def render_management_tax():
 def main():
     """Main application entry point."""
     init_session_state()
+
+    # Render page guide in sidebar
+    render_page_guide()
 
     # Simulate agent activity on each render (makes it feel alive)
     simulate_agent_tick()

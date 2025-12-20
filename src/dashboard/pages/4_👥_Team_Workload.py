@@ -4,6 +4,9 @@ Individual developer profiles, workload distribution, and capacity forecasting.
 """
 
 import sys
+
+# Import page guide component
+from src.dashboard.components import render_page_guide
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -712,6 +715,9 @@ def create_issue_type_by_dev(team_data: pd.DataFrame, issues_df: pd.DataFrame) -
 
 
 def main():
+    # Render page guide in sidebar
+    render_page_guide()
+
     st.markdown("# 👥 Team Workload & Capacity")
     st.markdown("*Real-time team analytics, individual profiles, and capacity planning*")
 
@@ -749,31 +755,27 @@ def main():
 </div>
 """
 
-        st.markdown(f"""
-<div class="quick-win-widget">
-    <div class="quick-win-header">
-        <span class="quick-win-icon">⚡</span>
-        <span class="quick-win-title">Capacity Alert — Who Needs Help? Who Has Bandwidth?</span>
+        st.markdown(f"""<div class="quick-win-widget">
+<div class="quick-win-header">
+    <span class="quick-win-icon">⚡</span>
+    <span class="quick-win-title">Capacity Alert — Who Needs Help? Who Has Bandwidth?</span>
+</div>
+<div class="capacity-alerts">{people_html}</div>
+<div class="capacity-summary">
+    <div class="summary-stat">
+        <div class="summary-value">{len(cap_alerts['overloaded'])}</div>
+        <div class="summary-label">Overloaded</div>
     </div>
-    <div class="capacity-alerts">
-        {people_html}
+    <div class="summary-stat">
+        <div class="summary-value">{len(cap_alerts['available'])}</div>
+        <div class="summary-label">Available</div>
     </div>
-    <div class="capacity-summary">
-        <div class="summary-stat">
-            <div class="summary-value">{len(cap_alerts['overloaded'])}</div>
-            <div class="summary-label">Overloaded</div>
-        </div>
-        <div class="summary-stat">
-            <div class="summary-value">{len(cap_alerts['available'])}</div>
-            <div class="summary-label">Available</div>
-        </div>
-        <div class="summary-stat">
-            <div class="summary-value">{cap_alerts['avg_wip']:.0f}</div>
-            <div class="summary-label">Avg WIP Pts</div>
-        </div>
+    <div class="summary-stat">
+        <div class="summary-value">{cap_alerts['avg_wip']:.0f}</div>
+        <div class="summary-label">Avg WIP Pts</div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
     # Get team workload data
     team_query = conn.execute("""
@@ -821,52 +823,42 @@ def main():
     avg_velocity = team_query['velocity_7d'].mean()
 
     with k1:
-        st.markdown(f"""
-<div class="kpi-card">
-    <div class="kpi-value">{team_size}</div>
-    <div class="kpi-label">Team Members</div>
-    <div class="kpi-trend trend-neutral">Active developers</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-card">
+<div class="kpi-value">{team_size}</div>
+<div class="kpi-label">Team Members</div>
+<div class="kpi-trend trend-neutral">Active developers</div>
+</div>""", unsafe_allow_html=True)
 
     with k2:
         trend = "trend-up" if total_wip < 100 else ("trend-down" if total_wip > 200 else "trend-neutral")
-        st.markdown(f"""
-<div class="kpi-card">
-    <div class="kpi-value">{total_wip:.0f}</div>
-    <div class="kpi-label">Total WIP Points</div>
-    <div class="kpi-trend {trend}">Work in progress</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-card">
+<div class="kpi-value">{total_wip:.0f}</div>
+<div class="kpi-label">Total WIP Points</div>
+<div class="kpi-trend {trend}">Work in progress</div>
+</div>""", unsafe_allow_html=True)
 
     with k3:
         trend = "trend-down" if total_blocked > 0 else "trend-up"
-        st.markdown(f"""
-<div class="kpi-card">
-    <div class="kpi-value">{total_blocked}</div>
-    <div class="kpi-label">Blocked Items</div>
-    <div class="kpi-trend {trend}">Needs attention</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-card">
+<div class="kpi-value">{total_blocked}</div>
+<div class="kpi-label">Blocked Items</div>
+<div class="kpi-trend {trend}">Needs attention</div>
+</div>""", unsafe_allow_html=True)
 
     with k4:
         trend = "trend-down" if overloaded_count > 0 else "trend-up"
-        st.markdown(f"""
-<div class="kpi-card">
-    <div class="kpi-value">{overloaded_count}</div>
-    <div class="kpi-label">Overloaded</div>
-    <div class="kpi-trend {trend}">Team members</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-card">
+<div class="kpi-value">{overloaded_count}</div>
+<div class="kpi-label">Overloaded</div>
+<div class="kpi-trend {trend}">Team members</div>
+</div>""", unsafe_allow_html=True)
 
     with k5:
-        st.markdown(f"""
-<div class="kpi-card">
-    <div class="kpi-value">{avg_velocity:.1f}</div>
-    <div class="kpi-label">Avg Velocity</div>
-    <div class="kpi-trend trend-neutral">pts/week/person</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-card">
+<div class="kpi-value">{avg_velocity:.1f}</div>
+<div class="kpi-label">Avg Velocity</div>
+<div class="kpi-trend trend-neutral">pts/week/person</div>
+</div>""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -986,41 +978,38 @@ def main():
         dev_issues = issues_df[issues_df['assignee_name'] == dev['name']]
         issue_types = dev_issues['issue_type'].value_counts().head(3).index.tolist()
 
-        st.markdown(f"""
-<div class="developer-card">
-    <div class="dev-header">
-        <div class="dev-avatar" style="background: {avatar_color};">{initials}</div>
-        <div class="dev-info">
-            <div class="dev-name">{dev['name']}</div>
-            <div class="dev-role">{"  ".join([f'<span class="skill-tag">{t}</span>' for t in issue_types])}</div>
-        </div>
-        <span class="dev-status-badge status-{status}">{status_text}</span>
+        st.markdown(f"""<div class="developer-card">
+<div class="dev-header">
+    <div class="dev-avatar" style="background: {avatar_color};">{initials}</div>
+    <div class="dev-info">
+        <div class="dev-name">{dev['name']}</div>
+        <div class="dev-role">{"  ".join([f'<span class="skill-tag">{t}</span>' for t in issue_types])}</div>
     </div>
-    <div class="dev-metrics">
-        <div class="dev-metric">
-            <div class="dev-metric-value">{int(dev['total_issues'])}</div>
-            <div class="dev-metric-label">Total Issues</div>
-        </div>
-        <div class="dev-metric">
-            <div class="dev-metric-value">{dev['wip_points']:.0f}</div>
-            <div class="dev-metric-label">WIP Points</div>
-        </div>
-        <div class="dev-metric">
-            <div class="dev-metric-value">{dev['done_points']:.0f}</div>
-            <div class="dev-metric-label">Completed</div>
-        </div>
-        <div class="dev-metric">
-            <div class="dev-metric-value">{dev['velocity_7d']:.1f}</div>
-            <div class="dev-metric-label">Velocity/wk</div>
-        </div>
+    <span class="dev-status-badge status-{status}">{status_text}</span>
+</div>
+<div class="dev-metrics">
+    <div class="dev-metric">
+        <div class="dev-metric-value">{int(dev['total_issues'])}</div>
+        <div class="dev-metric-label">Total Issues</div>
     </div>
-    <div style="font-size: 12px; color: #8892b0; margin-bottom: 4px;">Capacity Utilization</div>
-    <div class="capacity-bar-container">
-        <div class="capacity-bar capacity-{'low' if dev['capacity_used'] <= 70 else ('medium' if dev['capacity_used'] <= 90 else 'high')}"
-                style="width: {min(dev['capacity_used'], 100):.0f}%;"></div>
+    <div class="dev-metric">
+        <div class="dev-metric-value">{dev['wip_points']:.0f}</div>
+        <div class="dev-metric-label">WIP Points</div>
+    </div>
+    <div class="dev-metric">
+        <div class="dev-metric-value">{dev['done_points']:.0f}</div>
+        <div class="dev-metric-label">Completed</div>
+    </div>
+    <div class="dev-metric">
+        <div class="dev-metric-value">{dev['velocity_7d']:.1f}</div>
+        <div class="dev-metric-label">Velocity/wk</div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+<div style="font-size: 12px; color: #8892b0; margin-bottom: 4px;">Capacity Utilization</div>
+<div class="capacity-bar-container">
+    <div class="capacity-bar capacity-{'low' if dev['capacity_used'] <= 70 else ('medium' if dev['capacity_used'] <= 90 else 'high')}" style="width: {min(dev['capacity_used'], 100):.0f}%;"></div>
+</div>
+</div>""", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1036,12 +1025,9 @@ def main():
 
     # ========== Summary Footer ==========
     st.markdown("---")
-    st.markdown(f"""
-<div style="text-align: center; color: #64748b; font-size: 12px;">
-    Team Workload Dashboard | {team_size} team members | {total_wip:.0f} WIP points |
-    Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(f"""<div style="text-align: center; color: #64748b; font-size: 12px;">
+Team Workload Dashboard | {team_size} team members | {total_wip:.0f} WIP points | Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+</div>""", unsafe_allow_html=True)
 
     conn.close()
 

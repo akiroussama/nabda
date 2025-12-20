@@ -13,6 +13,9 @@ from plotly.subplots import make_subplots
 from pathlib import Path
 from datetime import datetime, timedelta
 
+# Import page guide component
+from src.dashboard.components import render_page_guide
+
 st.set_page_config(page_title="Overview", page_icon="📊", layout="wide")
 
 # Premium CSS - Light Mode
@@ -574,6 +577,9 @@ def create_bar_chart(df: pd.DataFrame, x_col: str, y_col: str, title: str, color
 
 
 def main():
+
+    # Render page guide in sidebar
+    render_page_guide()
     st.markdown("# 📊 Project Overview")
     st.markdown("*Real-time project health and activity dashboard*")
 
@@ -612,42 +618,33 @@ def main():
 
     # ========== ULTRATHINK: EXECUTIVE PULSE ==========
     pulse = get_client_confidence(conn)
-    st.markdown(f"""
-<div class="exec-pulse-widget">
-    <div class="exec-pulse-header">
-        <div class="exec-title">
-            <span>💎 Executive Pulse</span>
-        </div>
-        <div style="font-size: 11px; color: #64748b;">LIVE</div>
+    st.markdown(f"""<div class="exec-pulse-widget">
+<div class="exec-pulse-header">
+    <div class="exec-title"><span>💎 Executive Pulse</span></div>
+    <div style="font-size: 11px; color: #64748b;">LIVE</div>
+</div>
+<div class="exec-main-score">
+    <div class="confidence-value">{pulse['score']}</div>
+    <div class="confidence-label">Client Confidence Index<br><span style="font-size: 12px; color: #94a3b8; font-weight: 400;">Based on Velocity, Quality & ROI</span></div>
+</div>
+<div class="exec-metrics">
+    <div class="exec-metric-item">
+        <div class="exec-metric-label">ROI / Efficiency</div>
+        <div class="exec-metric-val">{pulse['roi']}</div>
+        <div class="metric-trend trend-up">▲ High Value</div>
     </div>
-    
-    <div class="exec-main-score">
-        <div class="confidence-value">{pulse['score']}</div>
-        <div class="confidence-label">
-            Client Confidence Index<br>
-            <span style="font-size: 12px; color: #94a3b8; font-weight: 400;">Based on Velocity, Quality & ROI</span>
-        </div>
+    <div class="exec-metric-item">
+        <div class="exec-metric-label">Quality Score</div>
+        <div class="exec-metric-val">{pulse['quality']}</div>
+        <div class="metric-trend {'trend-down' if pulse['open_risks'] > 2 else 'trend-up'}">{pulse['open_risks']} Open Bugs</div>
     </div>
-    
-    <div class="exec-metrics">
-        <div class="exec-metric-item">
-            <div class="exec-metric-label">ROI / Efficiency</div>
-            <div class="exec-metric-val">{pulse['roi']}</div>
-            <div class="metric-trend trend-up">▲ High Value</div>
-        </div>
-        <div class="exec-metric-item">
-            <div class="exec-metric-label">Quality Score</div>
-            <div class="exec-metric-val">{pulse['quality']}</div>
-            <div class="metric-trend {'trend-down' if pulse['open_risks'] > 2 else 'trend-up'}">{pulse['open_risks']} Open Bugs</div>
-        </div>
-        <div class="exec-metric-item">
-            <div class="exec-metric-label">Delivery Forecast</div>
-            <div class="exec-metric-val">On Track</div>
-            <div class="metric-trend trend-up">{pulse['velocity_trend']} vs avg</div>
-        </div>
+    <div class="exec-metric-item">
+        <div class="exec-metric-label">Delivery Forecast</div>
+        <div class="exec-metric-val">On Track</div>
+        <div class="metric-trend trend-up">{pulse['velocity_trend']} vs avg</div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
     # ========== TOP KPIs ==========
     kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
@@ -673,53 +670,39 @@ def main():
     """).fetchone()[0]
 
     with kpi1:
-        st.markdown(f"""
-<div class="kpi-box">
-    <div class="kpi-label">Total Issues</div>
-    <div class="kpi-value">{total_issues:,}</div>
-    <div class="kpi-delta delta-{'up' if created_this_week > 0 else 'neutral'}">
-        +{created_this_week} this week
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-box">
+<div class="kpi-label">Total Issues</div>
+<div class="kpi-value">{total_issues:,}</div>
+<div class="kpi-delta delta-{'up' if created_this_week > 0 else 'neutral'}">+{created_this_week} this week</div>
+</div>""", unsafe_allow_html=True)
 
     with kpi2:
-        st.markdown(f"""
-<div class="kpi-box">
-    <div class="kpi-label">Open Issues</div>
-    <div class="kpi-value">{open_issues:,}</div>
-    <div class="kpi-delta delta-neutral">{open_issues/max(total_issues,1)*100:.0f}% of total</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-box">
+<div class="kpi-label">Open Issues</div>
+<div class="kpi-value">{open_issues:,}</div>
+<div class="kpi-delta delta-neutral">{open_issues/max(total_issues,1)*100:.0f}% of total</div>
+</div>""", unsafe_allow_html=True)
 
     with kpi3:
-        st.markdown(f"""
-<div class="kpi-box">
-    <div class="kpi-label">In Progress</div>
-    <div class="kpi-value">{in_progress}</div>
-    <div class="kpi-delta delta-up">Active work</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-box">
+<div class="kpi-label">In Progress</div>
+<div class="kpi-value">{in_progress}</div>
+<div class="kpi-delta delta-up">Active work</div>
+</div>""", unsafe_allow_html=True)
 
     with kpi4:
-        st.markdown(f"""
-<div class="kpi-box">
-    <div class="kpi-label">Blocked</div>
-    <div class="kpi-value" style="color: {'#dc2626' if blocked > 0 else '#16a34a'};">{blocked}</div>
-    <div class="kpi-delta delta-{'down' if blocked > 0 else 'up'}">
-        {'Needs attention' if blocked > 0 else 'All clear'}
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-box">
+<div class="kpi-label">Blocked</div>
+<div class="kpi-value" style="color: {'#dc2626' if blocked > 0 else '#16a34a'};">{blocked}</div>
+<div class="kpi-delta delta-{'down' if blocked > 0 else 'up'}">{'Needs attention' if blocked > 0 else 'All clear'}</div>
+</div>""", unsafe_allow_html=True)
 
     with kpi5:
-        st.markdown(f"""
-<div class="kpi-box">
-    <div class="kpi-label">Done Today</div>
-    <div class="kpi-value" style="color: #16a34a;">{completed_today}</div>
-    <div class="kpi-delta delta-up">Keep it up!</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="kpi-box">
+<div class="kpi-label">Done Today</div>
+<div class="kpi-value" style="color: #16a34a;">{completed_today}</div>
+<div class="kpi-delta delta-up">Keep it up!</div>
+</div>""", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -811,18 +794,13 @@ def main():
                 elif row['status'] == 'Terminé(e)':
                     status_class = 'done'
 
-                st.markdown(f"""
-                <div class="activity-item">
-                    <div class="avatar" style="background: {color}; color: white;">{initials}</div>
-                    <div style="flex: 1;">
-                        <div style="color: #1e293b; font-weight: 500;">{row['summary'][:60]}{'...' if len(row['summary']) > 60 else ''}</div>
-                        <div style="color: #64748b; font-size: 12px;">
-                            <span class="status-pill status-{status_class}">{row['status']}</span>
-                            {row['key']} • {row['issue_type']} • {name} • {time_ago}
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<div class="activity-item">
+<div class="avatar" style="background: {color}; color: white;">{initials}</div>
+<div style="flex: 1;">
+    <div style="color: #1e293b; font-weight: 500;">{row['summary'][:60]}{'...' if len(row['summary']) > 60 else ''}</div>
+    <div style="color: #64748b; font-size: 12px;"><span class="status-pill status-{status_class}">{row['status']}</span> {row['key']} • {row['issue_type']} • {name} • {time_ago}</div>
+</div>
+</div>""", unsafe_allow_html=True)
 
     with col4:
         st.markdown("### Issue Types")
@@ -847,17 +825,15 @@ def main():
             for _, row in types_df.iterrows():
                 icon = type_icons.get(row['issue_type'], '📋')
                 pct = row['count'] / total_issues * 100
-                st.markdown(f"""
-                <div style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span style="color: #1e293b;">{icon} {row['issue_type']}</span>
-                        <span style="color: #64748b;">{row['count']} ({pct:.0f}%)</span>
-                    </div>
-                    <div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
-                        <div style="background: linear-gradient(90deg, #6366f1, #8b5cf6); width: {pct}%; height: 100%;"></div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<div style="margin-bottom: 16px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+    <span style="color: #1e293b;">{icon} {row['issue_type']}</span>
+    <span style="color: #64748b;">{row['count']} ({pct:.0f}%)</span>
+</div>
+<div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
+    <div style="background: linear-gradient(90deg, #6366f1, #8b5cf6); width: {pct}%; height: 100%;"></div>
+</div>
+</div>""", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -929,11 +905,7 @@ def main():
         if not components_df.empty:
             st.markdown('<div style="padding: 10px;">', unsafe_allow_html=True)
             for _, row in components_df.iterrows():
-                st.markdown(f"""
-                <span class="component-tag">
-                    {row['component']} <b>({row['count']})</b>
-                </span>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<span class="component-tag">{row['component']} <b>({row['count']})</b></span>""", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.info("No components assigned to issues yet.")
@@ -970,45 +942,40 @@ def main():
             st.markdown(f"**{sprint_name}**")
 
             # Progress bar
-            st.markdown(f"""
-            <div style="margin: 16px 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <span style="color: #64748b;">Issues: {done}/{total}</span>
-                    <span style="color: #16a34a; font-weight: 600;">{pct:.0f}%</span>
-                </div>
-                <div style="background: #e2e8f0; border-radius: 8px; height: 16px; overflow: hidden;">
-                    <div style="background: linear-gradient(90deg, #22c55e, #4ade80); width: {pct}%; height: 100%;"></div>
-                </div>
-            </div>
-
-            <div style="margin: 16px 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <span style="color: #64748b;">Points: {done_pts:.0f}/{total_pts:.0f}</span>
-                    <span style="color: #6366f1; font-weight: 600;">{pts_pct:.0f}%</span>
-                </div>
-                <div style="background: #e2e8f0; border-radius: 8px; height: 16px; overflow: hidden;">
-                    <div style="background: linear-gradient(90deg, #6366f1, #8b5cf6); width: {pts_pct}%; height: 100%;"></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<div style="margin: 16px 0;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+    <span style="color: #64748b;">Issues: {done}/{total}</span>
+    <span style="color: #16a34a; font-weight: 600;">{pct:.0f}%</span>
+</div>
+<div style="background: #e2e8f0; border-radius: 8px; height: 16px; overflow: hidden;">
+    <div style="background: linear-gradient(90deg, #22c55e, #4ade80); width: {pct}%; height: 100%;"></div>
+</div>
+</div>
+<div style="margin: 16px 0;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+    <span style="color: #64748b;">Points: {done_pts:.0f}/{total_pts:.0f}</span>
+    <span style="color: #6366f1; font-weight: 600;">{pts_pct:.0f}%</span>
+</div>
+<div style="background: #e2e8f0; border-radius: 8px; height: 16px; overflow: hidden;">
+    <div style="background: linear-gradient(90deg, #6366f1, #8b5cf6); width: {pts_pct}%; height: 100%;"></div>
+</div>
+</div>""", unsafe_allow_html=True)
 
             # Sprint stats
-            st.markdown(f"""
-            <div style="display: flex; gap: 16px; margin-top: 16px;">
-                <div style="flex: 1; text-align: center; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-                    <div style="color: #64748b; font-size: 11px;">TODO</div>
-                    <div style="color: #3b82f6; font-size: 20px; font-weight: 700;">{total - done - in_prog}</div>
-                </div>
-                <div style="flex: 1; text-align: center; padding: 12px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px;">
-                    <div style="color: #9a3412; font-size: 11px;">IN PROGRESS</div>
-                    <div style="color: #ea580c; font-size: 20px; font-weight: 700;">{in_prog}</div>
-                </div>
-                <div style="flex: 1; text-align: center; padding: 12px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px;">
-                    <div style="color: #166534; font-size: 11px;">DONE</div>
-                    <div style="color: #16a34a; font-size: 20px; font-weight: 700;">{done}</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<div style="display: flex; gap: 16px; margin-top: 16px;">
+<div style="flex: 1; text-align: center; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+    <div style="color: #64748b; font-size: 11px;">TODO</div>
+    <div style="color: #3b82f6; font-size: 20px; font-weight: 700;">{total - done - in_prog}</div>
+</div>
+<div style="flex: 1; text-align: center; padding: 12px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px;">
+    <div style="color: #9a3412; font-size: 11px;">IN PROGRESS</div>
+    <div style="color: #ea580c; font-size: 20px; font-weight: 700;">{in_prog}</div>
+</div>
+<div style="flex: 1; text-align: center; padding: 12px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px;">
+    <div style="color: #166534; font-size: 11px;">DONE</div>
+    <div style="color: #16a34a; font-size: 20px; font-weight: 700;">{done}</div>
+</div>
+</div>""", unsafe_allow_html=True)
         else:
             st.info("No active sprint found.")
 

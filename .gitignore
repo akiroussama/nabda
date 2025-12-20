@@ -86,7 +86,7 @@ dmypy.json
 # -------------------------------------------
 # Data & Models (Large files)
 # -------------------------------------------
-data/*.duckdb
+# data/*.duckdb
 data/*.duckdb.wal
 data/raw/*.json
 data/exports/*.csv

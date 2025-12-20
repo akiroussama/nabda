@@ -83,10 +83,7 @@ CREATE TABLE IF NOT EXISTS issue_changelog (
 
     -- Author
     author_id VARCHAR,
-    author_name VARCHAR,
-
-    -- Foreign key relationship (logical, not enforced in DuckDB)
-    FOREIGN KEY (issue_key) REFERENCES issues(key)
+    author_name VARCHAR
 )
 """
 
@@ -135,10 +132,7 @@ CREATE TABLE IF NOT EXISTS worklogs (
     updated TIMESTAMP,
 
     -- Comment
-    comment VARCHAR,
-
-    -- Foreign key relationship
-    FOREIGN KEY (issue_key) REFERENCES issues(key)
+    comment VARCHAR
 )
 """
 
@@ -266,9 +260,7 @@ CREATE TABLE IF NOT EXISTS recommendation_actions (
     snooze_until DATE,
     user_notes TEXT,
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (briefing_id) REFERENCES daily_briefings(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """
 

@@ -21,10 +21,12 @@ from tenacity import (
 
 # Suppress deprecation warning for google.generativeai
 # TODO: Migrate to google.genai package when stable
-warnings.filterwarnings("ignore", message=".*google.generativeai.*")
+warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
 
 try:
-    import google.generativeai as genai
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", FutureWarning)
+        import google.generativeai as genai
     from google.generativeai.types import GenerationConfig, HarmBlockThreshold, HarmCategory
     GENAI_AVAILABLE = True
 except ImportError:

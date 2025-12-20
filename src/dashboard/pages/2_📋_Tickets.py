@@ -110,7 +110,7 @@ try:
         st.dataframe(
             df,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             column_config={
                 "Key": st.column_config.TextColumn("Key", width="small"),
                 "Points": st.column_config.NumberColumn("SP", width="small"),

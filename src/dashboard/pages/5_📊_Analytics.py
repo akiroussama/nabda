@@ -44,7 +44,7 @@ try:
             st.line_chart(df.set_index("Sprint")[["Completed", "Committed"]])
 
         with col2:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
     # Issue Types Distribution
     st.header("🏷️ Issue Types")
@@ -69,7 +69,7 @@ try:
             st.bar_chart(df.set_index("Type")["Count"])
 
         with col2:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
     # Priority Distribution
     st.header("🎯 Priority Distribution")
@@ -103,7 +103,7 @@ try:
             st.bar_chart(df.set_index("Priority")[["Done", "Open"]])
 
         with col2:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
     # Created vs Resolved Over Time
     st.header("📈 Created vs Resolved (Last 30 Days)")
@@ -153,7 +153,7 @@ try:
         df["Progress %"] = (df["Done"] / df["Total"] * 100).fillna(0).round(1)
         df["Epic"] = df["Epic"].str[:30]
 
-        st.dataframe(df, hide_index=True, use_container_width=True)
+        st.dataframe(df, hide_index=True, width="stretch")
 
         # Progress bars
         for _, row in df.iterrows():

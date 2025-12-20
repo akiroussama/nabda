@@ -404,6 +404,7 @@ CREATE TABLE IF NOT EXISTS prediction_snapshots (
 
 # Index creation statements
 CREATE_INDEXES = [
+    # Core tables
     "CREATE INDEX IF NOT EXISTS idx_issues_assignee ON issues(assignee_id)",
     "CREATE INDEX IF NOT EXISTS idx_issues_sprint ON issues(sprint_id)",
     "CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_key)",
@@ -422,6 +423,21 @@ CREATE_INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_alerts_type ON alerts(alert_type)",
     "CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity)",
     "CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at)",
+    # Good Morning Dashboard tables
+    "CREATE INDEX IF NOT EXISTS idx_briefings_date ON daily_briefings(briefing_date)",
+    "CREATE INDEX IF NOT EXISTS idx_briefings_project ON daily_briefings(project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_briefings_user_project ON daily_briefings(user_id, project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_rec_actions_briefing ON recommendation_actions(briefing_id)",
+    "CREATE INDEX IF NOT EXISTS idx_rec_actions_status ON recommendation_actions(action_taken)",
+    "CREATE INDEX IF NOT EXISTS idx_stakeholder_project ON stakeholder_queries(project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_stakeholder_asked ON stakeholder_queries(asked_at)",
+    "CREATE INDEX IF NOT EXISTS idx_deltas_date ON daily_deltas(delta_date)",
+    "CREATE INDEX IF NOT EXISTS idx_deltas_project ON daily_deltas(project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_attention_project ON attention_queue(project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_attention_severity ON attention_queue(severity)",
+    "CREATE INDEX IF NOT EXISTS idx_attention_score ON attention_queue(attention_score)",
+    "CREATE INDEX IF NOT EXISTS idx_predictions_project ON prediction_snapshots(project_key)",
+    "CREATE INDEX IF NOT EXISTS idx_predictions_date ON prediction_snapshots(snapshot_date)",
 ]
 
 
@@ -454,6 +470,13 @@ def initialize_database(db_path: str | Path) -> duckdb.DuckDBPyConnection:
         ("sync_metadata", CREATE_SYNC_METADATA_TABLE),
         ("alerts", CREATE_ALERTS_TABLE),
         ("ml_features", CREATE_ML_FEATURES_TABLE),
+        # Good Morning Dashboard tables
+        ("daily_briefings", CREATE_DAILY_BRIEFINGS_TABLE),
+        ("recommendation_actions", CREATE_RECOMMENDATION_ACTIONS_TABLE),
+        ("stakeholder_queries", CREATE_STAKEHOLDER_QUERIES_TABLE),
+        ("daily_deltas", CREATE_DAILY_DELTAS_TABLE),
+        ("attention_queue", CREATE_ATTENTION_QUEUE_TABLE),
+        ("prediction_snapshots", CREATE_PREDICTION_SNAPSHOTS_TABLE),
     ]
 
     for table_name, create_sql in tables:
@@ -506,6 +529,14 @@ def drop_all_tables(conn: duckdb.DuckDBPyConnection) -> None:
     logger.warning("Dropping all tables!")
 
     tables = [
+        # Good Morning Dashboard tables (drop first due to FK)
+        "prediction_snapshots",
+        "attention_queue",
+        "daily_deltas",
+        "stakeholder_queries",
+        "recommendation_actions",
+        "daily_briefings",
+        # Core tables
         "ml_features",
         "alerts",
         "sync_metadata",
@@ -543,6 +574,13 @@ def get_table_stats(conn: duckdb.DuckDBPyConnection) -> dict[str, int]:
         "sync_metadata",
         "alerts",
         "ml_features",
+        # Good Morning Dashboard tables
+        "daily_briefings",
+        "recommendation_actions",
+        "stakeholder_queries",
+        "daily_deltas",
+        "attention_queue",
+        "prediction_snapshots",
     ]
 
     stats = {}

@@ -61,6 +61,7 @@ class JiraFetcher:
         "issuelinks",
         "attachment",
         "project",
+        "customfield_10020",  # Sprint field
     ]
 
     def __init__(

@@ -28,7 +28,7 @@ app = typer.Typer(
 )
 
 # Import command groups
-from src.cli.commands import sync, analyze, predict, report
+from src.cli.commands import sync, analyze, predict, report, morning
 
 
 # Register command groups
@@ -36,6 +36,7 @@ app.add_typer(sync.app, name="sync", help="🔄 Synchronize data from Jira")
 app.add_typer(analyze.app, name="analyze", help="📊 Analyze project data")
 app.add_typer(predict.app, name="predict", help="🎯 Make predictions")
 app.add_typer(report.app, name="report", help="📋 Generate reports")
+app.add_typer(morning.app, name="morning", help="🌅 Good Morning briefings")
 
 
 @app.command()

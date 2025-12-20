@@ -19,66 +19,39 @@ st.title("👥 Team Overview")
 try:
     conn = get_connection()
 
-    # Famous Tech Developers (from labels)
-    st.header("🌟 Famous Tech Developers")
-    st.caption("Developers assigned via labels (dev-*)")
+    # Team Members (6 Famous Tech Developers)
+    st.header("🌟 Team Members")
+    st.caption("Famous tech developers workload")
 
+    # Get workload from actual issue assignments
     dev_workload = conn.execute("""
-        WITH developer_issues AS (
-            SELECT
-                i.key,
-                i.status,
-                UNNEST(i.labels) as label
-            FROM issues i
-            WHERE i.labels IS NOT NULL
-        )
         SELECT
-            REPLACE(label, 'dev-', '') as developer,
-            COUNT(*) as total,
-            SUM(CASE WHEN status NOT IN ('Done', 'Closed', 'Resolved') THEN 1 ELSE 0 END) as open,
-            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
-            SUM(CASE WHEN status IN ('Done', 'Closed', 'Resolved') THEN 1 ELSE 0 END) as done
-        FROM developer_issues
-        WHERE label LIKE 'dev-%'
-        GROUP BY label
+            u.display_name as developer,
+            u.email,
+            COUNT(i.key) as total,
+            SUM(CASE WHEN i.status NOT IN ('Done', 'Closed', 'Resolved') THEN 1 ELSE 0 END) as open,
+            SUM(CASE WHEN i.status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN i.status IN ('Done', 'Closed', 'Resolved') THEN 1 ELSE 0 END) as done
+        FROM users u
+        LEFT JOIN issues i ON i.assignee_id = u.pseudonym
+        GROUP BY u.display_name, u.email
         ORDER BY total DESC
     """).fetchall()
 
     if dev_workload:
-        df = pd.DataFrame(dev_workload, columns=["Developer", "Total", "Open", "In Progress", "Done"])
-        # Format developer names nicely
-        df["Developer"] = df["Developer"].str.replace("-", " ").str.title()
+        df = pd.DataFrame(dev_workload, columns=["Developer", "Email", "Total", "Open", "In Progress", "Done"])
 
         col1, col2 = st.columns([2, 1])
 
         with col1:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
         with col2:
             st.subheader("📊 Workload by Developer")
             chart_df = df[["Developer", "Open", "Done"]].set_index("Developer")
             st.bar_chart(chart_df)
     else:
-        st.info("No developer labels found.")
-
-    # Jira Users (real accounts)
-    st.header("👤 Jira Accounts")
-    st.caption("Real Jira user accounts")
-
-    users = conn.execute("""
-        SELECT
-            COALESCE(display_name, pseudonym) as name,
-            COALESCE(NULLIF(email, ''), '-') as email,
-            CASE WHEN active THEN '✅ Active' ELSE '❌ Inactive' END as status
-        FROM users
-        ORDER BY name
-    """).fetchall()
-
-    if users:
-        df = pd.DataFrame(users, columns=["Name", "Email", "Status"])
-        st.dataframe(df, hide_index=True, use_container_width=True)
-    else:
-        st.info("No team members found in database.")
+        st.info("No team members found.")
 
     # Frontend vs Backend Distribution
     st.header("🎨 Frontend vs Backend")
@@ -110,7 +83,7 @@ try:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
         with col2:
             chart_df = df[["Category", "Open", "Done"]].set_index("Category")
@@ -146,7 +119,7 @@ try:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
         with col2:
             chart_df = df[["Type", "Total"]].set_index("Type")
@@ -174,7 +147,7 @@ try:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
         with col2:
             st.bar_chart(df.set_index("Points"))

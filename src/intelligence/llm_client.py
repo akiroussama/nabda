@@ -7,6 +7,7 @@ Provides a unified interface for LLM interactions with retry, caching, and fallb
 import hashlib
 import json
 import time
+import warnings
 from datetime import datetime, timedelta
 from typing import Any, Callable, Literal
 
@@ -17,6 +18,10 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
+
+# Suppress deprecation warning for google.generativeai
+# TODO: Migrate to google.genai package when stable
+warnings.filterwarnings("ignore", message=".*google.generativeai.*")
 
 try:
     import google.generativeai as genai

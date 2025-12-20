@@ -7,10 +7,42 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from loguru import logger
-from sentence_transformers import SentenceTransformer, util
-import xgboost as xgb
 import pickle
 from pathlib import Path
+
+# Lazy imports for GPU-optional dependencies
+SentenceTransformer = None
+util = None
+xgb = None
+
+def _load_sentence_transformers():
+    """Lazy load sentence_transformers to handle missing CUDA gracefully."""
+    global SentenceTransformer, util
+    if SentenceTransformer is None:
+        try:
+            import os
+            # Force CPU mode to avoid CUDA issues
+            os.environ.setdefault('CUDA_VISIBLE_DEVICES', '')
+            from sentence_transformers import SentenceTransformer as ST, util as st_util
+            SentenceTransformer = ST
+            util = st_util
+        except Exception as e:
+            logger.warning(f"Could not load sentence_transformers: {e}")
+            SentenceTransformer = None
+            util = None
+    return SentenceTransformer, util
+
+def _load_xgboost():
+    """Lazy load xgboost."""
+    global xgb
+    if xgb is None:
+        try:
+            import xgboost as xgb_module
+            xgb = xgb_module
+        except ImportError:
+            logger.warning("xgboost not available")
+            xgb = None
+    return xgb
 
 # Strategic Categories
 CATEGORY_NEW_VALUE = "New Value"
@@ -81,100 +113,165 @@ class WorkClassifier:
     """
     Classifies Jira tickets into work categories using embeddings and XGBoost/Heuristics.
     """
-    
+
     def __init__(self, model_path: Optional[str] = None):
         self.model_path = model_path
-        self._embedder: Optional[SentenceTransformer] = None
-        self._classifier: Optional[xgb.Booster] = None
+        self._embedder = None
+        self._classifier = None
         self._archetype_embeddings: Dict[str, np.ndarray] = {}
-        
-    def _get_embedder(self) -> SentenceTransformer:
+        self._embedder_available = None  # Lazy check
+
+    def _get_embedder(self):
+        """Get sentence transformer embedder, returns None if not available."""
+        if self._embedder_available is False:
+            return None
+
         if self._embedder is None:
+            ST, _ = _load_sentence_transformers()
+            if ST is None:
+                self._embedder_available = False
+                logger.warning("Sentence transformers not available - using fallback classification")
+                return None
+
             logger.info("Loading sentence-transformers model...")
-            # using a small, fast model
-            self._embedder = SentenceTransformer('all-MiniLM-L6-v2')
+            try:
+                self._embedder = ST('all-MiniLM-L6-v2')
+                self._embedder_available = True
+            except Exception as e:
+                logger.warning(f"Could not load embedding model: {e}")
+                self._embedder_available = False
+                return None
+
         return self._embedder
 
     def _generate_archetype_embeddings(self):
         """Pre-compute embeddings for archetypes for zero-shot classification."""
         if self._archetype_embeddings:
             return
-            
+
         embedder = self._get_embedder()
+        if embedder is None:
+            return
+
         for category, phrases in ARCHETYPES.items():
             self._archetype_embeddings[category] = embedder.encode(phrases)
 
-    def generate_embeddings(self, texts: List[str]) -> np.ndarray:
-        """Generate vectors for a list of texts."""
+    def generate_embeddings(self, texts: List[str]) -> Optional[np.ndarray]:
+        """Generate vectors for a list of texts. Returns None if embedder unavailable."""
         embedder = self._get_embedder()
+        if embedder is None:
+            return None
         return embedder.encode(texts, show_progress_bar=True)
+
+    def _keyword_classify(self, text: str) -> Tuple[str, float]:
+        """Fallback keyword-based classification when embeddings unavailable."""
+        text_lower = text.lower()
+
+        # Firefighting keywords (highest priority)
+        firefighting_keywords = ['bug', 'fix', 'incident', 'crash', 'urgent', 'hotfix', 'broken', 'error', 'outage']
+        if any(kw in text_lower for kw in firefighting_keywords):
+            return CATEGORY_FIREFIGHTING, 0.7
+
+        # Tech debt keywords
+        tech_debt_keywords = ['refactor', 'cleanup', 'debt', 'legacy', 'migrate', 'upgrade', 'deprecate']
+        if any(kw in text_lower for kw in tech_debt_keywords):
+            return CATEGORY_TECH_DEBT, 0.7
+
+        # Maintenance keywords
+        maintenance_keywords = ['update', 'maintenance', 'version', 'bump', 'dependency', 'routine']
+        if any(kw in text_lower for kw in maintenance_keywords):
+            return CATEGORY_MAINTENANCE, 0.6
+
+        # Rework keywords
+        rework_keywords = ['revert', 'redo', 'again', 'retry', 'regression']
+        if any(kw in text_lower for kw in rework_keywords):
+            return CATEGORY_REWORK, 0.6
+
+        # Dependency/blocked keywords
+        blocked_keywords = ['blocked', 'waiting', 'depends', 'dependency']
+        if any(kw in text_lower for kw in blocked_keywords):
+            return CATEGORY_DEPENDENCY, 0.6
+
+        # Default to new value
+        return CATEGORY_NEW_VALUE, 0.5
 
     def classify_tickets(self, df: pd.DataFrame, text_column: str = "summary") -> pd.DataFrame:
         """
-        Classify tickets in the DataFrame. 
+        Classify tickets in the DataFrame.
         Adds/Updates 'predicted_category' and 'confidence' columns.
         """
         if df.empty:
             return df
-        
+
         logger.info(f"Classifying {len(df)} tickets...")
-        
-        # 1. Combine summary and description for better context if available
-        # But for now, let's stick to summary or passed column to keep it simple/fast
+
         texts = df[text_column].fillna("").tolist()
-        
-        # 2. Heuristic/Keyword First (Fastest)
-        # We can implement simple keyword matching overrides here
-        
-        # 3. Embedding-based Classification
+
+        # Try embedding-based classification first
         embeddings = self.generate_embeddings(texts)
-        
-        # If we have a trained XGBoost model, use it
-        if self._classifier:
-            # TODO: Implement XGBoost prediction using embeddings as features
-            pass
-        else:
+
+        categories = []
+        confidences = []
+        shadow_flags = []
+
+        if embeddings is not None and self._archetype_embeddings is not None:
             # Use Zero-Shot / Similarity based on Archetypes
             self._generate_archetype_embeddings()
+            _, st_util = _load_sentence_transformers()
+
+            if st_util and self._archetype_embeddings:
+                for i, embedding in enumerate(embeddings):
+                    best_cat = CATEGORY_NEW_VALUE
+                    max_score = -1.0
+
+                    for category, arch_embeds in self._archetype_embeddings.items():
+                        scores = st_util.cos_sim(embedding, arch_embeds)
+                        score = float(scores.max())
+
+                        if score > max_score:
+                            max_score = score
+                            best_cat = category
+
+                    categories.append(best_cat)
+                    confidences.append(max_score)
+
+                    # Shadow Work Detection
+                    is_shadow = False
+                    original_type = df.iloc[i].get('issue_type', '').lower() if 'issue_type' in df.columns else ''
+                    if best_cat in [CATEGORY_MAINTENANCE, CATEGORY_FIREFIGHTING, CATEGORY_TECH_DEBT]:
+                        if 'story' in original_type or 'feature' in original_type or 'epic' in original_type:
+                            if max_score > 0.4:
+                                is_shadow = True
+                    shadow_flags.append(is_shadow)
+            else:
+                # Fallback to keyword classification
+                embeddings = None
+
+        if embeddings is None or not categories:
+            # Use keyword-based fallback
+            logger.info("Using keyword-based classification fallback")
             categories = []
             confidences = []
             shadow_flags = []
-            
-            for i, embedding in enumerate(embeddings):
-                best_cat = CATEGORY_NEW_VALUE # Default
-                max_score = -1.0
-                
-                # Check against each category's archetypes
-                for category, arch_embeds in self._archetype_embeddings.items():
-                    # Calculate max cosine similarity with any phrase in this category
-                    # embedding is (384,), arch_embeds is (N, 384)
-                    scores = util.cos_sim(embedding, arch_embeds)
-                    score = float(scores.max())
-                    
-                    if score > max_score:
-                        max_score = score
-                        best_cat = category
-                
-                categories.append(best_cat)
-                confidences.append(max_score)
-                
+
+            for i, text in enumerate(texts):
+                cat, conf = self._keyword_classify(text)
+                categories.append(cat)
+                confidences.append(conf)
+
                 # Shadow Work Detection
-                # Check if it was labeled "New Feature" or "Story" but classified as "Maintenance" or "Firefighting"
-                # This requires knowing the original issue type, let's assume valid input df has 'issue_type'
                 is_shadow = False
-                original_type = df.iloc[i].get('issue_type', '').lower()
-                if best_cat in [CATEGORY_MAINTENANCE, CATEGORY_FIREFIGHTING, CATEGORY_TECH_DEBT]:
+                original_type = df.iloc[i].get('issue_type', '').lower() if 'issue_type' in df.columns else ''
+                if cat in [CATEGORY_MAINTENANCE, CATEGORY_FIREFIGHTING, CATEGORY_TECH_DEBT]:
                     if 'story' in original_type or 'feature' in original_type or 'epic' in original_type:
-                        # High similarity to maintenance/firefighting despite being a Feature
-                        if max_score > 0.4: # Threshold
+                        if conf > 0.5:
                             is_shadow = True
-                            
                 shadow_flags.append(is_shadow)
 
-            df['predicted_category'] = categories
-            df['classification_confidence'] = confidences
-            df['is_shadow_work'] = shadow_flags
-            
+        df['predicted_category'] = categories
+        df['classification_confidence'] = confidences
+        df['is_shadow_work'] = shadow_flags
+
         return df
 
     def train(self, df: pd.DataFrame, label_column: str):

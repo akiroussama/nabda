@@ -136,7 +136,7 @@ def show_overview():
                     text=alt.value(f"{total_issues}")
                 )
                 
-                st.altair_chart(pie + text, use_container_width=True)
+                st.altair_chart(pie + text, width="stretch")
             else:
                 st.info("No data available")
 
@@ -183,7 +183,7 @@ def show_overview():
                     color='priority',
                     tooltip=['priority', 'count']
                 )
-                st.altair_chart(chart, use_container_width=True)
+                st.altair_chart(chart, width="stretch")
 
         with col4:
             st.markdown("### Types de ticket")
@@ -402,7 +402,7 @@ def show_sprint_health():
 
             st.dataframe(
                 df,
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
                 column_config={
                     "Blocked": st.column_config.TextColumn("🚫", width="small"),
@@ -495,7 +495,7 @@ def show_team_workload():
             return f"{colors.get(status, '⚪')} {status}"
 
         df["Status"] = df["Status"].apply(status_color)
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
 
         # Recommendations
         overloaded_devs = [d for d in workload_data if d["Status"].startswith("🔴")]

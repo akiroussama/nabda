@@ -172,33 +172,42 @@ class DeliveryForecaster:
         # Better: Duration = Total Work / Velocity_Distribution
         
         velocities = self._rng.normal(nominal_velocity_mean, nominal_velocity_std, n_simulations)
-        velocities = np.maximum(velocities, 0.1) # Avoid div/0 and negative velocity
-        
+        velocities = np.maximum(velocities, 1.0) # Avoid div/0 and unrealistic low velocity
+
         durations = total_work_load / velocities # in weeks
-        
-        simulated_durations_weeks = durations
+
+        # Cap durations to max 5 years (260 weeks) to avoid datetime overflow
+        MAX_WEEKS = 260
+        simulated_durations_weeks = np.minimum(durations, MAX_WEEKS)
 
         # Calculate Dates
-        simulation_dates = []
         target_ts = target_date.timestamp()
-        hits = 0
-        
+
         # Convert weeks to dates
         # Simulating just the end date
         seconds_per_week = 7 * 24 * 3600
         start_ts = start_date.timestamp()
-        
+
         end_timestamps = start_ts + (simulated_durations_weeks * seconds_per_week)
+
+        # Safely convert to datetime, capping at max representable date
+        max_timestamp = pd.Timestamp.max.timestamp() - 86400  # Leave 1 day buffer
+        end_timestamps = np.minimum(end_timestamps, max_timestamp)
         simulation_dates = pd.to_datetime(end_timestamps, unit='s')
         
         hits = np.sum(end_timestamps <= target_ts)
         prob = hits / n_simulations
         
+        # Safely get percentile dates
+        def safe_to_datetime(ts):
+            ts = min(ts, max_timestamp)
+            return pd.to_datetime(ts, unit='s')
+
         return SimulationResult(
             target_date_prob=prob,
-            p50_date=pd.to_datetime(np.percentile(end_timestamps, 50), unit='s'),
-            p85_date=pd.to_datetime(np.percentile(end_timestamps, 85), unit='s'),
-            p95_date=pd.to_datetime(np.percentile(end_timestamps, 95), unit='s'),
+            p50_date=safe_to_datetime(np.percentile(end_timestamps, 50)),
+            p85_date=safe_to_datetime(np.percentile(end_timestamps, 85)),
+            p95_date=safe_to_datetime(np.percentile(end_timestamps, 95)),
             simulation_dates=simulation_dates,
             risk_factors={
                 "Historical Bias": f"{bias_mean:.1f}x",

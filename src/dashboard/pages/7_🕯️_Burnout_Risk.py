@@ -151,7 +151,7 @@ def main():
     if healthy:
         st.dataframe(
             pd.DataFrame([{'Name': p.user_name, 'Risk Score': p.risk_score} for p in healthy]),
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
 

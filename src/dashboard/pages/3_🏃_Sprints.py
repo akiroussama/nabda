@@ -59,7 +59,7 @@ try:
         st.dataframe(
             df[["Name", "State", "Start", "End", "Issues", "Done", "Completion %", "Points", "Done Points"]],
             hide_index=True,
-            use_container_width=True
+            width="stretch"
         )
 
     # Sprint Details
@@ -112,7 +112,7 @@ try:
 
         df["Status"] = df["Status"].apply(status_color)
 
-        st.dataframe(df, hide_index=True, use_container_width=True)
+        st.dataframe(df, hide_index=True, width="stretch")
 
         # Status breakdown
         col1, col2 = st.columns(2)

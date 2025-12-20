@@ -59,7 +59,7 @@ try:
         with col1:
             st.bar_chart(df.set_index("Status"))
         with col2:
-            st.dataframe(df, hide_index=True, use_container_width=True)
+            st.dataframe(df, hide_index=True, width="stretch")
 
     # Sprint Summary
     st.header("🏃 Sprint Summary")
@@ -83,7 +83,7 @@ try:
         import pandas as pd
         df = pd.DataFrame(sprints, columns=["Sprint", "State", "Start", "End", "Issues", "Done"])
         df["Completion"] = (df["Done"] / df["Issues"] * 100).fillna(0).round(1).astype(str) + "%"
-        st.dataframe(df[["Sprint", "State", "Issues", "Done", "Completion"]], hide_index=True, use_container_width=True)
+        st.dataframe(df[["Sprint", "State", "Issues", "Done", "Completion"]], hide_index=True, width="stretch")
 
     # Recent Activity
     st.header("🕐 Recent Activity")
@@ -99,7 +99,7 @@ try:
         import pandas as pd
         df = pd.DataFrame(recent, columns=["Key", "Summary", "Status", "Updated"])
         df["Summary"] = df["Summary"].str[:50] + "..."
-        st.dataframe(df, hide_index=True, use_container_width=True)
+        st.dataframe(df, hide_index=True, width="stretch")
 
 except Exception as e:
     st.error(f"Error: {e}")

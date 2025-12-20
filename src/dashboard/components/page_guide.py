@@ -777,66 +777,6 @@ PAGE_REGISTRY: Dict[str, PageMetadata] = {
         new_features=["Full weather system", "Predictive forecasting"]
     ),
 
-    "Project_Autopilot": PageMetadata(
-        id="Project_Autopilot",
-        title="Project Autopilot",
-        emoji="🚀",
-        tagline="Hands-off project management",
-        goal="Automated project management with AI-driven decisions and minimal human intervention.",
-        added_value=[
-            "Automated routine decisions",
-            "Consistent management quality",
-            "Scale without adding managers"
-        ],
-        helps_with=[
-            "Managing multiple projects efficiently",
-            "Ensuring consistent processes",
-            "Freeing up time for strategic work",
-            "Reducing management overhead"
-        ],
-        key_features=[
-            "Automated task assignment",
-            "Smart priority adjustments",
-            "Automatic stakeholder updates",
-            "Exception-based management"
-        ],
-        pro_tips=[
-            "Review autopilot decisions daily at first",
-            "Gradually increase autonomy as trust builds"
-        ],
-        version="1.0"
-    ),
-
-    "Next_Domino": PageMetadata(
-        id="Next_Domino",
-        title="Next Domino",
-        emoji="🎯",
-        tagline="Find the one thing that unlocks everything",
-        goal="Identify the single highest-leverage action that will have the biggest cascade effect.",
-        added_value=[
-            "Focus on what truly moves the needle",
-            "See cascade effects before acting",
-            "Maximize impact per hour invested"
-        ],
-        helps_with=[
-            "Prioritizing when everything seems urgent",
-            "Finding leverage points in complex systems",
-            "Explaining priorities to stakeholders",
-            "Making tough trade-off decisions"
-        ],
-        key_features=[
-            "Cascade impact analysis",
-            "Leverage scoring algorithm",
-            "What-if simulation",
-            "Action recommendation engine"
-        ],
-        pro_tips=[
-            "Start each day by finding the domino",
-            "Trust the cascade analysis"
-        ],
-        version="1.0"
-    ),
-
     "CEO_Command_Center": PageMetadata(
         id="CEO_Command_Center",
         title="CEO Command Center",

@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fondations PWA - Guide Architecte BVA</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Outfit:wght@300;500;700&family=Fira+Code:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #ffffff;
+            --bg-gradient: #f8fafc;
+            --text-dark: #0f172a;
+            --text-secondary: #64748b;
+            --accent-blue: #2563eb;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --cnaf-blue: #003B5C;
+            --cnaf-light: #0066A1;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f8fafc 100%);
+            z-index: -2;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--cnaf-blue);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-purple);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 30px) scale(0.9);
+            }
+        }
+
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cnaf-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slide-counter {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cnaf-blue), var(--accent-purple));
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        main {
+            position: relative;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 4rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .slide.prev {
+            transform: translateX(-100px);
+            opacity: 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cnaf-blue), var(--cnaf-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .slide-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, var(--cnaf-blue), var(--accent-purple));
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            margin-right: 1rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px -10px rgba(0, 59, 92, 0.3);
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .content-full {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-single {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .code-block {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            backdrop-filter: blur(10px);
+            margin: 1rem 0;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            box-shadow: 20px 0 0 var(--accent-orange), 40px 0 0 var(--accent-green);
+        }
+
+        .code-block pre {
+            margin-top: 1.5rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .code-filename {
+            position: absolute;
+            top: 12px;
+            left: 80px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .token.keyword {
+            color: #c678dd;
+            font-weight: 600;
+        }
+
+        .token.string {
+            color: #98c379;
+        }
+
+        .token.property {
+            color: #e06c75;
+        }
+
+        .token.number {
+            color: #d19a66;
+        }
+
+        .token.comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .token.function {
+            color: #61afef;
+        }
+
+        .token.punctuation {
+            color: #abb2bf;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            margin: 1rem 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--cnaf-blue);
+            box-shadow: 0 10px 40px rgba(0, 59, 92, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-list li:before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-green);
+            color: white;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(251, 146, 60, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: var(--accent-red);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 2rem;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--cnaf-blue), var(--cnaf-light));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(0, 59, 92, 0.05);
+        }
+
+        .lifecycle-diagram {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .lifecycle-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--cnaf-blue);
+        }
+
+        .lifecycle-arrow {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            margin: 0.5rem 0;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(0, 59, 92, 0.1), rgba(37, 99, 235, 0.1));
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--cnaf-blue);
+        }
+
+        nav {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 200;
+        }
+
+        button {
+            font-family: 'Inter', sans-serif;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cnaf-blue), var(--cnaf-light));
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(0, 59, 92, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px -10px rgba(0, 59, 92, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cnaf-blue);
+            transform: translateY(-2px);
+        }
+
+        kbd {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .comparison-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .vs-badge {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .architecture-box {
+            background: white;
+            border: 2px solid var(--cnaf-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+
+        .flow-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--cnaf-blue);
+            margin: 0.5rem 0;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(0, 59, 92, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--cnaf-blue);
+        }
+
+        strong {
+            color: var(--cnaf-blue);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <header>
+        <div class="logo">BVA • Fondations PWA</div>
+        <div class="progress-container">
+            <span class="slide-counter"><span id="current">1</span> / <span id="total">60</span></span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+    </header>
+
+    <main id="slides-container">
+        <!-- SLIDE 0: Intro -->
+        <div class="slide active">
+            <div class="content-full text-center">
+                <h1 class="hero-title">Fondations PWA<br />Pour Architectes</h1>
+                <p class="hero-subtitle">
+                    Comprendre manifest.webmanifest • ngsw-config.json • Service Worker<br />
+                    Guide ultra-détaillé pour Charles & Alex
+                </p>
+
+                <div class="grid-3 mt-4">
+                    <div class="card">
+                        <span class="card-icon">📱</span>
+                        <div class="card-title">Manifest</div>
+                        <p class="card-text">Structure complète • Icons • Display modes • Métadonnées</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">⚙️</span>
+                        <div class="card-title">Service Worker</div>
+                        <p class="card-text">Lifecycle • Events • Registration • Scope • Architecture</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🗂️</span>
+                        <div class="card-title">ngsw-config.json</div>
+                        <p class="card-text">Asset Groups • Data Groups • Cache Strategies • Configuration</p>
+                    </div>
+                </div>
+
+                <div class="tip mt-4">
+                    <div class="tip-title">🎯 Objectif de cette présentation</div>
+                    <p>Maîtriser en profondeur les fondations techniques d'une PWA. Chaque slide se concentre sur UN
+                        concept, avec code et explications détaillées.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 1: MANIFEST.WEBMANIFEST ==================== -->
+
+        <!-- Slide 1: Intro Manifest -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">manifest.webmanifest</h2>
+                </div>
+
+                <h3 class="mb-3">🎯 Qu'est-ce que le manifest ?</h3>
+
+                <div class="info">
+                    <div class="info-title">📄 Définition</div>
+                    <p>Le fichier <strong>manifest.webmanifest</strong> est un fichier JSON qui décrit votre application
+                        web aux navigateurs et systèmes d'exploitation. Il permet de transformer votre site web en une
+                        application installable.</p>
+                </div>
+
+                <div class="card mt-3">
+                    <h4 class="mb-2">Rôles principaux:</h4>
+                    <ul class="feature-list">
+                        <li><strong>Installation</strong>: Définit comment l'app apparaît quand installée</li>
+                        <li><strong>Branding</strong>: Nom, icônes, couleurs de thème</li>
+                        <li><strong>Comportement</strong>: Mode d'affichage (standalone, fullscreen...)</li>
+                        <li><strong>Métadonnées</strong>: Description, catégories, captures d'écran</li>
+                    </ul>
+                </div>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Standard W3C</div>
+                    <p>Le manifest suit la spécification <strong>W3C Web App Manifest</strong>. Extension
+                        <code>.webmanifest</code> recommandée (pas <code>.json</code>).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Emplacement et référence -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">Emplacement</h2>
+                    </div>
+
+                    <h3 class="mb-2">📁 Où placer le manifest ?</h3>
+
+                    <div class="card">
+                        <p class="mb-2"><strong>Angular 18 PWA</strong>:</p>
+                        <div class="code-block">
+                            <span class="code-filename">structure</span>
+                            <pre>src/
+└── manifest.webmanifest <span class="token comment">← Racine src/</span>
+
+<span class="token comment"># Ou dans public/ (Angular 18+)</span>
+public/
+└── manifest.webmanifest</pre>
+                        </div>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Build Production</div>
+                        <p>Le fichier est copié automatiquement dans <code>dist/</code> lors du build.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔗 Référence dans index.html</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">src/index.html</span>
+                        <pre><span class="token punctuation">&lt;</span><span class="token keyword">head</span><span class="token punctuation">&gt;</span>
+  <span class="token punctuation">&lt;</span><span class="token keyword">link</span>
+    <span class="token property">rel</span>=<span class="token string">"manifest"</span>
+    <span class="token property">href</span>=<span class="token string">"manifest.webmanifest"</span>
+  <span class="token punctuation">&gt;</span>
+<span class="token punctuation">&lt;/</span><span class="token keyword">head</span><span class="token punctuation">&gt;</span></pre>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Content-Type</div>
+                        <p>Le serveur doit servir le manifest avec:<br />
+                            <code>Content-Type: application/manifest+json</code>
+                        </p>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🔍 Vérification</div>
+                        <p>Chrome DevTools → Application → Manifest<br />
+                            Affiche le manifest parsé et détecte les erreurs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Structure globale -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">Structure Globale</h2>
+                </div>
+
+                <h3 class="mb-2">📋 Anatomie complète du manifest</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token comment">// === IDENTIFICATION ===</span>
+  <span class="token property">"name"</span><span class="token punctuation">:</span> <span class="token string">"Bureau Virtuel Agents CNAF"</span><span class="token punctuation">,</span>
+  <span class="token property">"short_name"</span><span class="token punctuation">:</span> <span class="token string">"BVA CNAF"</span><span class="token punctuation">,</span>
+  <span class="token property">"description"</span><span class="token punctuation">:</span> <span class="token string">"Accès centralisé aux applications métier CNAF"</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// === APPARENCE ===</span>
+  <span class="token property">"theme_color"</span><span class="token punctuation">:</span> <span class="token string">"#003B5C"</span><span class="token punctuation">,</span>
+  <span class="token property">"background_color"</span><span class="token punctuation">:</span> <span class="token string">"#FFFFFF"</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// === COMPORTEMENT ===</span>
+  <span class="token property">"display"</span><span class="token punctuation">:</span> <span class="token string">"standalone"</span><span class="token punctuation">,</span>
+  <span class="token property">"orientation"</span><span class="token punctuation">:</span> <span class="token string">"portrait-primary"</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// === NAVIGATION ===</span>
+  <span class="token property">"scope"</span><span class="token punctuation">:</span> <span class="token string">"/"</span><span class="token punctuation">,</span>
+  <span class="token property">"start_url"</span><span class="token punctuation">:</span> <span class="token string">"/"</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// === ASSETS ===</span>
+  <span class="token property">"icons"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>...<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"screenshots"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>...<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">📊 5 catégories principales</div>
+                    <p>Le manifest organise les métadonnées en 5 groupes logiques. Nous allons détailler chaque
+                        propriété dans les slides suivantes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: name et short_name -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">name & short_name</h2>
+                    </div>
+
+                    <h3 class="mb-2">📝 Identification de l'application</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">manifest.webmanifest</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"name"</span><span class="token punctuation">:</span> <span class="token string">"Bureau Virtuel Agents CNAF"</span><span class="token punctuation">,</span>
+  <span class="token property">"short_name"</span><span class="token punctuation">:</span> <span class="token string">"BVA CNAF"</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Limite</th>
+                            <th>Usage</th>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>~45 caractères</td>
+                            <td>Splash screen, store</td>
+                        </tr>
+                        <tr>
+                            <td><code>short_name</code></td>
+                            <td>~12 caractères</td>
+                            <td>Icône bureau, home screen</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🎯 Où sont-ils affichés ?</h3>
+
+                    <div class="card">
+                        <div class="card-title">name (nom complet)</div>
+                        <ul class="feature-list">
+                            <li>Splash screen au démarrage</li>
+                            <li>Prompt d'installation</li>
+                            <li>App stores (si publish)</li>
+                        </ul>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">short_name (nom court)</div>
+                        <ul class="feature-list">
+                            <li>Sous l'icône bureau Windows</li>
+                            <li>Home screen mobile</li>
+                            <li>Barre des tâches</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Best Practice BVA</div>
+                        <p><strong>short_name</strong>: "BVA CNAF" (8 car)<br />
+                            <strong>name</strong>: "Bureau Virtuel Agents CNAF" (32 car)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: description -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">description</h2>
+                </div>
+
+                <h3 class="mb-2">📄 Description de l'application</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"description"</span><span class="token punctuation">:</span> <span class="token string">"Accès centralisé aux applications métier CNAF"</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">🎯 Rôle</div>
+                    <p>La <strong>description</strong> explique l'objectif de l'application. Utilisée dans:</p>
+                    <ul class="feature-list mt-2">
+                        <li>Moteurs de recherche (SEO)</li>
+                        <li>App stores (si publication)</li>
+                        <li>Certains OS lors de l'installation</li>
+                        <li>Accessibility (lecteurs d'écran)</li>
+                    </ul>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 Guidelines</div>
+                    <ul class="feature-list">
+                        <li><strong>Longueur</strong>: 80-150 caractères idéal</li>
+                        <li><strong>Ton</strong>: Professionnel et concis</li>
+                        <li><strong>Contenu</strong>: Objectif principal de l'app</li>
+                        <li><strong>SEO</strong>: Inclure mots-clés pertinents</li>
+                    </ul>
+                </div>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Optionnel mais recommandé</div>
+                    <p>Bien que <code>description</code> soit optionnelle, elle améliore significativement le SEO et
+                        l'accessibilité de votre PWA.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: theme_color -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">theme_color</h2>
+                    </div>
+
+                    <h3 class="mb-2">🎨 Couleur du thème</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">manifest.webmanifest</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"theme_color"</span><span class="token punctuation">:</span> <span class="token string">"#003B5C"</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <div class="info mt-2">
+                        <div class="info-title">🎯 Rôle</div>
+                        <p>Définit la couleur principale de l'interface système autour de votre PWA.</p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">Impact visuel:</div>
+                        <ul class="feature-list">
+                            <li>Barre d'adresse mobile (Android)</li>
+                            <li>Barre de titre desktop (Windows)</li>
+                            <li>Task switcher (récents)</li>
+                            <li>Splash screen Android</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔄 Synchronisation avec HTML</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">src/index.html</span>
+                        <pre><span class="token punctuation">&lt;</span><span class="token keyword">head</span><span class="token punctuation">&gt;</span>
+  <span class="token punctuation">&lt;</span><span class="token keyword">meta</span>
+    <span class="token property">name</span>=<span class="token string">"theme-color"</span>
+    <span class="token property">content</span>=<span class="token string">"#003B5C"</span>
+  <span class="token punctuation">&gt;</span>
+<span class="token punctuation">&lt;/</span><span class="token keyword">head</span><span class="token punctuation">&gt;</span></pre>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Cohérence obligatoire</div>
+                        <p>La couleur dans le <code>manifest.webmanifest</code> DOIT correspondre à la
+                            <code>&lt;meta name="theme-color"&gt;</code> dans le HTML.
+                        </p>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Best Practice BVA</div>
+                        <p>Utiliser la couleur principale CNAF: <span class="highlight">#003B5C</span><br />
+                            (Bleu marine CNAF dark)</p>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">📊 Format</div>
+                        <p>Hex 6 digits: <code>#RRGGBB</code><br />
+                            Pas de rgb(), rgba(), hsl()</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: background_color -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">background_color</h2>
+                </div>
+
+                <h3 class="mb-2">🎨 Couleur de fond (splash screen)</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"background_color"</span><span class="token punctuation">:</span> <span class="token string">"#FFFFFF"</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">🎯 Rôle unique</div>
+                    <p><strong>background_color</strong> est utilisée UNIQUEMENT pour le <strong>splash screen</strong>
+                        (écran de démarrage) lors du lancement de l'app.</p>
+                </div>
+
+                <div class="comparison mt-3" style="position: relative;">
+                    <div class="comparison-item">
+                        <div class="comparison-title">❌ Faux</div>
+                        <p>"C'est la couleur de fond de l'app"</p>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">✅ Vrai</div>
+                        <p>"C'est la couleur du splash screen pendant le chargement initial"</p>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-title">Splash Screen composition:</div>
+                    <ol style="padding-left: 2rem; margin-top: 1rem;">
+                        <li><strong>background_color</strong> → Fond de l'écran</li>
+                        <li><strong>icon</strong> (512x512) → Centré</li>
+                        <li><strong>name</strong> → Sous l'icône</li>
+                    </ol>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 Recommandation</div>
+                    <p>Utiliser la même couleur que <code>body { background-color }</code> dans votre CSS pour une
+                        transition fluide splash → app.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: display modes -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">display (modes d'affichage)</h2>
+                </div>
+
+                <h3 class="mb-2">🖥️ Comment l'app s'affiche-t-elle ?</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"display"</span><span class="token punctuation">:</span> <span class="token string">"standalone"</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <table class="mt-3">
+                    <tr>
+                        <th>Mode</th>
+                        <th>Description</th>
+                        <th>UI Navigateur</th>
+                    </tr>
+                    <tr>
+                        <td><code>fullscreen</code></td>
+                        <td>Plein écran complet</td>
+                        <td>❌ Aucune</td>
+                    </tr>
+                    <tr>
+                        <td><code>standalone</code> ⭐</td>
+                        <td>App native-like</td>
+                        <td>❌ Masquée</td>
+                    </tr>
+                    <tr>
+                        <td><code>minimal-ui</code></td>
+                        <td>Contrôles minimaux</td>
+                        <td>⚠️ Boutons back/forward</td>
+                    </tr>
+                    <tr>
+                        <td><code>browser</code></td>
+                        <td>Onglet normal</td>
+                        <td>✅ Complète</td>
+                    </tr>
+                </table>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 Recommandation BVA</div>
+                    <p><code>"display": "standalone"</code><br />
+                        Offre l'expérience native sans UI navigateur, tout en gardant les contrôles système (fermer,
+                        minimiser).</p>
+                </div>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Fallback chain</div>
+                    <p>Si <code>standalone</code> n'est pas supporté, le navigateur essaie automatiquement
+                        <code>minimal-ui</code> puis <code>browser</code>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continuing with more slides... Due to length, I'll create the key remaining slides -->
+
+        <!-- Slide 9: Icons structure -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">icons (structure)</h2>
+                    </div>
+
+                    <h3 class="mb-2">🖼️ Array d'icônes</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">manifest.webmanifest</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"icons"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"src"</span><span class="token punctuation">:</span> <span class="token string">"icons/icon-72x72.png"</span><span class="token punctuation">,</span>
+      <span class="token property">"sizes"</span><span class="token punctuation">:</span> <span class="token string">"72x72"</span><span class="token punctuation">,</span>
+      <span class="token property">"type"</span><span class="token punctuation">:</span> <span class="token string">"image/png"</span><span class="token punctuation">,</span>
+      <span class="token property">"purpose"</span><span class="token punctuation">:</span> <span class="token string">"any"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">📊 Structure</div>
+                        <p>Chaque objet icon contient 4 propriétés:</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔧 Propriétés icon</h3>
+
+                    <table>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Valeur</th>
+                            <th>Obligatoire</th>
+                        </tr>
+                        <tr>
+                            <td><code>src</code></td>
+                            <td>Chemin relatif</td>
+                            <td>✅ Oui</td>
+                        </tr>
+                        <tr>
+                            <td><code>sizes</code></td>
+                            <td>"WxH" ou "any"</td>
+                            <td>✅ Oui</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>MIME type</td>
+                            <td>⚠️ Recommandé</td>
+                        </tr>
+                        <tr>
+                            <td><code>purpose</code></td>
+                            <td>any|maskable|monochrome</td>
+                            <td>⚠️ Recommandé</td>
+                        </tr>
+                    </table>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Best Practice</div>
+                        <p>Toujours fournir <strong>multiple tailles</strong> pour s'adapter à tous les contextes
+                            (bureau, mobile, splash).</p>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Chemin relatif</div>
+                        <p><code>src</code> est relatif au <strong>manifest</strong>, pas au HTML!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 10: Icons sizes -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">Icons: Sizes Recommandées</h2>
+                </div>
+
+                <h3 class="mb-2">🖼️ Tailles d'icônes PWA</h3>
+
+                <table>
+                    <tr>
+                        <th>Taille</th>
+                        <th>Usage</th>
+                        <th>Priorité</th>
+                    </tr>
+                    <tr>
+                        <td><strong>72x72</strong></td>
+                        <td>Petites icônes Android</td>
+                        <td>⚠️ Optionnel</td>
+                    </tr>
+                    <tr>
+                        <td><strong>96x96</strong></td>
+                        <td>Icônes moyennes Android</td>
+                        <td>⚠️ Optionnel</td>
+                    </tr>
+                    <tr>
+                        <td><strong>128x128</strong></td>
+                        <td>Home screen Android</td>
+                        <td>✅ Recommandé</td>
+                    </tr>
+                    <tr>
+                        <td><strong>192x192</strong></td>
+                        <td>Chrome for Android</td>
+                        <td>✅ Obligatoire</td>
+                    </tr>
+                    <tr>
+                        <td><strong>512x512</strong></td>
+                        <td>Splash screen Android</td>
+                        <td>✅ Obligatoire</td>
+                    </tr>
+                </table>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Minimum PWA</div>
+                    <p>Pour qu'une PWA soit installable, vous DEVEZ avoir AU MINIMUM:<br />
+                        - 1 icône <strong>192x192</strong><br />
+                        - 1 icône <strong>512x512</strong></p>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 BVA CNAF</div>
+                    <p>Nous fournissons 7 tailles (72, 96, 128, 144, 192, 384, 512) pour couvrir tous les cas d'usage
+                        desktop + tablet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Icons purpose -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">Icons: purpose</h2>
+                    </div>
+
+                    <h3 class="mb-2">🎯 Propriété purpose</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">manifest.webmanifest</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"purpose"</span><span class="token punctuation">:</span> <span class="token string">"any"</span>        <span class="token comment">← Défaut</span>
+  <span class="token property">"purpose"</span><span class="token punctuation">:</span> <span class="token string">"maskable"</span>  <span class="token comment">← Android</span>
+  <span class="token property">"purpose"</span><span class="token punctuation">:</span> <span class="token string">"monochrome"</span> <span class="token comment">← Thème dark</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <table class="mt-3">
+                        <tr>
+                            <th>Valeur</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>any</code></td>
+                            <td>Icône standard, tous contextes</td>
+                        </tr>
+                        <tr>
+                            <td><code>maskable</code></td>
+                            <td>Icône avec safe zone pour Android</td>
+                        </tr>
+                        <tr>
+                            <td><code>monochrome</code></td>
+                            <td>Version monochrome (dark mode)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🎨 Maskable Icons</h3>
+
+                    <div class="info">
+                        <div class="info-title">📱 Android Adaptive Icons</div>
+                        <p>Sur Android 8+, les icônes peuvent être affichées dans différentes formes (cercle, carré,
+                            squircle). Les icônes <strong>maskable</strong> garantissent que votre design s'adapte.</p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">Safe zone maskable:</div>
+                        <ul class="feature-list">
+                            <li>Icône 512x512 totale</li>
+                            <li>Zone safe: cercle 409x409 centré (80%)</li>
+                            <li>Logo/texte DOIT être dans la safe zone</li>
+                            <li>Background peut déborder</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block mt-3">
+                        <span class="code-filename">Example</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"src"</span><span class="token punctuation">:</span> <span class="token string">"icon-512.png"</span><span class="token punctuation">,</span>
+  <span class="token property">"sizes"</span><span class="token punctuation">:</span> <span class="token string">"512x512"</span><span class="token punctuation">,</span>
+  <span class="token property">"purpose"</span><span class="token punctuation">:</span> <span class="token string">"any maskable"</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Multiple purposes</div>
+                        <p>Vous pouvez combiner: <code>"any maskable"</code> pour une icône utilisable dans tous les
+                            contextes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: orientation -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">orientation</h2>
+                </div>
+
+                <h3 class="mb-2">📱 Orientation de l'écran</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"orientation"</span><span class="token punctuation">:</span> <span class="token string">"portrait-primary"</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <table class="mt-3">
+                    <tr>
+                        <th>Valeur</th>
+                        <th>Description</th>
+                        <th>Usage</th>
+                    </tr>
+                    <tr>
+                        <td><code>any</code></td>
+                        <td>Toutes orientations</td>
+                        <td>Par défaut</td>
+                    </tr>
+                    <tr>
+                        <td><code>portrait</code></td>
+                        <td>Portrait (normal + inversé)</td>
+                        <td>Mobile apps</td>
+                    </tr>
+                    <tr>
+                        <td><code>portrait-primary</code> ⭐</td>
+                        <td>Portrait normal uniquement</td>
+                        <td>Formulaires, lecture</td>
+                    </tr>
+                    <tr>
+                        <td><code>landscape</code></td>
+                        <td>Paysage (normal + inversé)</td>
+                        <td>Jeux, vidéos</td>
+                    </tr>
+                    <tr>
+                        <td><code>landscape-primary</code></td>
+                        <td>Paysage normal uniquement</td>
+                        <td>Applications desktop-like</td>
+                    </tr>
+                </table>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 BVA CNAF</div>
+                    <p><code>"orientation": "portrait-primary"</code><br />
+                        Les agents utilisent principalement en portrait (bureau desktop + tablettes).</p>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">🖥️ Desktop</div>
+                    <p>Sur desktop, <code>orientation</code> n'a aucun effet. L'orientation n'impacte que les devices
+                        mobiles/tablettes avec accéléromètre.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: scope -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">MANIFEST</span>
+                        <h2 class="slide-title">scope</h2>
+                    </div>
+
+                    <h3 class="mb-2">🎯 Portée de l'application</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">manifest.webmanifest</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"scope"</span><span class="token punctuation">:</span> <span class="token string">"/"</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">📄 Définition</div>
+                        <p><strong>scope</strong> définit l'ensemble des URLs qui font partie de votre PWA. Si
+                            l'utilisateur navigue HORS du scope, l'app s'ouvre dans le navigateur normal.</p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">Exemples:</div>
+                        <div class="code-block">
+                            <pre><span class="token comment">// Toute l'app</span>
+<span class="token property">"scope"</span><span class="token punctuation">:</span> <span class="token string">"/"</span>
+
+<span class="token comment">// Seulement /app/*</span>
+<span class="token property">"scope"</span><span class="token punctuation">:</span> <span class="token string">"/app/"</span>
+
+<span class="token comment">// Sous-domaine</span>
+<span class="token property">"scope"</span><span class="token punctuation">:</span> <span class="token string">"https://app.cnaf.fr/"</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔍 Comportement</h3>
+
+                    <div class="architecture-box">https://bva.cnaf.fr/</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="architecture-box" style="border-color: var(--accent-green);">
+                        scope: "/" ✅<br />
+                        <small>Reste dans l'app</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="architecture-box">https://bva.cnaf.fr/dashboard</div>
+
+                    <div style="height: 2rem;"></div>
+
+                    <div class="architecture-box">https://www.cnaf.fr/</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="architecture-box" style="border-color: var(--accent-red);">
+                        HORS scope ❌<br />
+                        <small>Ouvre navigateur</small>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Contrainte</div>
+                        <p><code>scope</code> doit être un parent ou égal à l'emplacement du manifest. Vous ne pouvez
+                            pas avoir un scope plus large que l'emplacement du manifest.</p>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Best Practice</div>
+                        <p>Utilisez <code>"scope": "/"</code> pour permettre toute navigation dans votre domaine sans
+                            quitter l'app.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: start_url -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">MANIFEST</span>
+                    <h2 class="slide-title">start_url</h2>
+                </div>
+
+                <h3 class="mb-2">🚀 URL de démarrage</h3>
+
+                <div class="code-block">
+                    <span class="code-filename">manifest.webmanifest</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"start_url"</span><span class="token punctuation">:</span> <span class="token string">"/"</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">📄 Définition</div>
+                    <p><strong>start_url</strong> est l'URL qui s'ouvre quand l'utilisateur lance votre PWA depuis
+                        l'icône installée (bureau, home screen).</p>
+                </div>
+
+                <div class="comparison mt-3" style="position: relative;">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Sans start_url</div>
+                        <p>Ouvre la DERNIÈRE page visitée avant fermeture de l'app</p>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Avec start_url</div>
+                        <p>Ouvre TOUJOURS cette URL spécifique (ex: dashboard)</p>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-title">Exemples d'usage:</div>
+                    <div class="code-block">
+                        <pre><span class="token comment">// Page d'accueil</span>
+<span class="token property">"start_url"</span><span class="token punctuation">:</span> <span class="token string">"/"</span>
+
+<span class="token comment">// Dashboard direct</span>
+<span class="token property">"start_url"</span><span class="token punctuation">:</span> <span class="token string">"/dashboard"</span>
+
+<span class="token comment">// Tracking analytics</span>
+<span class="token property">"start_url"</span><span class="token punctuation">:</span> <span class="token string">"/?utm_source=pwa"</span></pre>
+                    </div>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 BVA CNAF</div>
+                    <p><code>"start_url": "/"</code><br />
+                        Ouvre toujours la page d'accueil avec sélection d'applications.</p>
+                </div>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Scope requis</div>
+                    <p><code>start_url</code> DOIT être dans le <code>scope</code> défini. Sinon, l'installation
+                        échouera.</p>
+                </div>
+            </div>
+        </div>
+        <!-- ==================== SECTION 2: SERVICE WORKER ==================== -->
+
+        <!-- Slide 20: Service Worker Intro -->
+        <div class="slide">
+            <div class="content-full text-center">
+                <h1 class="hero-title" style="font-size: 4rem;">Service Worker</h1>
+                <p class="hero-subtitle">
+                    Le cœur technique d'une PWA<br />
+                    Proxy JavaScript entre app et réseau
+                </p>
+
+                <div class="grid-3 mt-4">
+                    <div class="card">
+                        <span class="card-icon">🔄</span>
+                        <div class="card-title">Lifecycle</div>
+                        <p class="card-text">Install → Activate → Fetch</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📦</span>
+                        <div class="card-title">Cache API</div>
+                        <p class="card-text">Stockage assets hors-ligne</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">⚡</span>
+                        <div class="card-title">Background</div>
+                        <p class="card-text">Tourne sans l'app ouverte</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Qu'est-ce qu'un Service Worker -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">SERVICE WORKER</span>
+                    <h2 class="slide-title">Qu'est-ce qu'un Service Worker ?</h2>
+                </div>
+
+                <div class="info mb-3">
+                    <div class="info-title">📄 Définition</div>
+                    <p>Un <strong>Service Worker</strong> est un script JavaScript qui s'exécute en arrière-plan, séparé
+                        de la page web. Il agit comme un <strong>proxy</strong> entre votre application et le réseau.
+                    </p>
+                </div>
+
+                <div class="architecture-box">Browser (UI Thread)</div>
+                <div class="flow-arrow">↕️</div>
+                <div class="architecture-box" style="border-color: var(--accent-green);">Service Worker (Worker Thread)
+                </div>
+                <div class="flow-arrow">↕️</div>
+                <div class="architecture-box">Network / Cache</div>
+
+                <div class="card mt-4">
+                    <div class="card-title">🎯 Caractéristiques clés:</div>
+                    <ul class="feature-list">
+                        <li><strong>Thread séparé</strong>: Ne bloque jamais l'UI</li>
+                        <li><strong>Event-driven</strong>: Réagit aux events (fetch, install...)</li>
+                        <li><strong>HTTPS requis</strong>: Sécurité obligatoire (sauf localhost)</li>
+                        <li><strong>Scope limité</strong>: Contrôle un chemin spécifique</li>
+                        <li><strong>Terminable</strong>: Peut être arrêté et redémarré par le navigateur</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 3: NGSW-CONFIG.JSON ==================== -->
+
+        <!-- Slide 35: ngsw-config Intro -->
+        <div class="slide">
+            <div class="content-full text-center">
+                <h1 class="hero-title" style="font-size: 4rem;">ngsw-config.json</h1>
+                <p class="hero-subtitle">
+                    Configuration du Service Worker Angular<br />
+                    @angular/service-worker
+                </p>
+
+                <div class="grid-2 mt-4">
+                    <div class="card">
+                        <span class="card-icon">📁</span>
+                        <div class="card-title">Asset Groups</div>
+                        <p class="card-text">Fichiers statiques de l'app (JS, CSS, HTML, images)</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🌐</span>
+                        <div class="card-title">Data Groups</div>
+                        <p class="card-text">Données dynamiques (API calls, REST endpoints)</p>
+                    </div>
+                </div>
+
+                <div class="tip mt-4">
+                    <div class="tip-title">🎯 Rôle</div>
+                    <p>Angular génère automatiquement le Service Worker (ngsw-worker.js) basé sur cette configuration.
+                        Vous ne codez JAMAIS le SW manuellement!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 36: assetGroups structure -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">NGSW-CONFIG</span>
+                        <h2 class="slide-title">assetGroups</h2>
+                    </div>
+
+                    <h3 class="mb-2">📁 Assets statiques</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">ngsw-config.json</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"assetGroups"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token punctuation">:</span> <span class="token string">"app-shell"</span><span class="token punctuation">,</span>
+      <span class="token property">"installMode"</span><span class="token punctuation">:</span> <span class="token string">"prefetch"</span><span class="token punctuation">,</span>
+      <span class="token property">"updateMode"</span><span class="token punctuation">:</span> <span class="token string">"prefetch"</span><span class="token punctuation">,</span>
+      <span class="token property">"resources"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"files"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token string">"/favicon.ico"</span><span class="token punctuation">,</span>
+          <span class="token string">"/index.html"</span><span class="token punctuation">,</span>
+          <span class="token string">"/*.css"</span><span class="token punctuation">,</span>
+          <span class="token string">"/*.js"</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔧 Propriétés</h3>
+
+                    <table>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Valeur</th>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Identifiant unique du groupe</td>
+                        </tr>
+                        <tr>
+                            <td><code>installMode</code></td>
+                            <td>prefetch | lazy</td>
+                        </tr>
+                        <tr>
+                            <td><code>updateMode</code></td>
+                            <td>prefetch | lazy</td>
+                        </tr>
+                        <tr>
+                            <td><code>resources</code></td>
+                            <td>Patterns de fichiers</td>
+                        </tr>
+                    </table>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Usage</div>
+                        <p>Utilisez <strong>assetGroups</strong> pour tous les fichiers qui font partie de votre app
+                            compilée (JS, CSS, HTML, fonts, images statiques).</p>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Pattern matching</div>
+                        <p>Supporte les wildcards:<br />
+                            <code>*.js</code> = tous les JS<br />
+                            <code>/assets/**</code> = tout dans assets/
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 40: dataGroups structure -->
+        <div class="slide">
+            <div class="content-grid">
+                <div>
+                    <div class="slide-header">
+                        <span class="section-badge">NGSW-CONFIG</span>
+                        <h2 class="slide-title">dataGroups</h2>
+                    </div>
+
+                    <h3 class="mb-2">🌐 Données dynamiques</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">ngsw-config.json</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"dataGroups"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token punctuation">:</span> <span class="token string">"api-freshness"</span><span class="token punctuation">,</span>
+      <span class="token property">"urls"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"/api/**"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"cacheConfig"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"strategy"</span><span class="token punctuation">:</span> <span class="token string">"freshness"</span><span class="token punctuation">,</span>
+        <span class="token property">"maxSize"</span><span class="token punctuation">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
+        <span class="token property">"maxAge"</span><span class="token punctuation">:</span> <span class="token string">"1h"</span><span class="token punctuation">,</span>
+        <span class="token property">"timeout"</span><span class="token punctuation">:</span> <span class="token string">"5s"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="mb-2">🔧 Propriétés</h3>
+
+                    <table>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Identifiant du groupe</td>
+                        </tr>
+                        <tr>
+                            <td><code>urls</code></td>
+                            <td>Patterns d'URLs API</td>
+                        </tr>
+                        <tr>
+                            <td><code>strategy</code></td>
+                            <td>freshness | performance</td>
+                        </tr>
+                        <tr>
+                            <td><code>maxSize</code></td>
+                            <td>Nb max d'entrées</td>
+                        </tr>
+                        <tr>
+                            <td><code>maxAge</code></td>
+                            <td>Durée cache (1h, 1d, 1w)</td>
+                        </tr>
+                        <tr>
+                            <td><code>timeout</code></td>
+                            <td>Timeout réseau (freshness)</td>
+                        </tr>
+                    </table>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Usage</div>
+                        <p>Utilisez <strong>dataGroups</strong> pour toutes les requêtes API HTTP (GET uniquement!).</p>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ GET seulement</div>
+                        <p>Les dataGroups ne cachent QUE les requêtes GET. POST/PUT/DELETE ne sont jamais cachés.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 45: Strategy freshness -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">NGSW-CONFIG</span>
+                    <h2 class="slide-title">Strategy: freshness</h2>
+                </div>
+
+                <h3 class="mb-2">🌐 Network First (données fraîches)</h3>
+
+                <div class="lifecycle-diagram">
+                    <div class="lifecycle-step">
+                        <strong>1.</strong> Requête API interceptée
+                    </div>
+                    <div class="lifecycle-arrow">↓</div>
+                    <div class="lifecycle-step" style="border-color: var(--accent-green);">
+                        <strong>2.</strong> Essai RÉSEAU en premier (timeout: 5s)
+                    </div>
+                    <div class="lifecycle-arrow">↓</div>
+                    <div class="lifecycle-step">
+                        <strong>3a.</strong> ✅ Réseau OK → Retourne réponse + MAJ cache
+                    </div>
+                    <div class="lifecycle-arrow">↓</div>
+                    <div class="lifecycle-step">
+                        <strong>3b.</strong> ❌ Réseau KO ou timeout → Retourne cache (si existe)
+                    </div>
+                </div>
+
+                <div class="code-block mt-3">
+                    <span class="code-filename">ngsw-config.json</span>
+                    <pre><span class="token punctuation">{</span>
+  <span class="token property">"strategy"</span><span class="token punctuation">:</span> <span class="token string">"freshness"</span><span class="token punctuation">,</span>
+  <span class="token property">"timeout"</span><span class="token punctuation">:</span> <span class="token string">"5s"</span>  <span class="token comment">← Important!</span>
+<span class="token punctuation">}</span></pre>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">💡 Quand utiliser ?</div>
+                    <p>Données qui changent souvent et doivent être à jour (ex: profil utilisateur, notifications, état
+                        en temps réel).</p>
+                </div>
+
+                <div class="warning mt-3">
+                    <div class="warning-title">⚠️ Timeout critique</div>
+                    <p>Si <code>timeout</code> trop court (ex: 1s), l'utilisateur aura souvent du cache périmé. Si trop
+                        long (ex: 30s), mauvaise UX en mode dégradé.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 46: Strategy performance -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">NGSW-CONFIG</span>
+                    <h2 class="slide-title">Strategy: performance</h2>
+                </div>
+
+                <h3 class="mb-2">⚡ Cache First (vitesse maximale)</h3>
+
+                <div class="lifecycle-diagram">
+                    <div class="lifecycle-step">
+                        <strong>1.</strong> Requête API interceptée
+                    </div>
+                    <div class="lifecycle-arrow">↓</div>
+                    <div class="lifecycle-step" style="border-color: var(--accent-blue);">
+                        <strong>2.</strong> Check CACHE en premier
+                    </div>
+                    <div class="lifecycle-arrow">↓</div>
+                    <div class="lifecycle-step">
+                        <strong>3a.</strong> ✅ Cache valide (< maxAge) → Retourne immédiatement </div>
+                            <div class="lifecycle-arrow">↓</div>
+                            <div class="lifecycle-step">
+                                <strong>3b.</strong> ❌ Pas de cache ou expiré → Va au réseau + MAJ cache
+                            </div>
+                    </div>
+
+                    <div class="code-block mt-3">
+                        <span class="code-filename">ngsw-config.json</span>
+                        <pre><span class="token punctuation">{</span>
+  <span class="token property">"strategy"</span><span class="token punctuation">:</span> <span class="token string">"performance"</span><span class="token punctuation">,</span>
+  <span class="token property">"maxAge"</span><span class="token punctuation">:</span> <span class="token string">"1d"</span>  <span class="token comment">← Durée validité</span>
+<span class="token punctuation">}</span></pre>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Quand utiliser ?</div>
+                        <p>Données stables qui changent rarement (ex: référentiels, configurations, assets lourds).</p>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Performance boost</div>
+                        <p>Réponse quasi-instantanée (< 10ms) car lecture depuis cache local. Idéal pour UX
+                                ultra-rapide.</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Slide 22: Service Worker Registration -->
+            <div class="slide">
+                <div class="content-single">
+                    <div class="slide-header">
+                        <span class="section-badge">SERVICE WORKER</span>
+                        <h2 class="slide-title">Registration</h2>
+                    </div>
+
+                    <h3 class="mb-2">📝 Enregistrement du Service Worker</h3>
+
+                    <div class="code-block">
+                        <span class="code-filename">src/app/app.config.ts</span>
+                        <pre><span class="token keyword">import</span> <span class="token punctuation">{</span> provideServiceWorker <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@angular/service-worker'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> appConfig<span class="token punctuation">:</span> ApplicationConfig <span class="token punctuation">=</span> <span class="token punctuation">{</span>
+  <span class="token property">providers</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token function">provideServiceWorker</span><span class="token punctuation">(</span><span class="token string">'ngsw-worker.js'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+      <span class="token property">enabled</span><span class="token punctuation">:</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+      <span class="token property">registrationStrategy</span><span class="token punctuation">:</span> <span class="token string">'registerWhenStable:30000'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></pre>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Quand s'enregistre-t-il ?</div>
+                        <p><code>registerWhenStable:30000</code> signifie:</p>
+                        <ul class="feature-list mt-2">
+                            <li>Attendre que l'app soit <strong>stable</strong> (plus d'events Angular)</li>
+                            <li>OU attendre max <strong>30 secondes</strong></li>
+                            <li>Puis enregistrer le Service Worker</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Pourquoi attendre ?</div>
+                        <p>Le Service Worker download + install peut prendre des ressources réseau/CPU. On attend que
+                            l'app soit chargée pour ne pas ralentir le First Load.</p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">Autres stratégies:</div>
+                        <div class="code-block">
+                            <pre><span class="token comment">// Immédiat (déconseillé)</span>
+<span class="token string">'registerImmediately'</span>
+
+<span class="token comment">// Après 5s (bon compromis)</span>
+<span class="token string">'registerWithDelay:5000'</span>
+
+<span class="token comment">// Quand stable (recommandé)</span>
+<span class="token string">'registerWhenStable:30000'</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 23: SW Lifecycle Install -->
+            <div class="slide">
+                <div class="content-grid">
+                    <div>
+                        <div class="slide-header">
+                            <span class="section-badge">SERVICE WORKER</span>
+                            <h2 class="slide-title">Event: install</h2>
+                        </div>
+
+                        <h3 class="mb-2">📦 Phase d'installation</h3>
+
+                        <div class="lifecycle-diagram">
+                            <div class="lifecycle-step">
+                                <strong>1.</strong> Service Worker téléchargé
+                            </div>
+                            <div class="lifecycle-arrow">↓</div>
+                            <div class="lifecycle-step" style="border-color: var(--accent-green);">
+                                <strong>2.</strong> Event <code>install</code> déclenché
+                            </div>
+                            <div class="lifecycle-arrow">↓</div>
+                            <div class="lifecycle-step">
+                                <strong>3.</strong> Cache des assets (prefetch)
+                            </div>
+                            <div class="lifecycle-arrow">↓</div>
+                            <div class="lifecycle-step">
+                                <strong>4.</strong> Installation terminée
+                            </div>
+                        </div>
+
+                        <div class="info mt-3">
+                            <div class="info-title">🎯 Rôle</div>
+                            <p>L'event <code>install</code> est appelé UNE SEULE FOIS lors de la première installation
+                                du SW. C'est le moment de télécharger et cacher tous les assets critiques.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-2">🔧 Angular Service Worker</h3>
+
+                        <div class="card">
+                            <p class="mb-2">Avec Angular, vous ne codez JAMAIS l'event <code>install</code>
+                                manuellement!</p>
+                            <p>Angular génère automatiquement le code basé sur <code>ngsw-config.json</code>:</p>
+                        </div>
+
+                        <div class="code-block mt-3">
+                            <span class="code-filename">ngsw-config.json → ngsw-worker.js</span>
+                            <pre><span class="token comment">// assetGroups avec installMode: "prefetch"</span>
+<span class="token comment">// sont téléchargés pendant install</span>
+
+<span class="token punctuation">{</span>
+  <span class="token property">"installMode"</span><span class="token punctuation">:</span> <span class="token string">"prefetch"</span> <span class="token comment">← Install phase</span>
+<span class="token punctuation">}</span></pre>
+                        </div>
+
+                        <div class="warning mt-3">
+                            <div class="warning-title">⚠️ Échec d'installation</div>
+                            <p>Si UN SEUL fichier prefetch échoue à télécharger pendant install, TOUTE l'installation du
+                                SW échoue. Le SW ne s'active pas.</p>
+                        </div>
+
+                        <div class="tip mt-3">
+                            <div class="tip-title">💡 Best Practice</div>
+                            <p>Utilisez <code>prefetch</code> seulement pour les fichiers CRITIQUES (JS, CSS, HTML).
+                                Assets lourds (images, fonts) en <code>lazy</code>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 24: SW Lifecycle Activate -->
+            <div class="slide">
+                <div class="content-single">
+                    <div class="slide-header">
+                        <span class="section-badge">SERVICE WORKER</span>
+                        <h2 class="slide-title">Event: activate</h2>
+                    </div>
+
+                    <h3 class="mb-2">✅ Phase d'activation</h3>
+
+                    <div class="lifecycle-diagram">
+                        <div class="lifecycle-step">
+                            <strong>1.</strong> Installation terminée
+                        </div>
+                        <div class="lifecycle-arrow">↓</div>
+                        <div class="lifecycle-step">
+                            <strong>2.</strong> Aucun autre SW actif OU page fermée
+                        </div>
+                        <div class="lifecycle-arrow">↓</div>
+                        <div class="lifecycle-step" style="border-color: var(--accent-blue);">
+                            <strong>3.</strong> Event <code>activate</code> déclenché
+                        </div>
+                        <div class="lifecycle-arrow">↓</div>
+                        <div class="lifecycle-step">
+                            <strong>4.</strong> Nettoyage vieux caches
+                        </div>
+                        <div class="lifecycle-arrow">↓</div>
+                        <div class="lifecycle-step" style="border-color: var(--accent-green);">
+                            <strong>5.</strong> SW prend le contrôle des pages
+                        </div>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Rôle</div>
+                        <p>L'event <code>activate</code> marque le moment où le nouveau Service Worker prend le
+                            contrôle. C'est le moment de nettoyer les anciens caches.</p>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Activation différée</div>
+                        <p>Si un ancien SW est actif et que des pages sont ouvertes, le nouveau SW attend que TOUTES les
+                            pages soient fermées avant de s'activer. Sauf si on utilise <code>skipWaiting()</code>.</p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">Angular gère automatiquement:</div>
+                        <ul class="feature-list">
+                            <li>Suppression des anciens caches (versions précédentes)</li>
+                            <li>Migration des données si nécessaire</li>
+                            <li>Activation immédiate avec SwUpdate API</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 25: SW Event Fetch -->
+            <div class="slide">
+                <div class="content-grid">
+                    <div>
+                        <div class="slide-header">
+                            <span class="section-badge">SERVICE WORKER</span>
+                            <h2 class="slide-title">Event: fetch</h2>
+                        </div>
+
+                        <h3 class="mb-2">🌐 Interception réseau</h3>
+
+                        <div class="architecture-box">Application (fetch request)</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="architecture-box" style="border-color: var(--accent-purple);">
+                            Service Worker<br />
+                            <code>fetch</code> event
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="comparison"
+                            style="position: relative; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                            <div class="architecture-box" style="border-color: var(--accent-green);">
+                                Cache Hit ✅<br />
+                                <small>Retourne immédiat</small>
+                            </div>
+                            <div class="architecture-box" style="border-color: var(--accent-orange);">
+                                Cache Miss ❌<br />
+                                <small>Va au réseau</small>
+                            </div>
+                        </div>
+
+                        <div class="info mt-3">
+                            <div class="info-title">🎯 Rôle</div>
+                            <p>L'event <code>fetch</code> intercepte TOUTES les requêtes HTTP de votre app. Le SW
+                                décide: retourner depuis cache ou aller au réseau.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-2">🔧 Angular gère automatiquement</h3>
+
+                        <div class="card">
+                            <div class="card-title">Stratégies implémentées:</div>
+                            <ul class="feature-list">
+                                <li><strong>Assets statiques</strong> → Cache First</li>
+                                <li><strong>API freshness</strong> → Network First (timeout)</li>
+                                <li><strong>API performance</strong> → Cache First (maxAge)</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-block mt-3">
+                            <span class="code-filename">Logique générée automatiquement</span>
+                            <pre><span class="token comment">// Angular génère tout ça pour vous!</span>
+<span class="token keyword">self</span><span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'fetch'</span><span class="token punctuation">,</span> event <span class="token punctuation">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token comment">// 1. Check si l'URL match ngsw-config</span>
+  <span class="token comment">// 2. Applique stratégie (freshness/performance)</span>
+  <span class="token comment">// 3. Retourne response</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></pre>
+                        </div>
+
+                        <div class="tip mt-3">
+                            <div class="tip-title">💡 Zero code</div>
+                            <p>Avec Angular PWA, vous configurez uniquement <code>ngsw-config.json</code>. Tout le code
+                                du Service Worker est généré automatiquement.</p>
+                        </div>
+
+                        <div class="warning mt-3">
+                            <div class="warning-title">⚠️ Requêtes non-GET</div>
+                            <p>POST, PUT, DELETE, PATCH ne sont JAMAIS interceptés par le SW Angular. Ils passent
+                                toujours au réseau.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 50: Debugging - DevTools -->
+            <div class="slide">
+                <div class="content-single">
+                    <div class="slide-header">
+                        <span class="section-badge">DEBUGGING</span>
+                        <h2 class="slide-title">Chrome DevTools</h2>
+                    </div>
+
+                    <h3 class="mb-2">🔧 Onglet Application</h3>
+
+                    <div class="card">
+                        <div class="card-title">F12 → Application → Sections clés:</div>
+                        <ul class="feature-list">
+                            <li><strong>Manifest</strong> → Visualiser manifest.webmanifest parsé, erreurs de validation
+                            </li>
+                            <li><strong>Service Workers</strong> → État du SW (activé, waiting), forcer
+                                update/unregister</li>
+                            <li><strong>Cache Storage</strong> → Inspecter contenu des caches (ngsw:assets, ngsw:data)
+                            </li>
+                            <li><strong>Storage</strong> → Voir IndexedDB, localStorage utilisés</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip mt-3">
+                        <div class="tip-title">💡 Commandes utiles</div>
+                        <div class="code-block">
+                            <pre><span class="token comment">// Forcer mise à jour SW</span>
+Update on reload ✓
+
+<span class="token comment">// Simuler offline</span>
+Network tab → Offline ✓
+
+<span class="token comment">// Voir requêtes interceptées</span>
+Network tab → (Filtrer par ServiceWorker)</pre>
+                        </div>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Mode Incognito</div>
+                        <p>Les Service Workers fonctionnent en mode incognito, mais sont détruits dès que la fenêtre se
+                            ferme. Utile pour tester l'installation from scratch.</p>
+                    </div>
+
+                    <div class="info mt-3">
+                        <div class="info-title">🎯 Unregister SW</div>
+                        <p>Application → Service Workers → Unregister<br />
+                            Puis rafraîchir pour repartir de zéro.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 51: Lighthouse -->
+            <div class="slide">
+                <div class="content-grid">
+                    <div>
+                        <div class="slide-header">
+                            <span class="section-badge">DEBUGGING</span>
+                            <h2 class="slide-title">Lighthouse</h2>
+                        </div>
+
+                        <h3 class="mb-2">📊 Audit PWA automatique</h3>
+
+                        <div class="info">
+                            <div class="info-title">🎯 Rôle</div>
+                            <p><strong>Lighthouse</strong> est l'outil officiel Google pour auditer les PWA. Il vérifie
+                                automatiquement tous les critères d'installabilité et performance.</p>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-title">5 catégories auditées:</div>
+                            <ul class="feature-list">
+                                <li><strong>Performance</strong> (FCP, LCP, CLS...)</li>
+                                <li><strong>PWA</strong> (Installable, Offline, HTTPS...)</li>
+                                <li><strong>Accessibility</strong> (Contraste, ARIA...)</li>
+                                <li><strong>Best Practices</strong> (Erreurs console, HTTP/2...)</li>
+                                <li><strong>SEO</strong> (Meta tags, sitemap...)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-2">🚀 Lancer Lighthouse</h3>
+
+                        <div class="code-block">
+                            <span class="code-filename">Chrome DevTools</span>
+                            <pre><span class="token number">1.</span> F12 → Onglet <span class="token string">"Lighthouse"</span>
+<span class="token number">2.</span> Cocher<span class="token punctuation">:</span> Performance<span class="token punctuation">,</span> PWA<span class="token punctuation">,</span> Accessibility
+<span class="token number">3.</span> Mode<span class="token punctuation">:</span> Desktop <span class="token comment">(pour BVA)</span>
+<span class="token number">4.</span> Click <span class="token string">"Analyze page load"</span></pre>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-title">Critères PWA: 100/100</div>
+                            <ul class="feature-list">
+                                <li>✅ Manifest valide avec icons 192 + 512</li>
+                                <li>✅ Service Worker enregistré</li>
+                                <li>✅ HTTPS (ou localhost)</li>
+                                <li>✅ Répond en mode offline</li>
+                                <li>✅ start_url charge en 200</li>
+                                <li>✅ Viewport configuré</li>
+                                <li>✅ Display standalone/fullscreen</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip mt-3">
+                            <div class="tip-title">💡 BVA Target</div>
+                            <p>PWA: <strong>100/100</strong><br />
+                                Performance: <strong>&gt;90</strong><br />
+                                Accessibility: <strong>&gt;90</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 55: Best Practices BVA -->
+            <div class="slide">
+                <div class="content-single">
+                    <div class="slide-header">
+                        <span class="section-badge">BEST PRACTICES</span>
+                        <h2 class="slide-title">Checklist BVA CNAF</h2>
+                    </div>
+
+                    <h3 class="mb-2">✅ Checklist finale avant mise en production</h3>
+
+                    <div class="card">
+                        <div class="card-title">1. Manifest</div>
+                        <ul class="feature-list">
+                            <li>name = "Bureau Virtuel Agents CNAF"</li>
+                            <li>short_name = "BVA CNAF" (≤12 car)</li>
+                            <li>theme_color = #003B5C (CNAF blue)</li>
+                            <li>Icons 7 tailles (72→512)</li>
+                            <li>display = "standalone"</li>
+                        </ul>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">2. Service Worker</div>
+                        <ul class="feature-list">
+                            <li>ngsw-config.json configuré (assetGroups + dataGroups)</li>
+                            <li>App shell en prefetch (index.html, main.js, styles.css)</li>
+                            <li>Assets non-critiques en lazy</li>
+                            <li>API freshness avec timeout 5s</li>
+                            <li>Build production génère ngsw-worker.js + ngsw.json</li>
+                        </ul>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-title">3. Tests</div>
+                        <ul class="feature-list">
+                            <li>Lighthouse PWA: 100/100</li>
+                            <li>Test installation desktop Windows</li>
+                            <li>Test mode offline (Network tab → Offline)</li>
+                            <li>Test update notification (SwUpdate service)</li>
+                            <li>Test sur IE11 fallback (si requis)</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning mt-3">
+                        <div class="warning-title">⚠️ Production requis</div>
+                        <p>Le Service Worker Angular est DÉSACTIVÉ en mode dev. Testez TOUJOURS avec
+                            <code>ng build --prod</code> + serveur HTTP.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final slide -->
+            <div class="slide">
+                <div class="content-full text-center">
+                    <h1 class="hero-title">Fondations Maîtrisées ✅</h1>
+                    <p class="hero-subtitle">
+                        Vous connaissez maintenant les 3 piliers d'une PWA
+                    </p>
+
+                    <div class="grid-3 mt-4">
+                        <div class="card">
+                            <span class="card-icon">📱</span>
+                            <div class="card-title">manifest.webmanifest</div>
+                            <p class="card-text">Métadonnées • Icons • Display modes • Branding</p>
+                        </div>
+                        <div class="card">
+                            <span class="card-icon">⚙️</span>
+                            <div class="card-title">Service Worker</div>
+                            <p class="card-text">Lifecycle • Events • Cache API • Background</p>
+                        </div>
+                        <div class="card">
+                            <span class="card-icon">🗂️</span>
+                            <div class="card-title">ngsw-config.json</div>
+                            <p class="card-text">Asset Groups • Data Groups • Strategies</p>
+                        </div>
+                    </div>
+
+                    <div class="tip mt-4">
+                        <div class="tip-title">🎯 Prochaine étape</div>
+                        <p>Pratiquer avec le projet <strong>BVA-Shell-PWA</strong> créé aujourd'hui. Testez Lighthouse,
+                            installez l'app, testez offline!</p>
+                    </div>
+
+                    <div class="card mt-3" style="max-width: 600px; margin: 0 auto;">
+                        <h3 class="mb-2">📚 Ressources</h3>
+                        <ul class="feature-list">
+                            <li>W3C Web App Manifest Spec</li>
+                            <li>Angular Service Worker Guide</li>
+                            <li>MDN: Service Worker API</li>
+                            <li>Chrome DevTools: Application tab</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+    </main>
+
+    <nav>
+        <button class="btn-secondary" id="prevBtn">← Précédent</button>
+        <button class="btn-primary" id="nextBtn">Suivant →</button>
+    </nav>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const currentSpan = document.getElementById('current');
+        const totalSpan = document.getElementById('total');
+        const progress = document.getElementById('progress');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        totalSpan.textContent = totalSlides;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            currentSpan.textContent = currentSlide + 1;
+            progress.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            } else if (e.key === 'ArrowRight' && currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jira Intelligence Platform - Product Overview</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Outfit:wght@300;500;700&family=Fira+Code:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #ffffff;
+            --bg-gradient: #f8fafc;
+            --text-dark: #0f172a;
+            --text-secondary: #64748b;
+            --accent-blue: #2563eb;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --brand-primary: #667eea;
+            --brand-secondary: #764ba2;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f8fafc 100%);
+            z-index: -2;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--brand-primary);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-purple);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 30px) scale(0.9); }
+        }
+
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slide-counter {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--brand-primary), var(--accent-purple));
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        main {
+            position: relative;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 4rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .slide.prev {
+            transform: translateX(-100px);
+            opacity: 0;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .slide-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            margin-right: 1rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px -10px rgba(102, 126, 234, 0.3);
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .content-full {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-single {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            margin: 0.75rem 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--brand-primary);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-list li:before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-green);
+            color: white;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .tip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box-title {
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(102, 126, 234, 0.05); }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(37, 99, 235, 0.1));
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+
+        nav {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 200;
+        }
+
+        button {
+            font-family: 'Inter', sans-serif;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px -10px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-2px);
+        }
+
+        kbd {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .comparison-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .persona-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .persona-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .persona-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .persona-pages {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .persona-benefit {
+            font-size: 0.9rem;
+            color: var(--brand-primary);
+            font-weight: 500;
+        }
+
+        strong { color: var(--brand-primary); }
+
+        .page-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .page-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--brand-primary);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .page-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .page-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .big-number {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <header>
+        <div class="logo">Jira Intelligence Platform</div>
+        <div class="progress-container">
+            <span class="slide-counter"><span id="current">1</span> / <span id="total">15</span></span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+    </header>
+
+    <main id="slides-container">
+        <!-- SLIDE 0: Hero -->
+        <div class="slide active">
+            <div class="content-full text-center">
+                <h1 class="hero-title">Jira Intelligence<br/>Platform</h1>
+                <p class="hero-subtitle">
+                    Transform project management from reactive data analysis<br/>
+                    to proactive decision automation
+                </p>
+
+                <div class="grid-4 mt-4">
+                    <div class="stat-card">
+                        <div class="stat-value">3-6h</div>
+                        <div class="stat-label">Saved per manager per week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">90%</div>
+                        <div class="stat-label">Faster decisions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2-3w</div>
+                        <div class="stat-label">Earlier risk detection</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">50%</div>
+                        <div class="stat-label">Less status meetings</div>
+                    </div>
+                </div>
+
+                <div class="tip mt-4">
+                    <div class="tip-title">The Core Promise</div>
+                    <p>Stop drowning in dashboards. Get answers to one question: <strong>"What should I do right now?"</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 1: The Problem -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">THE PROBLEM</span>
+                    <h2 class="slide-title">Why Traditional Dashboards Fail</h2>
+                </div>
+
+                <div class="comparison">
+                    <div class="comparison-item" style="border-color: var(--accent-red);">
+                        <div class="comparison-title" style="color: var(--accent-red);">Traditional Dashboards</div>
+                        <ul class="feature-list" style="list-style: none;">
+                            <li style="color: var(--text-secondary);">Shows data, requires interpretation</li>
+                            <li style="color: var(--text-secondary);">Reactive: see problems after they happen</li>
+                            <li style="color: var(--text-secondary);">Hours of analysis needed</li>
+                            <li style="color: var(--text-secondary);">One-size-fits-all views</li>
+                            <li style="color: var(--text-secondary);">Static reports, manual refresh</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item" style="border-color: var(--accent-green);">
+                        <div class="comparison-title" style="color: var(--accent-green);">This Platform</div>
+                        <ul class="feature-list">
+                            <li>Shows <strong>what to do</strong>, provides recommendations</li>
+                            <li>Proactive: see problems <strong>before</strong> they happen</li>
+                            <li>Seconds to insight</li>
+                            <li>Role-specific, personalized views</li>
+                            <li>Real-time intelligence, auto-updated</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box mt-3">
+                    <div class="highlight-box-title">The Paradigm Shift</div>
+                    <p>From "here's your data, figure it out" to <strong>"here's what's happening and what you should do about it"</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Executive Intelligence -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">EXECUTIVE INTELLIGENCE</span>
+                    <h2 class="slide-title">Leadership Visibility in Seconds</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Executives get instant answers without asking "how's the project going?"
+                </p>
+
+                <div class="grid-3">
+                    <div class="page-card">
+                        <div class="page-icon">🏆</div>
+                        <div class="page-name">Executive Cockpit</div>
+                        <div class="page-desc">Traffic-light health indicators. One glance = full project status.</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🚀</div>
+                        <div class="page-name">CEO Command Center</div>
+                        <div class="page-desc">Strategic helicopter view with organizational KPIs.</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">📊</div>
+                        <div class="page-name">Project Overview</div>
+                        <div class="page-desc">Central hub aggregating all critical metrics.</div>
+                    </div>
+                </div>
+
+                <div class="info mt-3">
+                    <div class="info-title">Value for Leadership</div>
+                    <ul class="feature-list">
+                        <li>No more "status update" meetings - information is always available</li>
+                        <li>Instant risk visibility across all projects</li>
+                        <li>Data-driven decisions without waiting for reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Sprint & Delivery -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">SPRINT & DELIVERY</span>
+                    <h2 class="slide-title">Stop Guessing Delivery Dates</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Know your delivery dates with confidence levels, not hope.
+                </p>
+
+                <div class="grid-4">
+                    <div class="page-card">
+                        <div class="page-icon">🏃</div>
+                        <div class="page-name">Sprint Health</div>
+                        <div class="page-desc">Velocity tracking & burndown charts</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">📋</div>
+                        <div class="page-name">Kanban Board</div>
+                        <div class="page-desc">Visual workflow, spot bottlenecks</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🎲</div>
+                        <div class="page-name">Delivery Forecast</div>
+                        <div class="page-desc">Monte Carlo: "85% chance by March 15"</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">⏱️</div>
+                        <div class="page-name">Scope Negotiator</div>
+                        <div class="page-desc">"What if" timeline simulator</div>
+                    </div>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">The Game Changer</div>
+                    <p><strong>Scope Negotiator</strong> shows the timeline impact of adding/removing scope in real-time.
+                    Product Managers can negotiate with stakeholders using data, not opinions.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-box-title">Instead of saying...</div>
+                    <p>"We'll try to deliver by end of month" → <strong>"We have 85% confidence for March 15, or 95% confidence for March 22"</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Team & People -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">TEAM & PEOPLE</span>
+                    <h2 class="slide-title">Protect Your People, Optimize Your Teams</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Never be surprised by a resignation. Spot burnout before it happens.
+                </p>
+
+                <div class="grid-4">
+                    <div class="page-card">
+                        <div class="page-icon">👥</div>
+                        <div class="page-name">Team Workload</div>
+                        <div class="page-desc">Capacity planning, prevent overload</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🕯️</div>
+                        <div class="page-name">Burnout Barometer</div>
+                        <div class="page-desc">Early warning for at-risk members</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">👤</div>
+                        <div class="page-name">One-on-One Hub</div>
+                        <div class="page-desc">Auto-generated meeting agendas</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">💫</div>
+                        <div class="page-name">Relationship Pulse</div>
+                        <div class="page-desc">Who works well together?</div>
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-3">
+                    <div class="info">
+                        <div class="info-title">One-on-One Hub Impact</div>
+                        <p>Saves <strong>4-8 hours per week</strong> on meeting preparation. Auto-generates agendas with performance data, ensuring consistent quality meetings.</p>
+                    </div>
+                    <div class="tip">
+                        <div class="tip-title">Burnout Detection</div>
+                        <p>Identifies behavioral anomalies <strong>2-3 weeks before</strong> visible signs. Enables preventive interventions, not reactive responses.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Risk & Blocker -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">RISK & BLOCKERS</span>
+                    <h2 class="slide-title">Cut Firefighting Time by 50%</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Know the blast radius before the bomb goes off.
+                </p>
+
+                <div class="grid-4">
+                    <div class="page-card">
+                        <div class="page-icon">🔫</div>
+                        <div class="page-name">Blocker Assassin</div>
+                        <div class="page-desc">Impact in hours, best resolver matched</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">💥</div>
+                        <div class="page-name">What Breaks If</div>
+                        <div class="page-desc">"If John is sick, here's what breaks"</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🛡️</div>
+                        <div class="page-name">Shock Absorber</div>
+                        <div class="page-desc">Instant reallocation playbooks</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">📬</div>
+                        <div class="page-name">Waiting On Inbox</div>
+                        <div class="page-desc">Nothing falls through cracks</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box mt-3">
+                    <div class="highlight-box-title">Cascade Simulation Example</div>
+                    <p><strong>"What Breaks If"</strong> answers questions like: "If our lead developer is out for 2 weeks, which deliverables are at risk, what's the cascade effect, and who can cover?" - <em>in seconds, not hours of manual analysis.</em></p>
+                </div>
+
+                <div class="tip">
+                    <div class="tip-title">Resource Shock Absorber</div>
+                    <p>When someone is suddenly unavailable, get instant handover playbooks with skill-based matching. Eliminates <strong>25-40 minutes per incident</strong> of scrambling.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Predictive Intelligence -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">PREDICTIVE INTELLIGENCE</span>
+                    <h2 class="slide-title">See Around Corners</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Act on insights your competitors can't see.
+                </p>
+
+                <div class="grid-3">
+                    <div class="page-card">
+                        <div class="page-icon">🎯</div>
+                        <div class="page-name">Predictions</div>
+                        <div class="page-desc">ML-powered ticket duration & sprint risk forecasting</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🎯</div>
+                        <div class="page-name">Strategic Gap</div>
+                        <div class="page-desc">Stated strategy vs. actual execution comparison</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🧿</div>
+                        <div class="page-name">Sixth Sense</div>
+                        <div class="page-desc">Invisible dynamics detection, conflict prediction</div>
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-3">
+                    <div class="info">
+                        <div class="info-title">Strategic Gap Analysis</div>
+                        <p>Compares what leadership <em>says</em> is priority vs. what the team is <em>actually</em> working on. Finds misalignment before it becomes a crisis.</p>
+                    </div>
+                    <div class="tip">
+                        <div class="tip-title">Sixth Sense Detection</div>
+                        <p>Uses pattern recognition to identify team dynamics that aren't visible in traditional metrics - predicting conflicts and collaboration issues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: Daily Operations -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">DAILY OPERATIONS</span>
+                    <h2 class="slide-title">Arrive Prepared, Leave Nothing Forgotten</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    Everything you need to know in 2 minutes.
+                </p>
+
+                <div class="grid-4">
+                    <div class="page-card">
+                        <div class="page-icon">🌅</div>
+                        <div class="page-name">Good Morning</div>
+                        <div class="page-desc">Personalized daily briefing</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">⚡</div>
+                        <div class="page-name">Daily Action</div>
+                        <div class="page-desc">Today's critical actions & follow-ups</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🎖️</div>
+                        <div class="page-name">Scrum Master HQ</div>
+                        <div class="page-desc">Sprint intelligence & AI coaching</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">📋</div>
+                        <div class="page-name">Reports</div>
+                        <div class="page-desc">One-click export to PDF/Excel</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box mt-3">
+                    <div class="highlight-box-title">Good Morning Dashboard</div>
+                    <p>Opens with time-of-day personalization. Shows you exactly what changed overnight, what needs attention today, and priorities ranked by impact. <strong>Replaces 45 minutes of morning context-gathering with 5 minutes.</strong></p>
+                </div>
+
+                <div class="info">
+                    <div class="info-title">Daily Action Intelligence</div>
+                    <p>Consolidates: forgotten follow-ups, blocked items needing escalation, promises made that need delivery, and context from multiple sources. <strong>Eliminates cognitive overhead.</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Next-Gen Features -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">NEXT GENERATION</span>
+                    <h2 class="slide-title">The Future of Management</h2>
+                </div>
+
+                <p class="mb-3" style="color: var(--text-secondary); font-size: 1.1rem;">
+                    From "humans manage work" to "work manages itself."
+                </p>
+
+                <div class="grid-3">
+                    <div class="page-card">
+                        <div class="page-icon">🔮</div>
+                        <div class="page-name">The Oracle</div>
+                        <div class="page-desc">Pre-made decisions with one-click actions. "Do THIS now."</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🤖</div>
+                        <div class="page-name">Autonomous Agents</div>
+                        <div class="page-desc">Self-driving project management. Set intent, approve exceptions.</div>
+                    </div>
+                    <div class="page-card">
+                        <div class="page-icon">🌀</div>
+                        <div class="page-name">Project Weather</div>
+                        <div class="page-desc">Intuitive weather metaphor. "Stormy with clearing expected."</div>
+                    </div>
+                </div>
+
+                <div class="tip mt-3">
+                    <div class="tip-title">The Oracle Revolution</div>
+                    <p>Instead of "here's your data, figure out what to do" - The Oracle says: <strong>"Send this message to John about the blocked task. Here's the pre-written text. One click to send."</strong> Eliminates 90% of PM decision fatigue.</p>
+                </div>
+
+                <div class="info">
+                    <div class="info-title">Autonomous Agents</div>
+                    <p>Paradigm shift: Set your project intent ("Ship feature X by March 15 with quality bar Y"). Agents detect drift, propose interventions, execute approved actions. <strong>Humans only needed for judgment calls.</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Time Savings -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">ROI</span>
+                    <h2 class="slide-title">Quantified Time Savings</h2>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Without Platform</th>
+                        <th>With Platform</th>
+                        <th>Savings</th>
+                    </tr>
+                    <tr>
+                        <td>Morning context gathering</td>
+                        <td>45 min/day</td>
+                        <td>5 min/day</td>
+                        <td><strong style="color: var(--accent-green);">40 min/day</strong></td>
+                    </tr>
+                    <tr>
+                        <td>1-on-1 meeting prep</td>
+                        <td>30 min/meeting</td>
+                        <td>2 min/meeting</td>
+                        <td><strong style="color: var(--accent-green);">4-8 h/week</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Blocker resolution</td>
+                        <td>45 min/day</td>
+                        <td>15 min/day</td>
+                        <td><strong style="color: var(--accent-green);">30 min/day</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Status report creation</td>
+                        <td>2 h/week</td>
+                        <td>10 min/week</td>
+                        <td><strong style="color: var(--accent-green);">1.8 h/week</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Crisis scrambling</td>
+                        <td>40 min/incident</td>
+                        <td>10 min/incident</td>
+                        <td><strong style="color: var(--accent-green);">30 min/incident</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Decision research</td>
+                        <td>30 min/decision</td>
+                        <td>2 min/decision</td>
+                        <td><strong style="color: var(--accent-green);">90% reduction</strong></td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box mt-3">
+                    <div class="highlight-box-title">Total Impact</div>
+                    <p style="font-size: 1.2rem;"><strong>3-6 hours saved per manager per week</strong> = 150-300 hours per year per manager</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Target Users -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">TARGET USERS</span>
+                    <h2 class="slide-title">Built for Every Management Role</h2>
+                </div>
+
+                <div class="grid-3">
+                    <div class="persona-card">
+                        <div class="persona-icon">👔</div>
+                        <div class="persona-title">CEO / VP</div>
+                        <div class="persona-pages">Executive Cockpit, CEO Command Center</div>
+                        <div class="persona-benefit">Strategic visibility without meetings</div>
+                    </div>
+                    <div class="persona-card">
+                        <div class="persona-icon">🏗️</div>
+                        <div class="persona-title">Engineering Director</div>
+                        <div class="persona-pages">Team Workload, Autonomous Agents, What Breaks If</div>
+                        <div class="persona-benefit">Scale management across teams</div>
+                    </div>
+                    <div class="persona-card">
+                        <div class="persona-icon">📦</div>
+                        <div class="persona-title">Product Manager</div>
+                        <div class="persona-pages">Delivery Forecast, Scope Negotiator, The Oracle</div>
+                        <div class="persona-benefit">Ship on time with confidence</div>
+                    </div>
+                    <div class="persona-card">
+                        <div class="persona-icon">🎖️</div>
+                        <div class="persona-title">Scrum Master</div>
+                        <div class="persona-pages">Sprint Health, Scrum Master HQ, Blocker Assassin</div>
+                        <div class="persona-benefit">Run better sprints with less effort</div>
+                    </div>
+                    <div class="persona-card">
+                        <div class="persona-icon">👨‍💻</div>
+                        <div class="persona-title">Engineering Manager</div>
+                        <div class="persona-pages">Team Workload, Burnout Barometer, One-on-One Hub</div>
+                        <div class="persona-benefit">Protect and grow your team</div>
+                    </div>
+                    <div class="persona-card">
+                        <div class="persona-icon">📊</div>
+                        <div class="persona-title">Project Manager</div>
+                        <div class="persona-pages">Daily Action, Sixth Sense, Project Weather</div>
+                        <div class="persona-benefit">Never be surprised again</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: Key Metrics -->
+        <div class="slide">
+            <div class="content-full text-center">
+                <div class="slide-header" style="justify-content: center; border: none;">
+                    <span class="section-badge">OUTCOMES</span>
+                    <h2 class="slide-title">Measurable Results</h2>
+                </div>
+
+                <div class="grid-4 mt-4">
+                    <div class="card">
+                        <div class="big-number">90%</div>
+                        <div class="card-title">Faster Decisions</div>
+                        <div class="card-text">Pre-made recommendations eliminate research time</div>
+                    </div>
+                    <div class="card">
+                        <div class="big-number">2-3w</div>
+                        <div class="card-title">Earlier Detection</div>
+                        <div class="card-text">Problems identified before they become crises</div>
+                    </div>
+                    <div class="card">
+                        <div class="big-number">50%</div>
+                        <div class="card-title">Fewer Meetings</div>
+                        <div class="card-text">Information always available, no status updates needed</div>
+                    </div>
+                    <div class="card">
+                        <div class="big-number">15-20%</div>
+                        <div class="card-title">Productivity Gain</div>
+                        <div class="card-text">Cognitive overhead elimination</div>
+                    </div>
+                </div>
+
+                <div class="info mt-4" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <div class="info-title">Early Burnout Detection</div>
+                    <p>Behavioral anomalies identified before visible signs. <strong>Prevents turnover</strong> - the most expensive management failure.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Implementation -->
+        <div class="slide">
+            <div class="content-single">
+                <div class="slide-header">
+                    <span class="section-badge">IMPLEMENTATION</span>
+                    <h2 class="slide-title">Easy to Deploy, Zero Training Required</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h3 class="mb-3">Quick Setup</h3>
+                        <ul class="feature-list">
+                            <li><strong>Data Source:</strong> Connects directly to Jira</li>
+                            <li><strong>Setup Time:</strong> Under 1 hour</li>
+                            <li><strong>Training:</strong> Self-explanatory interfaces</li>
+                            <li><strong>Security:</strong> Read-only Jira access</li>
+                            <li><strong>Data:</strong> Stays local, no cloud dependency</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="mb-3">No Disruption</h3>
+                        <ul class="feature-list">
+                            <li>Works with your existing Jira setup</li>
+                            <li>No workflow changes required</li>
+                            <li>No team onboarding needed</li>
+                            <li>Value visible from day one</li>
+                            <li>Scales with your organization</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tip mt-4">
+                    <div class="tip-title">The Promise</div>
+                    <p>Your teams keep using Jira exactly as they do today. <strong>Only managers see the intelligence layer.</strong> No change management, no adoption curve, no training budget.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: Summary -->
+        <div class="slide">
+            <div class="content-full text-center">
+                <h1 class="hero-title" style="font-size: 3.5rem;">Built for Managers Who Are Tired<br/>of Dashboards That Don't Help</h1>
+
+                <p class="hero-subtitle">
+                    Stop showing problems. Start solving them.
+                </p>
+
+                <div class="grid-3 mt-4">
+                    <div class="card">
+                        <span class="card-icon">🎯</span>
+                        <div class="card-title">Actionable</div>
+                        <p class="card-text">Every screen answers "what should I do?" not "what's happening?"</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">⚡</span>
+                        <div class="card-title">Proactive</div>
+                        <p class="card-text">See problems 2-3 weeks before they become crises</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🤖</span>
+                        <div class="card-title">Intelligent</div>
+                        <p class="card-text">AI-powered recommendations, not just data visualization</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box mt-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div class="highlight-box-title">The Bottom Line</div>
+                    <p style="font-size: 1.2rem;"><strong>3-6 hours saved per week</strong><br/>
+                    <strong>90% faster decisions</strong><br/>
+                    <strong>50% fewer status meetings</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: CTA -->
+        <div class="slide">
+            <div class="content-full text-center">
+                <h1 class="hero-title">Ready to Transform<br/>Your Project Management?</h1>
+
+                <p class="hero-subtitle">
+                    From reactive data analysis to proactive decision automation.<br/>
+                    Your managers will thank you.
+                </p>
+
+                <div class="grid-3 mt-4" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+                    <div class="stat-card">
+                        <div class="stat-value">20+</div>
+                        <div class="stat-label">Intelligence Dashboards</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">&lt;1h</div>
+                        <div class="stat-label">Setup Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Day 1</div>
+                        <div class="stat-label">Value Visible</div>
+                    </div>
+                </div>
+
+                <div class="tip mt-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div class="tip-title">Next Steps</div>
+                    <p>Schedule a demo to see the platform in action with your actual Jira data.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav>
+        <button class="btn-secondary" onclick="prevSlide()">← Previous</button>
+        <button class="btn-primary" onclick="nextSlide()">Next →</button>
+    </nav>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total').textContent = totalSlides;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            document.getElementById('current').textContent = currentSlide + 1;
+            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Touch navigation
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) nextSlide();
+            if (touchEndX - touchStartX > 50) prevSlide();
+        });
+    </script>
+</body>
+
+</html>

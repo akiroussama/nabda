@@ -12,18 +12,16 @@
 
 1. [Introduction - Qu'est-ce que Jira AI Co-Pilot ?](#1-introduction)
 2. [Prérequis - Ce dont vous avez besoin](#2-prérequis)
-3. [Étape 1 - Installer l'éditeur de code (Antigravity/VS Code)](#3-étape-1---installer-léditeur-de-code)
-4. [Étape 2 - Installer Python](#4-étape-2---installer-python)
-5. [Étape 3 - Télécharger le projet](#5-étape-3---télécharger-le-projet)
-6. [Étape 4 - Créer un environnement virtuel](#6-étape-4---créer-un-environnement-virtuel)
+3. [Étape 1 - Accéder à Antigravity (l'éditeur cloud Google)](#3-étape-1---accéder-à-antigravity)
+4. [Étape 2 - Importer le projet dans Antigravity](#4-étape-2---importer-le-projet-dans-antigravity)
+5. [Étape 3 - Configurer votre token Jira](#5-étape-3---configurer-votre-token-jira)
+6. [Étape 4 - Configurer Google Gemini (IA)](#6-étape-4---configurer-google-gemini-ia)
 7. [Étape 5 - Installer les dépendances](#7-étape-5---installer-les-dépendances)
-8. [Étape 6 - Configurer votre token Jira](#8-étape-6---configurer-votre-token-jira)
-9. [Étape 7 - Configurer Google Gemini (IA)](#9-étape-7---configurer-google-gemini-ia)
-10. [Étape 8 - Lancer l'application](#10-étape-8---lancer-lapplication)
-11. [Utilisation du Dashboard](#11-utilisation-du-dashboard)
-12. [Ajouter un nouveau module](#12-ajouter-un-nouveau-module)
-13. [Dépannage - Problèmes courants](#13-dépannage---problèmes-courants)
-14. [Glossaire - Termes techniques expliqués](#14-glossaire)
+8. [Étape 6 - Lancer l'application](#8-étape-6---lancer-lapplication)
+9. [Utilisation du Dashboard](#9-utilisation-du-dashboard)
+10. [Ajouter un nouveau module](#10-ajouter-un-nouveau-module)
+11. [Dépannage - Problèmes courants](#11-dépannage---problèmes-courants)
+12. [Glossaire - Termes techniques expliqués](#12-glossaire)
 
 ---
 
@@ -66,408 +64,162 @@ L'application se connecte à votre Jira, récupère vos données, les analyse av
 Avant de commencer, assurez-vous d'avoir :
 
 ### Matériel nécessaire
-- Un ordinateur (Windows, Mac, ou Linux)
+- Un ordinateur avec un **navigateur web moderne** (Chrome recommandé)
 - Une connexion internet stable
-- Au moins 4 Go de RAM disponible
-- 2 Go d'espace disque libre
+
+> **Bonne nouvelle !** Avec Antigravity, vous n'avez **rien à installer** sur votre ordinateur. Tout fonctionne dans le navigateur !
 
 ### Comptes nécessaires
+- Un compte **Google** (obligatoire pour Antigravity et Gemini)
 - Un compte **Jira Cloud** (Atlassian)
-- Un compte **Google** (pour l'IA Gemini - gratuit)
 
 ### Temps estimé
 | Étape | Durée |
 |-------|-------|
-| Installation de l'éditeur | 10 minutes |
-| Installation de Python | 10 minutes |
-| Configuration du projet | 20 minutes |
-| Configuration Jira | 15 minutes |
-| **Total** | **~1 heure** |
+| Création du workspace Antigravity | 5 minutes |
+| Import du projet | 5 minutes |
+| Configuration Jira & Gemini | 15 minutes |
+| Installation des dépendances | 10 minutes |
+| **Total** | **~35 minutes** |
+
+> **Avantage d'Antigravity** : Pas besoin d'installer Python, VS Code, ou quoi que ce soit ! Tout est pré-configuré dans le cloud Google.
 
 ---
 
-## 3. Étape 1 - Installer l'éditeur de code
+## 3. Étape 1 - Accéder à Antigravity
 
-### Qu'est-ce qu'un éditeur de code ?
+### Qu'est-ce qu'Antigravity ?
 
-Un **éditeur de code** est un programme qui permet de voir et modifier les fichiers du projet. C'est comme Microsoft Word, mais pour le code informatique.
+**Antigravity** est un éditeur de code **dans le cloud** créé par Google. Il fonctionne entièrement dans votre navigateur web.
 
-### Nous recommandons : Visual Studio Code (VS Code)
+**Avantages pour vous** :
+- ✅ **Aucune installation** sur votre ordinateur
+- ✅ **Python pré-installé** (pas besoin de le configurer)
+- ✅ **Accessible partout** depuis n'importe quel ordinateur
+- ✅ **Sauvegarde automatique** dans le cloud Google
+- ✅ **Terminal intégré** pour exécuter les commandes
 
-VS Code est **gratuit**, **facile à utiliser**, et très populaire.
+### Accéder à Antigravity
 
-### Instructions d'installation
+1. **Ouvrez votre navigateur** (Chrome recommandé)
 
-#### Pour Windows :
-
-1. **Ouvrez votre navigateur** (Chrome, Firefox, Edge...)
-
-2. **Allez sur le site officiel** :
+2. **Allez sur Antigravity** :
    ```
-   https://code.visualstudio.com/
-   ```
-
-3. **Cliquez sur le bouton bleu "Download for Windows"**
-
-   ```
-   ┌────────────────────────────────────────────┐
-   │                                            │
-   │    [  Download for Windows  ]              │
-   │         ↑                                  │
-   │    Cliquez ici                             │
-   │                                            │
-   └────────────────────────────────────────────┘
+   https://antigravity.google/
    ```
 
-4. **Attendez** que le fichier `VSCodeUserSetup-x64-X.XX.X.exe` se télécharge
+3. **Connectez-vous avec votre compte Google**
 
-5. **Double-cliquez** sur le fichier téléchargé
+   ```
+   ┌─────────────────────────────────────────────────────────┐
+   │                                                         │
+   │           🚀 Antigravity                                │
+   │                                                         │
+   │     Bienvenue ! Connectez-vous pour continuer          │
+   │                                                         │
+   │     [  Se connecter avec Google  ]  ← Cliquez ici      │
+   │                                                         │
+   └─────────────────────────────────────────────────────────┘
+   ```
 
-6. **Suivez l'assistant d'installation** :
-   - Acceptez les termes de la licence ✓
-   - Laissez le dossier par défaut ✓
-   - **IMPORTANT** : Cochez ces options :
-     - ☑️ "Ajouter à PATH"
-     - ☑️ "Ajouter l'action 'Ouvrir avec Code' au menu contextuel"
-   - Cliquez sur "Installer"
+4. **Autorisez l'accès** si demandé
 
-7. **Redémarrez votre ordinateur** après l'installation
-
-#### Pour Mac :
-
-1. Allez sur `https://code.visualstudio.com/`
-2. Cliquez sur "Download for Mac"
-3. Ouvrez le fichier `.zip` téléchargé
-4. Glissez l'icône VS Code dans le dossier "Applications"
-5. Ouvrez VS Code depuis le Launchpad
-
-#### Pour Linux (Ubuntu/Debian) :
-
-```bash
-sudo apt update
-sudo apt install code
-```
-
-### Vérifier l'installation
-
-1. Ouvrez VS Code (cherchez "Visual Studio Code" dans vos applications)
-2. Vous devriez voir cette interface :
+5. **Vous arrivez sur la page d'accueil d'Antigravity**
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Visual Studio Code                               _ □ X    │
-├─────────────────────────────────────────────────────────────┤
-│  ┌──────────┐                                              │
-│  │ Explorer │    Welcome                                   │
-│  │          │                                              │
-│  │ (vide)   │    Start                                     │
-│  │          │    • New File                                │
-│  │          │    • Open Folder                             │
-│  │          │                                              │
-│  └──────────┘                                              │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│  🚀 Antigravity                                    [votre-email]   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   Mes Workspaces                                                    │
+│                                                                     │
+│   ┌─────────────────┐   ┌─────────────────┐                        │
+│   │                 │   │                 │                        │
+│   │  + Nouveau      │   │  Importer       │                        │
+│   │    Workspace    │   │  depuis GitHub  │                        │
+│   │                 │   │                 │                        │
+│   └─────────────────┘   └─────────────────┘                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Félicitations !** L'éditeur est installé.
+**Félicitations !** Vous avez accès à Antigravity.
 
 ---
 
-## 4. Étape 2 - Installer Python
+## 4. Étape 2 - Importer le projet dans Antigravity
 
-### Qu'est-ce que Python ?
+### Option A : Importer depuis GitHub (Recommandé)
 
-**Python** est le langage de programmation utilisé par Jira AI Co-Pilot. Vous devez l'installer pour que l'application fonctionne.
+Si le projet est sur GitHub :
 
-### Quelle version ?
+1. **Sur la page d'accueil d'Antigravity**, cliquez sur **"Import from GitHub"** ou **"Importer depuis GitHub"**
 
-Vous avez besoin de **Python 3.11** ou plus récent.
+2. **Connectez votre compte GitHub** si demandé
 
-### Instructions d'installation
+3. **Recherchez le projet** "jira-copilot" ou "nabda"
 
-#### Pour Windows :
+4. **Cliquez sur "Import"**
 
-1. **Allez sur le site officiel Python** :
-   ```
-   https://www.python.org/downloads/
-   ```
+5. **Attendez** que le workspace se crée (1-2 minutes)
 
-2. **Cliquez sur "Download Python 3.12.x"** (ou la version la plus récente)
+### Option B : Créer un nouveau workspace et uploader les fichiers
 
-3. **Ouvrez le fichier téléchargé**
+Si vous avez téléchargé le projet en ZIP :
 
-4. **TRÈS IMPORTANT - Cochez cette case** :
-   ```
-   ┌────────────────────────────────────────────────────────┐
-   │  Install Python 3.12.x                                 │
-   │                                                        │
-   │  ☑️ Add python.exe to PATH   ← COCHEZ CETTE CASE !    │
-   │                                                        │
-   │  [  Install Now  ]                                     │
-   │                                                        │
-   └────────────────────────────────────────────────────────┘
-   ```
+1. **Cliquez sur "+ New Workspace"** ou **"+ Nouveau Workspace"**
 
-   > ⚠️ **ATTENTION** : Si vous oubliez de cocher "Add python.exe to PATH", l'application ne fonctionnera pas !
+2. **Choisissez "Python"** comme type de projet
 
-5. Cliquez sur **"Install Now"**
+3. **Donnez un nom** : `jira-copilot`
 
-6. Attendez la fin de l'installation
+4. **Cliquez sur "Create"**
 
-7. Cliquez sur **"Close"**
+5. **Une fois le workspace créé**, vous pouvez glisser-déposer les fichiers du projet
 
-#### Pour Mac :
+### L'interface Antigravity
 
-1. Ouvrez le **Terminal** (Recherchez "Terminal" dans Spotlight)
+Une fois le projet ouvert, vous verrez cette interface :
 
-2. Installez Homebrew si ce n'est pas déjà fait :
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-3. Installez Python :
-   ```bash
-   brew install python@3.12
-   ```
-
-#### Pour Linux :
-
-```bash
-sudo apt update
-sudo apt install python3.12 python3.12-venv python3-pip
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  🚀 Antigravity - jira-copilot                              [Menu]     │
+├───────────────┬─────────────────────────────────────────────────────────┤
+│               │                                                         │
+│  📁 EXPLORER  │   [Zone d'édition du code]                             │
+│               │                                                         │
+│  ▼ nabda      │   # Fichier ouvert                                     │
+│    ▶ config/  │   contenu du fichier...                                │
+│    ▶ data/    │                                                         │
+│    ▶ src/     │                                                         │
+│    ▶ tests/   │                                                         │
+│    📄 .env    │                                                         │
+│    📄 ...     │                                                         │
+│               │                                                         │
+├───────────────┴─────────────────────────────────────────────────────────┤
+│  TERMINAL                                                               │
+│  user@workspace:~/jira-copilot$ _                                      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Vérifier l'installation
+**Éléments importants** :
+- **Explorer** (gauche) : Liste de tous les fichiers du projet
+- **Éditeur** (centre) : Zone pour modifier le code
+- **Terminal** (bas) : Pour taper des commandes
 
-1. **Ouvrez un terminal** :
-   - Windows : Tapez "cmd" dans la barre de recherche et appuyez sur Entrée
-   - Mac/Linux : Ouvrez l'application "Terminal"
+### Ouvrir le terminal
 
-2. **Tapez cette commande** et appuyez sur Entrée :
-   ```bash
-   python --version
-   ```
+Si le terminal n'est pas visible :
 
-   Ou sur certains systèmes :
-   ```bash
-   python3 --version
-   ```
+1. **Cliquez sur le menu** (icône ≡ ou "View")
+2. **Sélectionnez "Terminal"** ou appuyez sur `` Ctrl + ` ``
 
-3. **Vous devriez voir** quelque chose comme :
-   ```
-   Python 3.12.1
-   ```
-
-   > Si vous voyez une version 3.11 ou supérieure, c'est parfait !
-
-### Problème ? Python non reconnu ?
-
-Si vous voyez une erreur comme `'python' n'est pas reconnu...` :
-
-1. **Redémarrez votre ordinateur**
-2. Réessayez la commande
-3. Si ça ne marche toujours pas, réinstallez Python en vous assurant de cocher "Add to PATH"
+Le terminal s'ouvre en bas de l'écran. C'est ici que vous taperez les commandes.
 
 ---
 
-## 5. Étape 3 - Télécharger le projet
-
-### Option A : Télécharger depuis GitHub (Recommandé)
-
-1. **Allez sur la page GitHub du projet** (l'URL vous sera fournie)
-
-2. **Cliquez sur le bouton vert "Code"**
-   ```
-   ┌─────────────────────────┐
-   │  < > Code  ▼            │
-   └─────────────────────────┘
-   ```
-
-3. **Cliquez sur "Download ZIP"**
-   ```
-   ┌─────────────────────────────────┐
-   │  Clone                          │
-   │  ─────────────────────────────  │
-   │  HTTPS   SSH   GitHub CLI       │
-   │                                 │
-   │  [  Download ZIP  ]  ← Ici      │
-   └─────────────────────────────────┘
-   ```
-
-4. **Extrayez le fichier ZIP** :
-   - Faites un clic droit sur le fichier téléchargé
-   - Sélectionnez "Extraire tout..." ou "Extract All..."
-   - Choisissez un emplacement facile à retrouver, par exemple :
-     ```
-     C:\Projets\jira-copilot
-     ```
-     ou sur Mac :
-     ```
-     ~/Documents/jira-copilot
-     ```
-
-### Option B : Si vous avez Git installé
-
-Ouvrez un terminal et tapez :
-```bash
-git clone [URL_DU_PROJET]
-cd nabda
-```
-
-### Ouvrir le projet dans VS Code
-
-1. **Ouvrez VS Code**
-
-2. **Cliquez sur "File" → "Open Folder"** (ou Fichier → Ouvrir un dossier)
-
-3. **Naviguez** jusqu'au dossier extrait et sélectionnez-le
-
-4. **Cliquez sur "Sélectionner un dossier"**
-
-Vous devriez maintenant voir la structure du projet dans la barre latérale gauche :
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  EXPLORER                                                   │
-├─────────────────────────────────────────────────────────────┤
-│  ▼ NABDA                                                    │
-│    ▶ config/                                                │
-│    ▶ data/                                                  │
-│    ▶ models/                                                │
-│    ▶ prompts/                                               │
-│    ▶ scripts/                                               │
-│    ▶ src/                                                   │
-│    ▶ tests/                                                 │
-│    📄 .env.example                                          │
-│    📄 pyproject.toml                                        │
-│    📄 README.md                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 6. Étape 4 - Créer un environnement virtuel
-
-### Qu'est-ce qu'un environnement virtuel ?
-
-Un **environnement virtuel** est comme une "bulle" isolée pour votre projet. Il permet d'installer les outils nécessaires sans affecter les autres programmes de votre ordinateur.
-
-### Créer l'environnement virtuel
-
-1. **Ouvrez un terminal dans VS Code** :
-   - Menu : `Terminal` → `New Terminal`
-   - Ou raccourci : `Ctrl + ù` (Windows) / `Cmd + ù` (Mac)
-
-2. **Assurez-vous d'être dans le bon dossier**. Le terminal devrait afficher quelque chose comme :
-   ```
-   C:\Projets\jira-copilot>
-   ```
-   ou
-   ```
-   ~/Documents/jira-copilot$
-   ```
-
-3. **Créez l'environnement virtuel** en tapant cette commande :
-
-   **Windows** :
-   ```bash
-   python -m venv venv
-   ```
-
-   **Mac/Linux** :
-   ```bash
-   python3 -m venv venv
-   ```
-
-   > Cette commande crée un dossier `venv` qui contient l'environnement virtuel.
-
-4. **Activez l'environnement virtuel** :
-
-   **Windows (PowerShell)** :
-   ```bash
-   .\venv\Scripts\Activate.ps1
-   ```
-
-   **Windows (CMD)** :
-   ```bash
-   venv\Scripts\activate.bat
-   ```
-
-   **Mac/Linux** :
-   ```bash
-   source venv/bin/activate
-   ```
-
-5. **Vérifiez que c'est activé** - Vous devriez voir `(venv)` au début de la ligne :
-   ```
-   (venv) C:\Projets\jira-copilot>
-   ```
-
-### Problème avec PowerShell ?
-
-Si vous voyez une erreur sur Windows PowerShell du type "l'exécution de scripts est désactivée" :
-
-1. Ouvrez PowerShell **en tant qu'administrateur**
-2. Tapez cette commande :
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-3. Tapez `O` pour confirmer
-4. Réessayez d'activer l'environnement
-
----
-
-## 7. Étape 5 - Installer les dépendances
-
-### Qu'est-ce qu'une dépendance ?
-
-Les **dépendances** sont des bibliothèques (des outils pré-fabriqués) dont l'application a besoin pour fonctionner. Par exemple : Streamlit (pour le tableau de bord), pandas (pour les données), etc.
-
-### Installer toutes les dépendances
-
-1. **Assurez-vous que l'environnement virtuel est activé** (vous voyez `(venv)` dans le terminal)
-
-2. **Tapez cette commande** :
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
-   > Cette commande lit le fichier `pyproject.toml` et installe automatiquement toutes les dépendances nécessaires.
-
-3. **Attendez** - L'installation peut prendre **5 à 15 minutes** selon votre connexion internet.
-
-   Vous verrez beaucoup de texte défiler, c'est normal :
-   ```
-   Collecting streamlit>=1.35.0
-     Downloading streamlit-1.35.0-py2.py3-none-any.whl (8.5 MB)
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.5/8.5 MB 2.1 MB/s
-   Collecting pandas>=2.0.0
-     ...
-   Successfully installed ...
-   ```
-
-4. **Vérifiez l'installation** en tapant :
-   ```bash
-   pip list
-   ```
-
-   Vous devriez voir une longue liste de packages installés.
-
-### Liste des principales dépendances installées
-
-| Package | Rôle |
-|---------|------|
-| `streamlit` | Crée le tableau de bord interactif |
-| `pandas` | Manipule les données |
-| `jira` | Se connecte à votre Jira |
-| `duckdb` | Base de données locale ultra-rapide |
-| `lightgbm` | Intelligence artificielle pour les prédictions |
-| `google-generativeai` | Connexion à l'IA Gemini de Google |
-| `plotly` | Graphiques interactifs |
-| `typer` | Interface en ligne de commande |
-
----
-
-## 8. Étape 6 - Configurer votre token Jira
+## 5. Étape 3 - Configurer votre token Jira
 
 ### Qu'est-ce qu'un token API ?
 
@@ -543,11 +295,11 @@ Vous aurez besoin de ces informations :
                                                                             C'est l'ID !
    ```
 
-### Étape 6.3 - Créer le fichier .env
+### Étape 5.3 - Créer le fichier .env
 
 Le fichier `.env` contient toutes vos informations de configuration secrètes.
 
-1. **Dans VS Code**, regardez la liste des fichiers à gauche
+1. **Dans Antigravity**, regardez la liste des fichiers à gauche (Explorer)
 
 2. **Trouvez le fichier `.env.example`**
 
@@ -555,7 +307,7 @@ Le fichier `.env` contient toutes vos informations de configuration secrètes.
 
 4. **Renommez-le en** `.env` (supprimez `.example`)
 
-   > **Note** : Sur certains systèmes, les fichiers commençant par `.` sont cachés. Dans VS Code, ils sont toujours visibles.
+   > **Note** : Dans Antigravity, les fichiers commençant par `.` sont toujours visibles.
 
 5. **Ouvrez le fichier `.env`** en double-cliquant dessus
 
@@ -611,7 +363,7 @@ SYNC_INTERVAL_MINUTES=30
 ENABLE_LLM_FEATURES=true
 ```
 
-7. **Sauvegardez le fichier** : `Ctrl + S` (Windows) ou `Cmd + S` (Mac)
+7. **Sauvegardez le fichier** : `Ctrl + S` ou `Cmd + S` (le fichier est aussi auto-sauvegardé par Antigravity)
 
 ### Exemple concret
 
@@ -634,7 +386,7 @@ ENABLE_LLM_FEATURES=true
 
 ---
 
-## 9. Étape 7 - Configurer Google Gemini (IA)
+## 6. Étape 4 - Configurer Google Gemini (IA)
 
 ### Pourquoi Gemini ?
 
@@ -686,17 +438,62 @@ ENABLE_LLM_FEATURES=true
 
 ---
 
-## 10. Étape 8 - Lancer l'application
+## 7. Étape 5 - Installer les dépendances
+
+### Qu'est-ce qu'une dépendance ?
+
+Les **dépendances** sont des bibliothèques (des outils pré-fabriqués) dont l'application a besoin pour fonctionner.
+
+### Installer toutes les dépendances dans Antigravity
+
+1. **Ouvrez le terminal** dans Antigravity (en bas de l'écran, ou `Ctrl + ù`)
+
+2. **Tapez cette commande** et appuyez sur Entrée :
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+3. **Attendez** - L'installation prend **3 à 10 minutes**.
+
+   Vous verrez beaucoup de texte défiler, c'est normal :
+   ```
+   Collecting streamlit>=1.35.0
+     Downloading streamlit-1.35.0-py2.py3-none-any.whl (8.5 MB)
+   Collecting pandas>=2.0.0
+     ...
+   Successfully installed ...
+   ```
+
+4. **Vérifiez l'installation** en tapant :
+   ```bash
+   pip list | head -20
+   ```
+
+> **Note** : Dans Antigravity, Python est déjà installé et configuré. Pas besoin d'environnement virtuel !
+
+### Principales dépendances installées
+
+| Package | Rôle |
+|---------|------|
+| `streamlit` | Crée le tableau de bord interactif |
+| `pandas` | Manipule les données |
+| `jira` | Se connecte à votre Jira |
+| `duckdb` | Base de données locale ultra-rapide |
+| `lightgbm` | Intelligence artificielle pour les prédictions |
+| `google-generativeai` | Connexion à l'IA Gemini de Google |
+| `plotly` | Graphiques interactifs |
+
+---
+
+## 8. Étape 6 - Lancer l'application
 
 ### Initialiser la base de données
 
 Avant la première utilisation, initialisez la base de données :
 
-1. **Ouvrez un terminal** dans VS Code (`Terminal` → `New Terminal`)
+1. **Dans le terminal Antigravity** (en bas de l'écran)
 
-2. **Assurez-vous que l'environnement virtuel est activé** (vous voyez `(venv)`)
-
-3. **Tapez cette commande** :
+2. **Tapez cette commande** :
    ```bash
    jira-copilot init
    ```
@@ -760,13 +557,32 @@ streamlit run src/dashboard/app.py
      You can now view your Streamlit app in your browser.
 
      Local URL: http://localhost:8501
-     Network URL: http://192.168.1.XX:8501
 
    ```
 
-2. **Votre navigateur s'ouvre automatiquement** sur le dashboard
+2. **Dans Antigravity** : Une notification apparaît pour ouvrir l'aperçu web
 
-3. **Si le navigateur ne s'ouvre pas**, copiez l'URL `http://localhost:8501` et collez-la dans votre navigateur
+3. **Cliquez sur "Open in Browser"** ou **"Preview"** pour voir le dashboard
+
+4. **Alternative** : Antigravity peut afficher un onglet "Web Preview" à côté de votre code
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  🚀 Antigravity                                                         │
+├────────────────┬────────────────────────────────────────────────────────┤
+│                │  [Code]  [Web Preview]  ← Cliquez ici                 │
+│  📁 EXPLORER   │  ┌────────────────────────────────────────────────┐   │
+│                │  │  🏆 Jira AI Co-Pilot                           │   │
+│  ▼ nabda       │  │                                                │   │
+│    ▶ src/      │  │  Bienvenue !                                   │   │
+│    📄 .env     │  │  [Dashboard s'affiche ici]                     │   │
+│                │  │                                                │   │
+│                │  └────────────────────────────────────────────────┘   │
+├────────────────┴────────────────────────────────────────────────────────┤
+│  TERMINAL                                                               │
+│  streamlit run src/dashboard/app.py                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Aperçu du dashboard
 
@@ -795,7 +611,7 @@ Pour arrêter le dashboard :
 
 ---
 
-## 11. Utilisation du Dashboard
+## 9. Utilisation du Dashboard
 
 ### Navigation
 
@@ -876,7 +692,7 @@ Pour mettre à jour les données depuis Jira :
 
 ---
 
-## 12. Ajouter un nouveau module
+## 10. Ajouter un nouveau module
 
 ### Structure des modules
 
@@ -899,8 +715,8 @@ src/
 
 #### Étape 1 - Créer le fichier de logique
 
-1. **Dans VS Code**, faites un clic droit sur le dossier `src/features/`
-2. Sélectionnez **"New File"**
+1. **Dans Antigravity**, dans l'Explorer à gauche, faites un clic droit sur le dossier `src/features/`
+2. Sélectionnez **"New File"** (Nouveau fichier)
 3. Nommez-le : `quality_analyzer.py`
 4. Copiez ce contenu :
 
@@ -982,12 +798,12 @@ class QualityAnalyzer:
         return df[df['quality_score'] < threshold].sort_values('quality_score')
 ```
 
-5. **Sauvegardez** (`Ctrl + S`)
+5. **Sauvegardez** (`Ctrl + S` - Antigravity sauvegarde aussi automatiquement)
 
 #### Étape 2 - Créer la page du dashboard
 
-1. **Dans VS Code**, faites un clic droit sur le dossier `src/dashboard/pages/`
-2. Sélectionnez **"New File"**
+1. **Dans Antigravity**, faites un clic droit sur le dossier `src/dashboard/pages/`
+2. Sélectionnez **"New File"** (Nouveau fichier)
 3. Nommez-le : `25_📝_Quality_Analysis.py`
 
    > **Note** : Le numéro au début (25) détermine l'ordre dans le menu. L'emoji rend le menu plus visuel.
@@ -1140,27 +956,16 @@ with st.expander("💡 Comment améliorer la qualité des tickets ?"):
 
 ---
 
-## 13. Dépannage - Problèmes courants
-
-### Problème : "Python n'est pas reconnu"
-
-**Symptôme** : Le terminal affiche `'python' n'est pas reconnu comme commande interne`
-
-**Solutions** :
-1. Redémarrez votre ordinateur
-2. Réinstallez Python en cochant "Add to PATH"
-3. Sur Windows, essayez `py` au lieu de `python`
+## 11. Dépannage - Problèmes courants
 
 ### Problème : "Module not found"
 
 **Symptôme** : `ModuleNotFoundError: No module named 'streamlit'`
 
-**Solutions** :
-1. Vérifiez que l'environnement virtuel est activé (vous voyez `(venv)`)
-2. Réinstallez les dépendances :
-   ```bash
-   pip install -e ".[dev]"
-   ```
+**Solution dans Antigravity** :
+```bash
+pip install -e ".[dev]"
+```
 
 ### Problème : Erreur de connexion Jira
 
@@ -1169,30 +974,26 @@ with st.expander("💡 Comment améliorer la qualité des tickets ?"):
 **Solutions** :
 1. Vérifiez votre URL Jira (doit se terminer par `.atlassian.net`)
 2. Vérifiez que l'email est correct
-3. Régénérez un nouveau token API
+3. Régénérez un nouveau token API sur https://id.atlassian.com/manage-profile/security/api-tokens
 4. Vérifiez que vous avez accès au projet spécifié
 
-### Problème : Le dashboard ne s'ouvre pas
+### Problème : Le dashboard ne s'ouvre pas dans Antigravity
 
-**Symptôme** : Pas de fenêtre de navigateur après `streamlit run`
+**Symptôme** : Pas de preview après `streamlit run`
 
 **Solutions** :
-1. Ouvrez manuellement `http://localhost:8501` dans votre navigateur
-2. Vérifiez qu'aucun autre programme n'utilise le port 8501
-3. Essayez avec un port différent :
-   ```bash
-   streamlit run src/dashboard/app.py --server.port 8080
-   ```
+1. Cherchez la notification "Open Preview" dans Antigravity
+2. Cliquez sur l'onglet "Web Preview" en haut
+3. Si rien ne marche, utilisez le port forwarding d'Antigravity
 
-### Problème : "Permission denied" sur Mac/Linux
+### Problème : Le workspace Antigravity est lent
 
-**Symptôme** : Erreur de permission lors de l'exécution
+**Symptôme** : L'éditeur ou le terminal répond lentement
 
-**Solution** :
-```bash
-chmod +x venv/bin/activate
-source venv/bin/activate
-```
+**Solutions** :
+1. Fermez les autres onglets de navigateur
+2. Rafraîchissez la page (F5)
+3. Redémarrez le workspace (Menu → Restart Workspace)
 
 ### Problème : Erreur Google API
 
@@ -1208,38 +1009,46 @@ source venv/bin/activate
 **Symptôme** : Erreurs DuckDB ou données incohérentes
 
 **Solution** :
-1. Supprimez la base de données :
-   ```bash
-   rm data/jira.duckdb
-   ```
-2. Réinitialisez :
-   ```bash
-   jira-copilot init
-   jira-copilot sync full
-   ```
+```bash
+rm data/jira.duckdb
+jira-copilot init
+jira-copilot sync full
+```
+
+### Problème : Fichier .env non reconnu
+
+**Symptôme** : L'application ne trouve pas vos configurations
+
+**Solutions** :
+1. Vérifiez que le fichier s'appelle bien `.env` (avec le point au début)
+2. Vérifiez qu'il est à la racine du projet (pas dans un sous-dossier)
+3. Redémarrez le terminal dans Antigravity
 
 ---
 
-## 14. Glossaire
+## 12. Glossaire
 
 ### Termes généraux
 
 | Terme | Explication |
 |-------|-------------|
+| **Antigravity** | Éditeur de code cloud de Google, accessible via navigateur |
+| **Workspace** | Espace de travail dans Antigravity contenant votre projet |
 | **API** | Interface de programmation - permet à deux logiciels de communiquer |
 | **Token** | Clé secrète qui authentifie votre accès |
-| **Terminal** | Fenêtre pour taper des commandes textuelles |
+| **Terminal** | Zone pour taper des commandes textuelles (en bas d'Antigravity) |
 | **Dashboard** | Tableau de bord visuel |
 | **Dépendance** | Logiciel tiers dont l'application a besoin |
+| **Cloud** | Service accessible via internet, pas installé sur votre ordinateur |
 
 ### Termes Python
 
 | Terme | Explication |
 |-------|-------------|
 | **pip** | Gestionnaire de packages Python (installe les bibliothèques) |
-| **venv** | Environnement virtuel isolé |
 | **Module** | Fichier Python contenant du code réutilisable |
 | **Package** | Collection de modules |
+| **Streamlit** | Framework Python pour créer des dashboards web |
 
 ### Termes Jira
 
@@ -1280,40 +1089,81 @@ Si vous rencontrez un problème non couvert par ce guide :
 
 ---
 
-## Mémo des commandes
+## Mémo des commandes (à taper dans le terminal Antigravity)
 
 ```bash
-# Activer l'environnement virtuel
-# Windows PowerShell :
-.\venv\Scripts\Activate.ps1
+# ═══════════════════════════════════════════════════════════════
+# INSTALLATION (une seule fois)
+# ═══════════════════════════════════════════════════════════════
 
-# Windows CMD :
-venv\Scripts\activate.bat
+# Installer les dépendances
+pip install -e ".[dev]"
 
-# Mac/Linux :
-source venv/bin/activate
+# Initialiser la base de données
+jira-copilot init
 
-# Commandes principales
-jira-copilot init          # Initialiser la base de données
-jira-copilot sync full     # Synchroniser toutes les données Jira
-jira-copilot train         # Entraîner les modèles IA
-jira-copilot dashboard     # Lancer le tableau de bord
-jira-copilot status        # Vérifier l'état du système
+# ═══════════════════════════════════════════════════════════════
+# UTILISATION QUOTIDIENNE
+# ═══════════════════════════════════════════════════════════════
 
-# Lancer directement Streamlit
+# Synchroniser les données depuis Jira
+jira-copilot sync full
+
+# Entraîner les modèles IA (après sync)
+jira-copilot train
+
+# Lancer le tableau de bord
+jira-copilot dashboard
+# ou
 streamlit run src/dashboard/app.py
 
-# Arrêter l'application
+# Vérifier l'état du système
+jira-copilot status
+
+# ═══════════════════════════════════════════════════════════════
+# RACCOURCIS ANTIGRAVITY
+# ═══════════════════════════════════════════════════════════════
+
+# Ouvrir/fermer le terminal
+Ctrl + ù  (ou Ctrl + `)
+
+# Sauvegarder
+Ctrl + S
+
+# Arrêter une commande en cours
 Ctrl + C
+
+# Rechercher dans les fichiers
+Ctrl + Shift + F
 ```
 
 ---
 
-**Félicitations !** 🎉 Vous avez configuré avec succès Jira AI Co-Pilot !
+## Résumé rapide - Démarrage en 5 étapes
+
+| Étape | Action | Commande/URL |
+|-------|--------|--------------|
+| 1 | Ouvrir Antigravity | `https://antigravity.google/` |
+| 2 | Importer le projet | Import from GitHub |
+| 3 | Configurer `.env` | Copier `.env.example` → `.env` et remplir |
+| 4 | Installer | `pip install -e ".[dev]"` |
+| 5 | Lancer | `jira-copilot init && jira-copilot sync full && jira-copilot dashboard` |
+
+---
+
+**Félicitations !** Vous avez configuré avec succès Jira AI Co-Pilot !
 
 Si vous suivez ce guide étape par étape, vous aurez une application fonctionnelle qui analyse vos données Jira et vous aide à mieux gérer vos projets.
+
+### Besoin d'aide ?
+
+- **Documentation Antigravity** : https://antigravity.google/docs
+- **Documentation Streamlit** : https://docs.streamlit.io
+- **Créer un token Jira** : https://id.atlassian.com/manage-profile/security/api-tokens
+- **Créer une clé Gemini** : https://aistudio.google.com/app/apikey
 
 ---
 
 *Guide créé pour Jira AI Co-Pilot v0.1.0*
 *Dernière mise à jour : Janvier 2026*
+*Optimisé pour Google Antigravity*
